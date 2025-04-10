@@ -67,6 +67,15 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
+  const [configValues, setConfigValues] = useState({
+    flag_key: '',
+    error_metric_1: '',
+    latency_metric_1: '',
+    business_metric_1: '',
+    error_metric_enabled: true,
+    latency_metric_enabled: true,
+    business_metric_enabled: true
+  });
   const [resourceStatuses, setResourceStatuses] = useState({
     flag: { status: 'pending', message: '' },
     errorMetric: { status: 'pending', message: '' },
@@ -80,6 +89,46 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
     setLoading(false);
     setError(null);
     setResult(null);
+    
+    // Get the current form values directly from the form elements
+    const formElements = document.querySelectorAll('input[name], textarea[name]');
+    let currentConfig = {};
+    
+    // First get the saved config as a base
+    try {
+      const savedConfig = localStorage.getItem('ldConfig');
+      if (savedConfig) {
+        currentConfig = JSON.parse(savedConfig);
+      }
+      
+      // Update with latest values from the form
+      formElements.forEach(element => {
+        if (element.name) {
+          // Handle checkbox/switch inputs
+          if (element.type === 'checkbox') {
+            currentConfig[element.name] = element.checked;
+          } 
+          // Handle regular inputs
+          else {
+            currentConfig[element.name] = element.value;
+          }
+        }
+      });
+      
+      // Update display values with current form values
+      setConfigValues({
+        flag_key: currentConfig.flag_key || '',
+        error_metric_1: currentConfig.error_metric_1 || '',
+        latency_metric_1: currentConfig.latency_metric_1 || '',
+        business_metric_1: currentConfig.business_metric_1 || '',
+        error_metric_enabled: currentConfig.error_metric_enabled !== false,
+        latency_metric_enabled: currentConfig.latency_metric_enabled !== false,
+        business_metric_enabled: currentConfig.business_metric_enabled !== false
+      });
+    } catch (error) {
+      console.error('Error loading config values:', error);
+    }
+    
     setResourceStatuses({
       flag: { status: 'pending', message: '' },
       errorMetric: { status: 'pending', message: '' },
@@ -97,23 +146,49 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
     setError(null);
     
     try {
-      // Get current config from form via localStorage
+      // Get current form values directly from the DOM to ensure we have the latest values
+      // even if the user hasn't clicked Save in the ConfigForm
+      const formElements = document.querySelectorAll('input[name], textarea[name]');
+      let currentConfig = {};
+      
+      // First get the saved config as a base
       const savedConfig = localStorage.getItem('ldConfig');
-      if (!savedConfig) {
-        throw new Error('No configuration found. Please save your configuration first.');
+      if (savedConfig) {
+        currentConfig = JSON.parse(savedConfig);
       }
       
-      // Parse and validate config
-      let config = JSON.parse(savedConfig);
+      // Update config with latest values from form fields
+      formElements.forEach(element => {
+        if (element.name) {
+          // Handle checkbox/switch inputs
+          if (element.type === 'checkbox') {
+            currentConfig[element.name] = element.checked;
+          } 
+          // Handle regular inputs
+          else {
+            currentConfig[element.name] = element.value;
+          }
+        }
+      });
       
       // Basic validation
-      if (!config.sdk_key || !config.api_key || !config.project_key || !config.flag_key) {
+      if (!currentConfig.sdk_key || !currentConfig.api_key || !currentConfig.project_key || !currentConfig.flag_key) {
         throw new Error('All required fields must be filled');
       }
       
       // Process and save the configuration to ensure we have the latest values
-      // This helps synchronize with any form changes that might not have been saved yet
-      config = saveConfiguration(config);
+      currentConfig = saveConfiguration(currentConfig);
+      
+      // Update display values with the latest config
+      setConfigValues({
+        flag_key: currentConfig.flag_key || '',
+        error_metric_1: currentConfig.error_metric_1 || '',
+        latency_metric_1: currentConfig.latency_metric_1 || '',
+        business_metric_1: currentConfig.business_metric_1 || '',
+        error_metric_enabled: currentConfig.error_metric_enabled !== false,
+        latency_metric_enabled: currentConfig.latency_metric_enabled !== false,
+        business_metric_enabled: currentConfig.business_metric_enabled !== false
+      });
       
       // Update status for flag creation
       setResourceStatuses(prev => ({
@@ -121,8 +196,8 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
         flag: { status: 'loading', message: 'Creating flag...' }
       }));
       
-      // Create resources
-      const results = await createLaunchDarklyResources(config);
+      // Create resources - pass the entire configuration without altering metric keys
+      const results = await createLaunchDarklyResources(currentConfig);
       setResult(results);
       
       // Update statuses based on results
@@ -132,21 +207,21 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
           message: results.flag.error || 'Flag created successfully!'
         },
         errorMetric: { 
-          status: !config.error_metric_enabled ? 'disabled' : 
+          status: !currentConfig.error_metric_enabled ? 'disabled' : 
                   results.metrics.error?.error ? 'error' : 'success',
-          message: !config.error_metric_enabled ? 'Metric disabled' :
+          message: !currentConfig.error_metric_enabled ? 'Metric disabled' :
                    results.metrics.error?.error || 'Error metric created successfully!'
         },
         latencyMetric: { 
-          status: !config.latency_metric_enabled ? 'disabled' : 
+          status: !currentConfig.latency_metric_enabled ? 'disabled' : 
                   results.metrics.latency?.error ? 'error' : 'success',
-          message: !config.latency_metric_enabled ? 'Metric disabled' :
+          message: !currentConfig.latency_metric_enabled ? 'Metric disabled' :
                    results.metrics.latency?.error || 'Latency metric created successfully!'
         },
         businessMetric: { 
-          status: !config.business_metric_enabled ? 'disabled' : 
+          status: !currentConfig.business_metric_enabled ? 'disabled' : 
                   results.metrics.business?.error ? 'error' : 'success',
-          message: !config.business_metric_enabled ? 'Metric disabled' :
+          message: !currentConfig.business_metric_enabled ? 'Metric disabled' :
                    results.metrics.business?.error || 'Business metric created successfully!'
         }
       };
@@ -200,7 +275,7 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
         Create LaunchDarkly Resources
       </Button>
       
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={open} onClose={handleClose} maxWidth="md">
         <DialogTitle>Create LaunchDarkly Resources</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -213,7 +288,14 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
                 {getStatusIcon(resourceStatuses.flag.status)}
               </ListItemIcon>
               <ListItemText 
-                primary="Boolean Flag" 
+                primary={
+                  <Box display="flex" alignItems="center">
+                    <Typography fontWeight="bold" mr={1}>Boolean Flag:</Typography>
+                    <Typography color="info.main" fontFamily="monospace">
+                      {configValues.flag_key || 'Not set'}
+                    </Typography>
+                  </Box>
+                }
                 secondary={resourceStatuses.flag.status !== 'pending' ? resourceStatuses.flag.message : 'Pending creation'} 
               />
             </ListItem>
@@ -225,7 +307,16 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
                 {getStatusIcon(resourceStatuses.errorMetric.status)}
               </ListItemIcon>
               <ListItemText 
-                primary="Error Metric (lower is better)"
+                primary={
+                  <Box display="flex" alignItems="center" sx={{ opacity: configValues.error_metric_enabled ? 1 : 0.5 }}>
+                    <Typography fontWeight="bold" mr={1}>Error Metric (lower is better):</Typography>
+                    <Typography color="info.main" fontFamily="monospace">
+                      {configValues.error_metric_enabled 
+                        ? configValues.error_metric_1 || 'Not set'
+                        : 'Disabled'}
+                    </Typography>
+                  </Box>
+                }
                 secondary={resourceStatuses.errorMetric.status !== 'pending' ? resourceStatuses.errorMetric.message : 'Pending creation'} 
               />
             </ListItem>
@@ -237,7 +328,16 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
                 {getStatusIcon(resourceStatuses.latencyMetric.status)}
               </ListItemIcon>
               <ListItemText 
-                primary="Latency Metric (lower is better)"
+                primary={
+                  <Box display="flex" alignItems="center" sx={{ opacity: configValues.latency_metric_enabled ? 1 : 0.5 }}>
+                    <Typography fontWeight="bold" mr={1}>Latency Metric (lower is better):</Typography>
+                    <Typography color="info.main" fontFamily="monospace">
+                      {configValues.latency_metric_enabled 
+                        ? configValues.latency_metric_1 || 'Not set'
+                        : 'Disabled'}
+                    </Typography>
+                  </Box>
+                }
                 secondary={resourceStatuses.latencyMetric.status !== 'pending' ? resourceStatuses.latencyMetric.message : 'Pending creation'} 
               />
             </ListItem>
@@ -249,7 +349,16 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
                 {getStatusIcon(resourceStatuses.businessMetric.status)}
               </ListItemIcon>
               <ListItemText 
-                primary="Conversion Metric (higher is better)"
+                primary={
+                  <Box display="flex" alignItems="center" sx={{ opacity: configValues.business_metric_enabled ? 1 : 0.5 }}>
+                    <Typography fontWeight="bold" mr={1}>Conversion Metric (higher is better):</Typography>
+                    <Typography color="info.main" fontFamily="monospace">
+                      {configValues.business_metric_enabled 
+                        ? configValues.business_metric_1 || 'Not set'
+                        : 'Disabled'}
+                    </Typography>
+                  </Box>
+                }
                 secondary={resourceStatuses.businessMetric.status !== 'pending' ? resourceStatuses.businessMetric.message : 'Pending creation'} 
               />
             </ListItem>
