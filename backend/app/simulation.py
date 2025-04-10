@@ -109,6 +109,8 @@ def update_stats():
         simulation_status.stats.treatment.error_rate.count = treatment_error_total
         simulation_status.stats.treatment.error_rate.sum = treatment_error_count
         simulation_status.stats.treatment.error_rate.avg = (treatment_error_count / treatment_error_total) * 100 if treatment_error_total > 0 else 0
+        # Add debug message
+        print(f"DEBUG: Updated treatment error stats - total: {treatment_error_total}, count: {treatment_error_count}, avg: {simulation_status.stats.treatment.error_rate.avg}")
     
     # Business metrics
     if treatment_business_total > 0:
@@ -151,6 +153,7 @@ async def check_guarded_rollout() -> bool:
     config = active_clients.get("config")
     if not config:
         await send_log_to_clients("No configuration found")
+        simulation_status.guarded_rollout_active = False
         return False
         
     try:
@@ -174,6 +177,7 @@ async def check_guarded_rollout() -> bool:
                 rollout_type = experiment_allocation.get('type')
         
         is_active = rollout_type == 'measuredRollout'
+        simulation_status.guarded_rollout_active = is_active
         status_msg = "Guarded Rollout is active" if is_active else "Guarded Rollout is not active"
         await send_log_to_clients(status_msg)
         return is_active
@@ -181,16 +185,19 @@ async def check_guarded_rollout() -> bool:
     except requests.RequestException as e:
         error_msg = f"API request error: {str(e)}"
         simulation_status.last_error = error_msg
+        simulation_status.guarded_rollout_active = False
         await send_log_to_clients(error_msg)
         return False
     except json.JSONDecodeError as e:
         error_msg = f"Error parsing API response: {str(e)}"
         simulation_status.last_error = error_msg
+        simulation_status.guarded_rollout_active = False
         await send_log_to_clients(error_msg)
         return False
     except Exception as e:
         error_msg = f"Unexpected error checking rollout: {str(e)}"
         simulation_status.last_error = error_msg
+        simulation_status.guarded_rollout_active = False
         await send_log_to_clients(error_msg)
         return False
 
@@ -233,10 +240,16 @@ async def send_events(num_events: int = 1000):
                 # Treatment (true variation)
                 # Error metric tracking - only if enabled
                 treatment_error_total += 1
+                # Add debug
+                error_roll = random.randint(1, 100)
+                should_trigger = error_roll <= config.error_metric_1_true_converted
+                print(f"DEBUG: Treatment error check - roll: {error_roll}, threshold: {config.error_metric_1_true_converted}, will trigger: {should_trigger}")
+                
                 if error_enabled and error_chance(config.error_metric_1_true_converted):
                     client.track(config.error_metric_1, context)
                     treatment_error_count += 1
                     await send_log_to_clients(f"Tracking {config.error_metric_1} for treatment")
+                    print(f"DEBUG: Tracked treatment error - total: {treatment_error_total}, count: {treatment_error_count}")
                 elif not error_enabled:
                     await send_log_to_clients(f"Skipping {config.error_metric_1} tracking (disabled)")
                 
@@ -320,6 +333,7 @@ async def simulation_loop():
         else:
             await send_log_to_clients("Waiting for guarded rollout to become active...")
             await asyncio.sleep(5)  # Check again in 5 seconds
+            await send_status_to_clients()  # Send updated status with guarded_rollout_active flag
 
 async def start_simulation(config: LDConfig):
     """Start the simulation"""
@@ -351,6 +365,7 @@ async def start_simulation(config: LDConfig):
     simulation_status.running = True
     simulation_status.events_sent = 0
     simulation_status.last_error = None
+    simulation_status.guarded_rollout_active = False
     
     # Reset stats properly by importing and using SimulationStats instead of SimulationStatus
     simulation_status.stats = SimulationStats()

@@ -59,3 +59,4 @@ class SimulationStatus(BaseModel):
     events_sent: int = 0
     last_error: Optional[str] = None
     stats: SimulationStats = SimulationStats()
+    guarded_rollout_active: bool = False

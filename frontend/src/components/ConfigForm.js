@@ -231,8 +231,8 @@ const ConfigForm = ({ disabled }) => {
   };
   
   const titleStyle = {
-    fontSize: '0.9rem', 
-    fontWeight: 'medium',
+    fontSize: '1rem', 
+    fontWeight: 'bold',
     color: 'warning.main',
     flexShrink: 0
   };
@@ -240,22 +240,24 @@ const ConfigForm = ({ disabled }) => {
   const formLabelStyle = {
     margin: 0, 
     '& .MuiFormControlLabel-label': {
-      fontSize: '0.8rem'
+      fontSize: '0.875rem'
     }
   };
   
   return (
     <Box component="form" onSubmit={handleSubmit} noValidate sx={{ 
       '& .MuiTextField-root': { my: 0.5 },
-      '& .MuiFormHelperText-root': { margin: 0, fontSize: '0.7rem' }
+      '& .MuiFormHelperText-root': { margin: 0, fontSize: '0.75rem' },
+      '& .MuiInputLabel-root': { fontSize: '0.875rem' },
+      '& .MuiInputBase-input': { fontSize: '0.875rem' }
     }}>
-      {error && <Alert severity="error" sx={{ mb: 1, py: 0.5, fontSize: '0.8rem' }}>{error}</Alert>}
-      {success && <Alert severity="success" sx={{ mb: 1, py: 0.5, fontSize: '0.8rem' }}>{success}</Alert>}
+      {error && <Alert severity="error" sx={{ mb: 1, py: 0.5, fontSize: '0.875rem' }}>{error}</Alert>}
+      {success && <Alert severity="success" sx={{ mb: 1, py: 0.5, fontSize: '0.875rem' }}>{success}</Alert>}
       
       {/* Section 1: SDK key, API key, Project key, Flag key */}
       <Paper sx={sectionStyle}>
         <Box sx={headerStyle}>
-          <Typography variant="subtitle2" sx={titleStyle}>LaunchDarkly Connection</Typography>
+          <Typography variant="body1" sx={titleStyle}>LaunchDarkly Connection</Typography>
           <Divider sx={{ flex: 1, ml: 1 }} />
         </Box>
         
@@ -341,7 +343,7 @@ const ConfigForm = ({ disabled }) => {
             label=""
             sx={formLabelStyle}
           />
-          <Typography variant="subtitle2" sx={titleStyle}>Error Metric Configuration</Typography>
+          <Typography variant="body1" sx={titleStyle}>Error Metric Configuration</Typography>
           <Divider sx={{ flex: 1, ml: 1 }} />
         </Box>
         
@@ -421,7 +423,7 @@ const ConfigForm = ({ disabled }) => {
             label=""
             sx={formLabelStyle}
           />
-          <Typography variant="subtitle2" sx={titleStyle}>Latency Configuration</Typography>
+          <Typography variant="body1" sx={titleStyle}>Latency Configuration</Typography>
           <Divider sx={{ flex: 1, ml: 1 }} />
         </Box>
         
@@ -493,7 +495,7 @@ const ConfigForm = ({ disabled }) => {
             label=""
             sx={formLabelStyle}
           />
-          <Typography variant="subtitle2" sx={titleStyle}>Business Conversion Configuration</Typography>
+          <Typography variant="body1" sx={titleStyle}>Business Conversion Configuration</Typography>
           <Divider sx={{ flex: 1, ml: 1 }} />
         </Box>
         
