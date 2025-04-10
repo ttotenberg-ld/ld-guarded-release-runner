@@ -12,13 +12,14 @@ const api = axios.create({
 });
 
 // Helper function to make API requests via the proxy
-const makeProxyRequest = async (url, method, payload, api_key) => {
+const makeProxyRequest = async (url, method, payload, api_key, headers) => {
   try {
     const response = await api.post('/ld-api-proxy/proxy', {
       url,
       method,
       payload,
-      api_key
+      api_key,
+      headers
     });
     
     if (!response.data.success) {
@@ -65,7 +66,8 @@ export const createLaunchDarklyResources = async (config) => {
         error: null,
         latency: null,
         business: null
-      }
+      },
+      metricAttachment: null
     };
     
     // Create metrics based on toggles
@@ -79,6 +81,23 @@ export const createLaunchDarklyResources = async (config) => {
     
     if (config.business_metric_enabled) {
       results.metrics.business = await createBusinessMetric(config);
+    }
+    
+    // Collect metric keys that were successfully created
+    const metricKeys = [];
+    if (config.error_metric_enabled && !results.metrics.error?.error) {
+      metricKeys.push(config.error_metric_1);
+    }
+    if (config.latency_metric_enabled && !results.metrics.latency?.error) {
+      metricKeys.push(config.latency_metric_1);
+    }
+    if (config.business_metric_enabled && !results.metrics.business?.error) {
+      metricKeys.push(config.business_metric_1);
+    }
+    
+    // Attach metrics to flag if we have metrics to attach
+    if (metricKeys.length > 0 && !flagResponse.error) {
+      results.metricAttachment = await attachMetricsToFlag(config, metricKeys);
     }
     
     return results;
@@ -211,4 +230,27 @@ const createBusinessMetric = async (config) => {
   };
   
   return makeProxyRequest(url, 'post', payload, api_key);
+};
+
+/**
+ * Attaches metrics to the flag for measured rollout
+ * @param {Object} config - The configuration object
+ * @param {Array<string>} metricKeys - The metric keys to attach
+ * @returns {Promise<Object>} - The API response
+ */
+const attachMetricsToFlag = async (config, metricKeys) => {
+  const { api_key, project_key, flag_key } = config;
+  
+  const url = `https://app.launchdarkly.com/api/v2/projects/${project_key}/flags/${flag_key}/measured-rollout-configuration`;
+  
+  console.log('Attaching metrics to flag:', { url, metricKeys });
+  
+  const payload = {
+    metricKeys: metricKeys
+  };
+  
+  // Use makeProxyRequest with special beta API header
+  return makeProxyRequest(url, 'put', payload, api_key, {
+    'LD-API-Version': 'beta'
+  });
 }; 

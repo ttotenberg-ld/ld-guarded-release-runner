@@ -80,7 +80,8 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
     flag: { status: 'pending', message: '' },
     errorMetric: { status: 'pending', message: '' },
     latencyMetric: { status: 'pending', message: '' },
-    businessMetric: { status: 'pending', message: '' }
+    businessMetric: { status: 'pending', message: '' },
+    metricAttachment: { status: 'pending', message: '' }
   });
 
   const handleClickOpen = () => {
@@ -133,7 +134,8 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
       flag: { status: 'pending', message: '' },
       errorMetric: { status: 'pending', message: '' },
       latencyMetric: { status: 'pending', message: '' },
-      businessMetric: { status: 'pending', message: '' }
+      businessMetric: { status: 'pending', message: '' },
+      metricAttachment: { status: 'pending', message: '' }
     });
   };
 
@@ -223,6 +225,14 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
                   results.metrics.business?.error ? 'error' : 'success',
           message: !currentConfig.business_metric_enabled ? 'Metric disabled' :
                    results.metrics.business?.error || 'Business metric created successfully!'
+        },
+        metricAttachment: {
+          status: (!currentConfig.error_metric_enabled && !currentConfig.latency_metric_enabled && !currentConfig.business_metric_enabled) ? 'disabled' :
+                  results.metricAttachment?.error ? 'error' : 
+                  results.metricAttachment ? 'success' : 'pending',
+          message: (!currentConfig.error_metric_enabled && !currentConfig.latency_metric_enabled && !currentConfig.business_metric_enabled) ? 'No metrics to attach' :
+                   results.metricAttachment?.error ? results.metricAttachment.error : 
+                   results.metricAttachment ? 'Metrics attached to flag successfully!' : 'Pending...'
         }
       };
       
@@ -272,7 +282,7 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
         fullWidth
         sx={{ mt: 2 }}
       >
-        Create LaunchDarkly Resources
+        ✨ Auto-Create LaunchDarkly Resources ✨
       </Button>
       
       <Dialog open={open} onClose={handleClose} maxWidth="md">
@@ -360,6 +370,27 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
                   </Box>
                 }
                 secondary={resourceStatuses.businessMetric.status !== 'pending' ? resourceStatuses.businessMetric.message : 'Pending creation'} 
+              />
+            </ListItem>
+            
+            <Divider component="li" />
+            
+            <ListItem>
+              <ListItemIcon>
+                {getStatusIcon(resourceStatuses.metricAttachment.status)}
+              </ListItemIcon>
+              <ListItemText 
+                primary={
+                  <Box display="flex" alignItems="center">
+                    <Typography fontWeight="bold" mr={1}>Attach Metrics to Flag:</Typography>
+                    <Typography color="info.main" fontFamily="monospace">
+                      {(configValues.error_metric_enabled || configValues.latency_metric_enabled || configValues.business_metric_enabled) 
+                        ? 'Metrics will be attached to flag for measured rollout'
+                        : 'No metrics to attach'}
+                    </Typography>
+                  </Box>
+                }
+                secondary={resourceStatuses.metricAttachment.status !== 'pending' ? resourceStatuses.metricAttachment.message : 'Pending attachment'} 
               />
             </ListItem>
           </List>

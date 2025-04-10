@@ -12,6 +12,7 @@ class ProxyRequest(BaseModel):
     method: str
     payload: dict
     api_key: str
+    headers: dict = None
 
 @router.post("/proxy")
 async def proxy_launchdarkly_request(request: ProxyRequest):
@@ -25,7 +26,12 @@ async def proxy_launchdarkly_request(request: ProxyRequest):
             "Content-Type": "application/json"
         }
         
+        # Add any custom headers provided in the request
+        if request.headers:
+            headers.update(request.headers)
+        
         logger.info(f"Proxying request to LaunchDarkly: {request.method} {request.url}")
+        logger.info(f"Headers: {headers}")
         
         # Make the request
         async with httpx.AsyncClient() as client:
