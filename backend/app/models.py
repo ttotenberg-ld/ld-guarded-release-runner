@@ -4,18 +4,22 @@ import json
 
 class MetricStats(BaseModel):
     count: int = 0
-    sum: float = 0
-    avg: float = 0
+    sum: int = 0
+    avg: float = 0.0
 
 class VariationStats(BaseModel):
     error_rate: MetricStats = MetricStats()
     latency: MetricStats = MetricStats()
     business: MetricStats = MetricStats()
+    evaluations: int = 0  # Total flag evaluations
+    in_experiment: int = 0  # Flag evaluations that were in experiment
 
 class SimulationStats(BaseModel):
     control: VariationStats = VariationStats()
     treatment: VariationStats = VariationStats()
-    last_updated: float = 0  # timestamp of last update
+    last_updated: float = 0.0
+    last_updated_flag_evaluations: int = 0  # Timestamp of last flag evaluation update
+    last_updated_flag_evaluations_in_experiment: int = 0  # Flag evaluations in experiment at last update
 
 class LDConfig(BaseModel):
     sdk_key: str

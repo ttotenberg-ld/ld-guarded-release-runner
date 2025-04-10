@@ -32,7 +32,7 @@ const formatDuration = (seconds) => {
 
 // Stat display component for consistent styling
 const StatDisplay = ({ label, value, unit = '', color = 'warning.main', subtitle = null }) => (
-  <Box sx={{ textAlign: 'center', mb: 1.5, p: 0.75, borderRadius: 1, bgcolor: 'rgba(0, 0, 0, 0.05)' }}>
+  <Box sx={{ textAlign: 'center', mb: 1, p: 0.5, borderRadius: 1, bgcolor: 'rgba(0, 0, 0, 0.05)' }}>
     <Typography 
       variant="body2" 
       display="block" 
@@ -43,7 +43,7 @@ const StatDisplay = ({ label, value, unit = '', color = 'warning.main', subtitle
     <Typography 
       variant="h6" 
       color={color} 
-      sx={{ fontWeight: 'bold', lineHeight: 1.1, my: 0.5, fontSize: '1.125rem' }}
+      sx={{ fontWeight: 'bold', lineHeight: 1, my: 0.25, fontSize: '1.125rem' }}
     >
       {value}{unit}
     </Typography>
@@ -64,7 +64,9 @@ const formatStats = (stats) => {
   if (!stats) return { 
     errorEvents: 0,
     latencyEvents: 0,
-    conversionEvents: 0
+    conversionEvents: 0,
+    totalEvaluations: 0,
+    inExperiment: 0
   };
   
   return {
@@ -73,7 +75,10 @@ const formatStats = (stats) => {
     // For latency, .count is the number of events
     latencyEvents: stats.latency.count || 0,
     // For business/conversions, .sum is the actual conversion count
-    conversionEvents: stats.business.sum || 0
+    conversionEvents: stats.business.sum || 0,
+    // Evaluations statistics
+    totalEvaluations: stats.evaluations || 0,
+    inExperiment: stats.in_experiment || 0
   };
 };
 
@@ -88,7 +93,12 @@ const StatusPanel = ({ status }) => {
   useEffect(() => {
     let interval;
     
-    if (status.running && status.first_event_time) {
+    // Reset counter to 0 if simulation is running but no events have been sent yet
+    if (status.running && !status.first_event_time) {
+      setElapsedTime(0);
+    } 
+    // Start counting from first event time if available and running
+    else if (status.running && status.first_event_time) {
       // Initial calculation from first event time
       const initialElapsed = Math.floor(Date.now() / 1000 - status.first_event_time);
       setElapsedTime(initialElapsed);
@@ -98,14 +108,22 @@ const StatusPanel = ({ status }) => {
         const elapsed = Math.floor(Date.now() / 1000 - status.first_event_time);
         setElapsedTime(elapsed);
       }, 1000);
-    } else if (!status.running && status.first_event_time && status.end_time) {
+    } 
+    // Use end_time for completed simulations
+    else if (!status.running && status.first_event_time && status.end_time) {
       // If not running and we have both first event and end times, calculate final elapsed time
       const finalElapsed = Math.floor(status.end_time - status.first_event_time);
       setElapsedTime(finalElapsed);
-    } else if (status.first_event_time) {
+    } 
+    // Handle case where we have first_event_time but no end_time (unusual, but possible)
+    else if (status.first_event_time) {
       // If we only have first event time
       const currentElapsed = Math.floor(Date.now() / 1000 - status.first_event_time);
       setElapsedTime(currentElapsed);
+    }
+    // Reset counter when simulation has just started but no events have been sent
+    else if (status.running) {
+      setElapsedTime(0);
     }
     
     // Clean up interval
@@ -116,52 +134,15 @@ const StatusPanel = ({ status }) => {
 
   return (
     <Box>
-      {/* Events Sent Counter */}
-      <Paper 
-        variant="outlined" 
-        sx={{ 
-          p: 1.5, 
-          textAlign: 'center',
-          backgroundColor: 'rgba(255, 193, 7, 0.1)',
-          borderColor: 'warning.main',
-          mb: 2,
-          borderRadius: 1.5,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}
-      >
-        <Typography 
-          variant="body1" 
-          sx={{ 
-            fontWeight: 'bold', 
-            textTransform: 'uppercase', 
-            letterSpacing: 0.5, 
-            ml: 1,
-            fontSize: '1rem' 
-          }}
-        >
-          Events Sent
-        </Typography>
-        <Typography 
-          variant="h5" 
-          component="div" 
-          color="warning.main" 
-          sx={{ fontWeight: 'bold', mr: 1, fontSize: '1.5rem' }}
-        >
-          {status.events_sent.toLocaleString()}
-        </Typography>
-      </Paper>
-      
       {/* Guarded Rollout Status */}
       <Paper 
         variant="outlined" 
         sx={{ 
-          p: 1.5, 
+          p: 1.25, 
           textAlign: 'center',
           backgroundColor: status.guarded_rollout_active ? 'rgba(46, 125, 50, 0.1)' : 'rgba(211, 47, 47, 0.1)',
           borderColor: status.guarded_rollout_active ? 'success.main' : 'error.main',
-          mb: 2,
+          mb: 1.5,
           borderRadius: 1.5,
           display: 'flex',
           alignItems: 'center',
@@ -193,10 +174,10 @@ const StatusPanel = ({ status }) => {
       <Paper 
         variant="outlined" 
         sx={{ 
-          p: 1.5, 
+          p: 1.25, 
           backgroundColor: 'rgba(255, 255, 255, 0.05)',
           borderColor: 'divider',
-          mb: 2,
+          mb: 1.5,
           borderRadius: 1.5
         }}
       >
@@ -204,37 +185,92 @@ const StatusPanel = ({ status }) => {
           variant="body1" 
           sx={{ 
             fontWeight: 'bold', 
-            mb: 1.5, 
+            mb: 1, 
             fontSize: '1rem'
           }}
         >
           Timing Information
         </Typography>
         
-        <Grid container spacing={1.5}>
+        <Grid container spacing={1}>
           <Grid item xs={12} md={4}>
-            <Box sx={{ textAlign: 'center', p: 0.75, borderRadius: 1, bgcolor: 'rgba(0, 0, 0, 0.05)' }}>
+            <Box sx={{ textAlign: 'center', p: 0.5, borderRadius: 1, bgcolor: 'rgba(0, 0, 0, 0.05)' }}>
               <Typography variant="body2" sx={{ fontWeight: 'medium' }}>First Event At</Typography>
-              <Typography variant="body1" color="text.primary" sx={{ fontWeight: 'bold', mt: 0.5 }}>
+              <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 'bold', mt: 0.25 }}>
                 {formatTime(status.first_event_time)}
               </Typography>
             </Box>
           </Grid>
           
           <Grid item xs={12} md={4}>
-            <Box sx={{ textAlign: 'center', p: 0.75, borderRadius: 1, bgcolor: 'rgba(0, 0, 0, 0.05)' }}>
+            <Box sx={{ textAlign: 'center', p: 0.5, borderRadius: 1, bgcolor: 'rgba(0, 0, 0, 0.05)' }}>
               <Typography variant="body2" sx={{ fontWeight: 'medium' }}>Running For</Typography>
-              <Typography variant="body1" color={status.running ? 'success.main' : 'text.primary'} sx={{ fontWeight: 'bold', mt: 0.5 }}>
-                {formatDuration(elapsedTime)}
+              <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 'bold', mt: 0.25 }}>
+                {status.running && !status.first_event_time ? 'Waiting...' : formatDuration(elapsedTime)}
               </Typography>
             </Box>
           </Grid>
           
           <Grid item xs={12} md={4}>
-            <Box sx={{ textAlign: 'center', p: 0.75, borderRadius: 1, bgcolor: 'rgba(0, 0, 0, 0.05)' }}>
+            <Box sx={{ textAlign: 'center', p: 0.5, borderRadius: 1, bgcolor: 'rgba(0, 0, 0, 0.05)' }}>
               <Typography variant="body2" sx={{ fontWeight: 'medium' }}>Ended At</Typography>
-              <Typography variant="body1" color={!status.running && status.end_time ? 'error.main' : 'text.secondary'} sx={{ fontWeight: 'bold', mt: 0.5 }}>
-                {status.running ? 'Running...' : formatTime(status.end_time)}
+              <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 'bold', mt: 0.25 }}>
+                {status.running ? 'Waiting...' : formatTime(status.end_time)}
+              </Typography>
+            </Box>
+          </Grid>
+        </Grid>
+      </Paper>
+      
+      {/* Flag Evaluations Section */}
+      <Paper 
+        variant="outlined" 
+        sx={{ 
+          p: 1.25, 
+          backgroundColor: 'rgba(255, 255, 255, 0.05)',
+          borderColor: 'divider',
+          mb: 1.5,
+          borderRadius: 1.5
+        }}
+      >
+        <Typography 
+          variant="body1" 
+          sx={{ 
+            fontWeight: 'bold', 
+            mb: 1, 
+            fontSize: '1rem'
+          }}
+        >
+          Flag Evaluations
+        </Typography>
+        
+        <Grid container spacing={1}>
+          {/* Total Evaluations */}
+          <Grid item xs={12} md={4}>
+            <Box sx={{ textAlign: 'center', p: 0.5, borderRadius: 1, bgcolor: 'rgba(0, 0, 0, 0.05)' }}>
+              <Typography variant="body2" sx={{ fontWeight: 'medium' }}>Total Evaluations</Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 'bold', mt: 0.25 }}>
+                {(controlStats.totalEvaluations + treatmentStats.totalEvaluations).toLocaleString()}
+              </Typography>
+            </Box>
+          </Grid>
+          
+          {/* Control In Experiment */}
+          <Grid item xs={12} md={4}>
+            <Box sx={{ textAlign: 'center', p: 0.5, borderRadius: 1, bgcolor: 'rgba(0, 0, 0, 0.05)' }}>
+              <Typography variant="body2" sx={{ fontWeight: 'medium' }}>Control In Experiment</Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 'bold', mt: 0.25 }}>
+                {controlStats.inExperiment.toLocaleString()}
+              </Typography>
+            </Box>
+          </Grid>
+          
+          {/* Treatment In Experiment */}
+          <Grid item xs={12} md={4}>
+            <Box sx={{ textAlign: 'center', p: 0.5, borderRadius: 1, bgcolor: 'rgba(0, 0, 0, 0.05)' }}>
+              <Typography variant="body2" sx={{ fontWeight: 'medium' }}>Treatment In Experiment</Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 'bold', mt: 0.25 }}>
+                {treatmentStats.inExperiment.toLocaleString()}
               </Typography>
             </Box>
           </Grid>
@@ -245,7 +281,7 @@ const StatusPanel = ({ status }) => {
       <Paper 
         variant="outlined" 
         sx={{ 
-          p: 2, 
+          p: 1.25, 
           backgroundColor: 'rgba(255, 255, 255, 0.05)',
           borderColor: 'divider',
           borderRadius: 1.5
@@ -255,48 +291,54 @@ const StatusPanel = ({ status }) => {
           variant="body1" 
           sx={{ 
             fontWeight: 'bold', 
-            mb: 1.5, 
+            mb: 1, 
             fontSize: '1rem'
           }}
         >
-          Aggregated Statistics
+          Aggregated Events
         </Typography>
         
-        <Grid container spacing={1.5}>
+        <Grid container spacing={1}>
           {/* Control Group */}
           <Grid item xs={12} md={6}>
             <Card variant="outlined" sx={{ backgroundColor: 'rgba(0, 0, 0, 0.1)', height: '100%' }}>
-              <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
+              <CardContent sx={{ p: 1, '&:last-child': { pb: 1 } }}>
                 <Typography 
                   variant="body1" 
                   sx={{ 
                     fontWeight: 'bold', 
                     color: 'text.primary', 
-                    mb: 1,
+                    mb: 0.5,
                     fontSize: '1rem'
                   }}
                 >
                   Control Group
                 </Typography>
-                <Divider sx={{ mb: 1.5 }} />
+                <Divider sx={{ mb: 1 }} />
                 
-                <StatDisplay 
-                  label="Error Events" 
-                  value={controlStats.errorEvents} 
-                  color="error.main"
-                />
-                
-                <StatDisplay 
-                  label="Latency Events" 
-                  value={controlStats.latencyEvents} 
-                  color="warning.main"
-                />
-                
-                <StatDisplay 
-                  label="Conversion Events" 
-                  value={controlStats.conversionEvents} 
-                  color="success.main"
-                />
+                <Grid container spacing={1}>
+                  <Grid item xs={4}>
+                    <StatDisplay 
+                      label="Error Events" 
+                      value={controlStats.errorEvents} 
+                      color="error.main"
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <StatDisplay 
+                      label="Latency Events" 
+                      value={controlStats.latencyEvents} 
+                      color="warning.main"
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <StatDisplay 
+                      label="Conversion Events" 
+                      value={controlStats.conversionEvents} 
+                      color="success.main"
+                    />
+                  </Grid>
+                </Grid>
               </CardContent>
             </Card>
           </Grid>
@@ -304,37 +346,43 @@ const StatusPanel = ({ status }) => {
           {/* Treatment Group */}
           <Grid item xs={12} md={6}>
             <Card variant="outlined" sx={{ backgroundColor: 'rgba(0, 0, 0, 0.1)', height: '100%' }}>
-              <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
+              <CardContent sx={{ p: 1, '&:last-child': { pb: 1 } }}>
                 <Typography 
                   variant="body1" 
                   sx={{ 
                     fontWeight: 'bold', 
                     color: 'text.primary', 
-                    mb: 1,
+                    mb: 0.5,
                     fontSize: '1rem'
                   }}
                 >
                   Treatment Group
                 </Typography>
-                <Divider sx={{ mb: 1.5 }} />
+                <Divider sx={{ mb: 1 }} />
                 
-                <StatDisplay 
-                  label="Error Events" 
-                  value={treatmentStats.errorEvents} 
-                  color="error.main"
-                />
-                
-                <StatDisplay 
-                  label="Latency Events" 
-                  value={treatmentStats.latencyEvents}
-                  color="warning.main" 
-                />
-                
-                <StatDisplay 
-                  label="Conversion Events" 
-                  value={treatmentStats.conversionEvents} 
-                  color="success.main"
-                />
+                <Grid container spacing={1}>
+                  <Grid item xs={4}>
+                    <StatDisplay 
+                      label="Error Events" 
+                      value={treatmentStats.errorEvents} 
+                      color="error.main"
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <StatDisplay 
+                      label="Latency Events" 
+                      value={treatmentStats.latencyEvents}
+                      color="warning.main" 
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <StatDisplay 
+                      label="Conversion Events" 
+                      value={treatmentStats.conversionEvents} 
+                      color="success.main"
+                    />
+                  </Grid>
+                </Grid>
               </CardContent>
             </Card>
           </Grid>
@@ -346,10 +394,10 @@ const StatusPanel = ({ status }) => {
         <Paper 
           variant="outlined" 
           sx={{ 
-            p: 1.5, 
+            p: 1.25, 
             backgroundColor: 'rgba(211, 47, 47, 0.1)',
             borderColor: 'error.main',
-            mt: 2,
+            mt: 1.5,
             borderRadius: 1.5
           }}
         >
@@ -358,7 +406,7 @@ const StatusPanel = ({ status }) => {
             sx={{ 
               fontWeight: 'bold', 
               color: 'error.main', 
-              mb: 0.5,
+              mb: 0.25,
               fontSize: '1rem'
             }}
           >

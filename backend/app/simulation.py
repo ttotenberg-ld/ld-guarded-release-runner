@@ -177,6 +177,14 @@ async def check_guarded_rollout() -> bool:
                 rollout_type = experiment_allocation.get('type')
         
         is_active = rollout_type == 'measuredRollout'
+        
+        # Check if the rollout status changed from active to inactive
+        if simulation_status.guarded_rollout_active and not is_active and simulation_status.running:
+            # The rollout just became inactive, but the simulation is still running
+            simulation_status.end_time = time.time()
+            await send_log_to_clients("Guarded rollout became inactive - recording end time")
+        
+        # Update the status
         simulation_status.guarded_rollout_active = is_active
         status_msg = "Guarded Rollout is active" if is_active else "Guarded Rollout is not active"
         await send_log_to_clients(status_msg)
@@ -222,12 +230,8 @@ async def send_events(num_events: int = 1000):
     # Log again for debugging
     await send_log_to_clients(f"DEBUG - At send_events: Latency toggle: {latency_enabled} (type: {type(latency_enabled).__name__})")
     
-    # Record first event time if not set yet
-    if simulation_status.first_event_time is None:
-        simulation_status.first_event_time = time.time()
-        await send_log_to_clients(f"First event sent at: {time.strftime('%H:%M:%S', time.localtime(simulation_status.first_event_time))}")
-    
     events_sent = 0
+    first_event_tracked = False
     
     for i in range(num_events):
         if not simulation_status.running:
@@ -235,12 +239,43 @@ async def send_events(num_events: int = 1000):
             
         try:
             context = create_multi_context()
-            flag_variation = client.variation(config.flag_key, context, False)
+            flag_variation_detail = client.variation_detail(config.flag_key, context, False)
+            flag_variation = flag_variation_detail.value
             
+            # Check if this user is part of an experiment
+            in_experiment = False
+            reason = flag_variation_detail.reason
+            if reason and isinstance(reason, dict) and reason.get('inExperiment') is True:
+                in_experiment = True
+            
+            # Update evaluation counters
+            if flag_variation:
+                # Treatment group
+                simulation_status.stats.treatment.evaluations += 1
+                if in_experiment:
+                    simulation_status.stats.treatment.in_experiment += 1
+            else:
+                # Control group
+                simulation_status.stats.control.evaluations += 1
+                if in_experiment:
+                    simulation_status.stats.control.in_experiment += 1
+                    
             # Use control/treatment terminology in logs
             variation_str = "treatment" if flag_variation else "control"
-            await send_log_to_clients(f"Executing {variation_str}")
+            experiment_str = "in experiment" if in_experiment else "not in experiment"
+            await send_log_to_clients(f"Executing {variation_str} ({experiment_str})")
             
+            # Only send events if the user is part of an experiment
+            if not in_experiment:
+                await send_log_to_clients("Skipping event tracking - user not in experiment")
+                continue
+            
+            # Record first event time if not set yet and this is our first actual event
+            if simulation_status.first_event_time is None:
+                simulation_status.first_event_time = time.time()
+                await send_log_to_clients(f"First event sent at: {time.strftime('%H:%M:%S', time.localtime(simulation_status.first_event_time))}")
+                first_event_tracked = True
+                
             if flag_variation:
                 # Treatment (true variation)
                 # Error metric tracking - only if enabled
@@ -330,8 +365,19 @@ async def send_events(num_events: int = 1000):
 
 async def simulation_loop():
     """Main simulation loop"""
+    was_active = False
+    
     while simulation_status.running:
         is_active = await check_guarded_rollout()
+        
+        # Check if rollout went from active to inactive
+        if was_active and not is_active:
+            await send_log_to_clients("Guarded rollout became inactive - stopping simulation")
+            await stop_simulation()
+            break
+            
+        # Record current active state for next loop
+        was_active = is_active
         
         if is_active:
             await send_events(100)  # Send batches of 100 for better control
@@ -374,7 +420,7 @@ async def start_simulation(config: LDConfig):
     simulation_status.first_event_time = None
     simulation_status.end_time = None
     
-    # Reset stats properly by importing and using SimulationStats instead of SimulationStatus
+    # Reset stats properly by creating a new SimulationStats instance
     simulation_status.stats = SimulationStats()
     
     # Start simulation in background
@@ -388,9 +434,12 @@ async def stop_simulation():
         await send_log_to_clients("No simulation running")
         return
     
-    # Set end time
-    simulation_status.end_time = time.time()
-    await send_log_to_clients(f"Simulation ended at: {time.strftime('%H:%M:%S', time.localtime(simulation_status.end_time))}")
+    # Set end time only if not already set by the guarded rollout check
+    if not simulation_status.end_time:
+        simulation_status.end_time = time.time()
+        await send_log_to_clients(f"Simulation ended at: {time.strftime('%H:%M:%S', time.localtime(simulation_status.end_time))}")
+    else:
+        await send_log_to_clients(f"Simulation already ended at: {time.strftime('%H:%M:%S', time.localtime(simulation_status.end_time))}")
     
     # Calculate run time if the simulation had events sent
     if simulation_status.first_event_time:
