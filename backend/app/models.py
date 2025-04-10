@@ -2,6 +2,21 @@ from pydantic import BaseModel, validator, field_validator
 from typing import List, Optional, Union, Dict, Any
 import json
 
+class MetricStats(BaseModel):
+    count: int = 0
+    sum: float = 0
+    avg: float = 0
+
+class VariationStats(BaseModel):
+    error_rate: MetricStats = MetricStats()
+    latency: MetricStats = MetricStats()
+    business: MetricStats = MetricStats()
+
+class SimulationStats(BaseModel):
+    control: VariationStats = VariationStats()
+    treatment: VariationStats = VariationStats()
+    last_updated: float = 0  # timestamp of last update
+
 class LDConfig(BaseModel):
     sdk_key: str
     api_key: str
@@ -43,3 +58,4 @@ class SimulationStatus(BaseModel):
     running: bool
     events_sent: int = 0
     last_error: Optional[str] = None
+    stats: SimulationStats = SimulationStats()
