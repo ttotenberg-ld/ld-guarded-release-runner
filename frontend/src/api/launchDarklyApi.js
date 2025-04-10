@@ -22,12 +22,9 @@ const makeProxyRequest = async (url, method, payload, api_key, headers) => {
       headers
     });
     
-    console.log('Proxy response:', response.data);
-    
     // Check if the status code indicates success (2xx) even if success flag is false
     if (response.data.status_code >= 200 && response.data.status_code < 300) {
       // This is a successful response regardless of the success flag
-      console.log('Found successful status code despite success flag:', response.data.status_code);
       return {
         ...response.data.data,
         status_code: response.data.status_code,
@@ -265,8 +262,6 @@ const attachMetricsToFlag = async (config, metricKeys) => {
   
   const url = `https://app.launchdarkly.com/api/v2/projects/${project_key}/flags/${flag_key}/measured-rollout-configuration`;
   
-  console.log('Attaching metrics to flag:', { url, metricKeys });
-  
   const payload = {
     metricKeys: metricKeys
   };
@@ -276,11 +271,8 @@ const attachMetricsToFlag = async (config, metricKeys) => {
     'LD-API-Version': 'beta'
   });
   
-  console.log('Metric attachment raw response:', response);
-  
   // Add explicit check for 200 status code in raw_response
   if (response && response.raw_response && response.raw_response.status_code === 200) {
-    console.log('Detected 200 status code in raw_response');
     return {
       success: true,
       message: 'Metrics successfully attached to flag',

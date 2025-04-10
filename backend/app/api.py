@@ -31,7 +31,6 @@ async def proxy_launchdarkly_request(request: ProxyRequest):
             headers.update(request.headers)
         
         logger.info(f"Proxying request to LaunchDarkly: {request.method} {request.url}")
-        logger.info(f"Headers: {headers}")
         
         # Make the request
         async with httpx.AsyncClient() as client:
@@ -74,7 +73,6 @@ async def proxy_launchdarkly_request(request: ProxyRequest):
         }
         
         logger.info(f"Response status code: {response.status_code}")
-        logger.info(f"Response success: {response.status_code < 400}")
         
         return response_data
     except httpx.RequestError as e:

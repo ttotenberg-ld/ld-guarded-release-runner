@@ -201,9 +201,6 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
       // Create resources - pass the entire configuration without altering metric keys
       const results = await createLaunchDarklyResources(currentConfig);
       
-      console.log('Resource creation results:', results);
-      console.log('Metric attachment result structure:', results.metricAttachment);
-      
       // Update metrics attachment status to loading
       if (results && !results.flag.error && 
           (currentConfig.error_metric_enabled || 
@@ -308,8 +305,6 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
       return 'Error: No response from attachment process';
     }
     
-    console.log('Getting message for attachment result:', attachResult);
-    
     // Success cases
     if (attachResult.success) {
       if (attachResult.message) {
@@ -350,8 +345,6 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
 
   // Add the new helper function for determining metric attachment status
   const getMetricAttachmentStatus = (config, attachResult) => {
-    console.log('Determining attachment status for:', attachResult);
-    
     // No metrics enabled
     if (!config.error_metric_enabled && !config.latency_metric_enabled && !config.business_metric_enabled) {
       return 'disabled';
