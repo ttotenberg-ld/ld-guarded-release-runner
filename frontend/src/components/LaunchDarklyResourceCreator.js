@@ -29,7 +29,7 @@ const saveConfiguration = (currentConfig) => {
         }
       } else if (!Array.isArray(submissionConfig[rangeKey])) {
         // If it's neither a string nor an array, default to the placeholder values
-        submissionConfig[rangeKey] = rangeKey.includes('false') ? [50, 100] : [75, 125];
+        submissionConfig[rangeKey] = rangeKey.includes('false') ? [50, 125] : [52, 131];
       }
     });
     

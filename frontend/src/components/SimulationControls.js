@@ -56,13 +56,13 @@ const SimulationControls = ({ running, connected }) => {
             if (validValues.length === 2) {
               currentConfig[rangeKey] = validValues;
             } else {
-              currentConfig[rangeKey] = rangeKey.includes('false') ? [50, 100] : [75, 125];
+              currentConfig[rangeKey] = rangeKey.includes('false') ? [50, 125] : [52, 131];
             }
           } catch (err) {
-            currentConfig[rangeKey] = rangeKey.includes('false') ? [50, 100] : [75, 125];
+            currentConfig[rangeKey] = rangeKey.includes('false') ? [50, 125] : [52, 131];
           }
         } else if (!Array.isArray(currentConfig[rangeKey])) {
-          currentConfig[rangeKey] = rangeKey.includes('false') ? [50, 100] : [75, 125];
+          currentConfig[rangeKey] = rangeKey.includes('false') ? [50, 125] : [52, 131];
         }
       });
       

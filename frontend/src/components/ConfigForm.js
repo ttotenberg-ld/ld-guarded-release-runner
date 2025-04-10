@@ -12,13 +12,13 @@ const DEFAULT_CONFIG = {
   flag_key: '',
   latency_metric_1: 'latency',
   error_metric_1: 'error-rate',
-  business_metric_1: 'conversion',
-  latency_metric_1_false_range: [50, 100],
-  latency_metric_1_true_range: [75, 125],
-  error_metric_1_false_converted: 5,
-  error_metric_1_true_converted: 10,
-  business_metric_1_false_converted: 10,
-  business_metric_1_true_converted: 15,
+  business_metric_1: 'payment-success',
+  latency_metric_1_false_range: [50, 125],
+  latency_metric_1_true_range: [52, 131],
+  error_metric_1_false_converted: 2,
+  error_metric_1_true_converted: 3,
+  business_metric_1_false_converted: 99,
+  business_metric_1_true_converted: 98,
   error_metric_enabled: true,
   latency_metric_enabled: true,
   business_metric_enabled: true
@@ -41,13 +41,13 @@ const ConfigForm = ({ disabled }) => {
               if (validValues.length === 2) {
                 parsedConfig[rangeKey] = validValues;
               } else {
-                parsedConfig[rangeKey] = rangeKey.includes('false') ? [50, 100] : [75, 125];
+                parsedConfig[rangeKey] = rangeKey.includes('false') ? [50, 125] : [52, 131];
               }
             } catch (err) {
-              parsedConfig[rangeKey] = rangeKey.includes('false') ? [50, 100] : [75, 125];
+              parsedConfig[rangeKey] = rangeKey.includes('false') ? [50, 125] : [52, 131];
             }
           } else if (!Array.isArray(parsedConfig[rangeKey])) {
-            parsedConfig[rangeKey] = rangeKey.includes('false') ? [50, 100] : [75, 125];
+            parsedConfig[rangeKey] = rangeKey.includes('false') ? [50, 125] : [52, 131];
           }
         });
         
@@ -125,10 +125,10 @@ const ConfigForm = ({ disabled }) => {
           if (validValues.length === 2) {
             submissionConfig[rangeKey] = validValues;
           } else {
-            submissionConfig[rangeKey] = rangeKey.includes('false') ? [50, 100] : [75, 125];
+            submissionConfig[rangeKey] = rangeKey.includes('false') ? [50, 125] : [52, 131];
           }
         } catch (err) {
-          submissionConfig[rangeKey] = rangeKey.includes('false') ? [50, 100] : [75, 125];
+          submissionConfig[rangeKey] = rangeKey.includes('false') ? [50, 125] : [52, 131];
         }
       }
     });
@@ -175,7 +175,7 @@ const ConfigForm = ({ disabled }) => {
           }
         } else if (!Array.isArray(submissionConfig[rangeKey])) {
           // If it's neither a string nor an array, default to the placeholder values
-          submissionConfig[rangeKey] = rangeKey.includes('false') ? [50, 100] : [75, 125];
+          submissionConfig[rangeKey] = rangeKey.includes('false') ? [50, 125] : [52, 131];
         }
       });
       
