@@ -200,6 +200,21 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
       
       // Create resources - pass the entire configuration without altering metric keys
       const results = await createLaunchDarklyResources(currentConfig);
+      
+      console.log('Resource creation results:', results);
+      console.log('Metric attachment result structure:', results.metricAttachment);
+      
+      // Update metrics attachment status to loading
+      if (results && !results.flag.error && 
+          (currentConfig.error_metric_enabled || 
+           currentConfig.latency_metric_enabled || 
+           currentConfig.business_metric_enabled)) {
+        setResourceStatuses(prev => ({
+          ...prev,
+          metricAttachment: { status: 'loading', message: 'Attaching metrics to flag...' }
+        }));
+      }
+      
       setResult(results);
       
       // Update statuses based on results
@@ -227,12 +242,8 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
                    results.metrics.business?.error || 'Business metric created successfully!'
         },
         metricAttachment: {
-          status: (!currentConfig.error_metric_enabled && !currentConfig.latency_metric_enabled && !currentConfig.business_metric_enabled) ? 'disabled' :
-                  results.metricAttachment?.error ? 'error' : 
-                  results.metricAttachment ? 'success' : 'pending',
-          message: (!currentConfig.error_metric_enabled && !currentConfig.latency_metric_enabled && !currentConfig.business_metric_enabled) ? 'No metrics to attach' :
-                   results.metricAttachment?.error ? results.metricAttachment.error : 
-                   results.metricAttachment ? 'Metrics attached to flag successfully!' : 'Pending...'
+          status: getMetricAttachmentStatus(currentConfig, results.metricAttachment),
+          message: getMetricAttachmentMessage(currentConfig, results.metricAttachment)
         }
       };
       
@@ -270,6 +281,114 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
       default:
         return <PendingIcon color="disabled" />;
     }
+  };
+
+  // Helper to format the metrics that will be attached
+  const getMetricKeysString = (values) => {
+    const metrics = [];
+    if (values.error_metric_enabled && values.error_metric_1) metrics.push(`"${values.error_metric_1}"`);
+    if (values.latency_metric_enabled && values.latency_metric_1) metrics.push(`"${values.latency_metric_1}"`);
+    if (values.business_metric_enabled && values.business_metric_1) metrics.push(`"${values.business_metric_1}"`);
+    
+    if (metrics.length === 0) return 'No metrics';
+    if (metrics.length === 1) return metrics[0];
+    if (metrics.length === 2) return `${metrics[0]} and ${metrics[1]}`;
+    return `${metrics.slice(0, -1).join(', ')}, and ${metrics[metrics.length - 1]}`;
+  };
+
+  // Add a helper function above handleCreate
+  const getMetricAttachmentMessage = (config, attachResult) => {
+    // No metrics enabled
+    if (!config.error_metric_enabled && !config.latency_metric_enabled && !config.business_metric_enabled) {
+      return 'No metrics to attach';
+    }
+    
+    // No response at all
+    if (!attachResult) {
+      return 'Error: No response from attachment process';
+    }
+    
+    console.log('Getting message for attachment result:', attachResult);
+    
+    // Success cases
+    if (attachResult.success) {
+      if (attachResult.message) {
+        return attachResult.message;
+      }
+      if (attachResult.metricKeys && attachResult.metricKeys.length > 0) {
+        return `Attached ${attachResult.metricKeys.length} metrics to flag: ${attachResult.metricKeys.join(', ')}`;
+      }
+      return 'Metrics attached to flag successfully!';
+    }
+    
+    // Error with success status code (sometimes happens with 200 responses)
+    if (attachResult.error && (
+      attachResult.status_code === 200 || 
+      (attachResult.raw_response && attachResult.raw_response.status_code === 200) ||
+      attachResult.error.includes('200')
+    )) {
+      return 'Metrics successfully attached (or already attached) to flag';
+    }
+    
+    // Resource already exists error (409)
+    if (attachResult.error && (
+      attachResult.status_code === 409 || 
+      attachResult.error.includes('409') ||
+      attachResult.error.includes('already exists')
+    )) {
+      return 'Metrics are already attached to this flag';
+    }
+    
+    // General error case
+    if (attachResult.error) {
+      return attachResult.error;
+    }
+    
+    // Fallback
+    return 'Processing attachment request...';
+  };
+
+  // Add the new helper function for determining metric attachment status
+  const getMetricAttachmentStatus = (config, attachResult) => {
+    console.log('Determining attachment status for:', attachResult);
+    
+    // No metrics enabled
+    if (!config.error_metric_enabled && !config.latency_metric_enabled && !config.business_metric_enabled) {
+      return 'disabled';
+    }
+    
+    // No response at all
+    if (!attachResult) {
+      return 'pending';
+    }
+    
+    // Success is explicitly set
+    if (attachResult.success) {
+      return 'success';
+    }
+    
+    // Error with success code (200)
+    if (attachResult.raw_response && attachResult.raw_response.status_code === 200) {
+      return 'success';
+    }
+    
+    if (attachResult.status_code === 200) {
+      return 'success';
+    }
+    
+    // Conflict/already exists (409)
+    if (attachResult.status_code === 409 || 
+       (attachResult.error && attachResult.error.includes('409'))) {
+      return 'success';
+    }
+    
+    // Genuine error
+    if (attachResult.error && !attachResult.success) {
+      return 'error';
+    }
+    
+    // Default fallback
+    return 'pending';
   };
 
   return (
@@ -386,12 +505,18 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
                     <Typography fontWeight="bold" mr={1}>Attach Metrics to Flag:</Typography>
                     <Typography color="info.main" fontFamily="monospace">
                       {(configValues.error_metric_enabled || configValues.latency_metric_enabled || configValues.business_metric_enabled) 
-                        ? 'Metrics will be attached to flag for measured rollout'
+                        ? `${getMetricKeysString(configValues)} will be attached for measured rollout`
                         : 'No metrics to attach'}
                     </Typography>
                   </Box>
                 }
-                secondary={resourceStatuses.metricAttachment.status !== 'pending' ? resourceStatuses.metricAttachment.message : 'Pending attachment'} 
+                secondary={
+                  resourceStatuses.metricAttachment.status === 'loading' 
+                    ? 'Attaching metrics to flag...' 
+                    : resourceStatuses.metricAttachment.status === 'pending' 
+                      ? 'Waiting to attach metrics...' 
+                      : resourceStatuses.metricAttachment.message
+                } 
               />
             </ListItem>
           </List>

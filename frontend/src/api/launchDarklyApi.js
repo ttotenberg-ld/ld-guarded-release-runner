@@ -22,9 +22,25 @@ const makeProxyRequest = async (url, method, payload, api_key, headers) => {
       headers
     });
     
+    console.log('Proxy response:', response.data);
+    
+    // Check if the status code indicates success (2xx) even if success flag is false
+    if (response.data.status_code >= 200 && response.data.status_code < 300) {
+      // This is a successful response regardless of the success flag
+      console.log('Found successful status code despite success flag:', response.data.status_code);
+      return {
+        ...response.data.data,
+        status_code: response.data.status_code,
+        success: true
+      };
+    }
+    
     if (!response.data.success) {
       return { 
-        error: `API Error: ${response.data.status_code} - ${response.data.data?.message || 'Unknown error'}` 
+        error: `API Error: ${response.data.status_code} - ${response.data.data?.message || 'Unknown error'}`,
+        status_code: response.data.status_code,
+        data: response.data.data,
+        raw_response: response.data
       };
     }
     
@@ -83,21 +99,27 @@ export const createLaunchDarklyResources = async (config) => {
       results.metrics.business = await createBusinessMetric(config);
     }
     
-    // Collect metric keys that were successfully created
+    // Collect metric keys to attach, even if creation failed with 409 (already exists)
     const metricKeys = [];
-    if (config.error_metric_enabled && !results.metrics.error?.error) {
+    if (config.error_metric_enabled) {
+      // Include error metric key if enabled (regardless of creation result)
       metricKeys.push(config.error_metric_1);
     }
-    if (config.latency_metric_enabled && !results.metrics.latency?.error) {
+    if (config.latency_metric_enabled) {
+      // Include latency metric key if enabled (regardless of creation result)
       metricKeys.push(config.latency_metric_1);
     }
-    if (config.business_metric_enabled && !results.metrics.business?.error) {
+    if (config.business_metric_enabled) {
+      // Include business metric key if enabled (regardless of creation result)
       metricKeys.push(config.business_metric_1);
     }
     
     // Attach metrics to flag if we have metrics to attach
-    if (metricKeys.length > 0 && !flagResponse.error) {
+    if (metricKeys.length > 0 && (!flagResponse.error || flagResponse.status_code === 409)) {
+      console.log('Attaching metrics to flag with keys:', metricKeys);
       results.metricAttachment = await attachMetricsToFlag(config, metricKeys);
+    } else {
+      console.log('Skipping metric attachment: no metrics to attach or flag creation failed');
     }
     
     return results;
@@ -250,7 +272,59 @@ const attachMetricsToFlag = async (config, metricKeys) => {
   };
   
   // Use makeProxyRequest with special beta API header
-  return makeProxyRequest(url, 'put', payload, api_key, {
+  const response = await makeProxyRequest(url, 'put', payload, api_key, {
     'LD-API-Version': 'beta'
   });
+  
+  console.log('Metric attachment raw response:', response);
+  
+  // Add explicit check for 200 status code in raw_response
+  if (response && response.raw_response && response.raw_response.status_code === 200) {
+    console.log('Detected 200 status code in raw_response');
+    return {
+      success: true,
+      message: 'Metrics successfully attached to flag',
+      metricKeys,
+      data: response.raw_response.data
+    };
+  }
+  
+  // Handle the various responses:
+  
+  // 1. Successful attachment (200 OK)
+  if (response && !response.error) {
+    return { 
+      success: true,
+      message: 'Metrics attached to flag successfully!',
+      metricKeys: metricKeys,
+      data: response
+    };
+  }
+  
+  // 2. Resource already exists cases (409 or 200 in error)
+  if (response && response.status_code === 409) {
+    return {
+      success: true,
+      message: 'Metrics are already attached to this flag',
+      metricKeys: metricKeys,
+      data: response.data
+    };
+  }
+  
+  // 3. We sometimes get 200 returned as an "error" due to how the proxy reports success
+  if (response && response.error && (
+    response.error.includes('200') || 
+    response.status_code === 200 ||
+    (response.raw_response && response.raw_response.status_code === 200)
+  )) {
+    return {
+      success: true,
+      message: 'Metrics successfully attached (or already attached) to flag',
+      metricKeys: metricKeys,
+      data: response.data || response.raw_response?.data
+    };
+  }
+  
+  // 4. Something else went wrong, return the error
+  return response;
 }; 

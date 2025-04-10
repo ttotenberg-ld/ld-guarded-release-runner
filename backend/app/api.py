@@ -65,11 +65,18 @@ async def proxy_launchdarkly_request(request: ProxyRequest):
                 raise HTTPException(status_code=400, detail=f"Unsupported method: {request.method}")
             
         # Return the response data
-        return {
+        response_data = {
             "status_code": response.status_code,
             "data": response.json() if response.text else None,
-            "success": response.status_code < 400
+            "success": response.status_code < 400,
+            "headers": dict(response.headers),
+            "url": response.url
         }
+        
+        logger.info(f"Response status code: {response.status_code}")
+        logger.info(f"Response success: {response.status_code < 400}")
+        
+        return response_data
     except httpx.RequestError as e:
         logger.error(f"Request error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Request error: {str(e)}")
