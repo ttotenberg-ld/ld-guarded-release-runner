@@ -1,0 +1,2824 @@
+INFO:     Started server process [55032]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     ('127.0.0.1', 62483) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62485) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62487) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62489) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62491) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62493) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62496) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62499) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62501) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62503) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62505) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62507) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62509) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62511) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62513) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62515) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62517) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62519) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62521) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62523) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62525) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62527) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62529) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62531) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62534) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62536) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62539) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62541) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62543) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62545) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62547) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62549) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62551) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62554) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62556) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62558) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62560) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62562) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62563) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62566) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62568) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62570) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62573) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62575) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62577) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62580) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62582) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62584) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62586) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62588) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62590) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62592) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62594) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62597) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62599) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62601) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62603) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62605) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62607) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62609) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62611) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62613) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62615) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62617) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62620) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62622) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62624) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62628) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62630) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62632) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62635) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62637) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62639) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62641) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62645) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62647) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62649) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62651) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62653) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62655) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62657) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62659) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62661) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62663) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62665) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62667) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62669) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62671) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62673) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62676) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62678) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62680) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62682) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62684) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62686) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62688) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62690) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62692) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62695) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62697) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62699) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62701) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62703) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62705) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62707) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62709) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62712) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62714) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62716) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62718) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62720) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62723) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62725) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62727) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62729) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62732) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62733) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62737) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62739) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62741) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62743) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62745) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62747) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62749) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62751) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62753) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62755) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62757) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62759) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62761) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62763) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62765) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62767) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62769) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62771) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62773) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62775) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62777) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62779) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62781) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62783) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62785) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62787) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62790) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62792) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62794) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62796) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62798) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62800) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62802) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62804) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62806) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62808) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62810) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62812) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62814) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62816) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62818) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62820) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62822) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62824) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62826) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62829) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62831) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62833) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62835) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62837) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62839) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62841) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62843) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62845) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62847) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62849) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62852) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62854) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62856) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62858) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62860) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62863) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62865) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62867) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62869) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62871) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62873) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62876) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62878) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62880) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62882) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62884) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62887) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62889) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62893) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62895) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62897) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62899) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62901) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62903) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62906) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62908) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62911) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62913) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62915) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62918) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62920) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62922) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62925) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62927) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62929) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62932) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62935) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62937) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62939) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62941) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62944) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62946) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62948) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62950) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62952) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62956) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62959) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62961) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62964) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62966) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62968) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62970) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62972) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62974) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62976) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62978) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62980) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62982) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62984) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62987) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62991) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62994) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62996) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 62998) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 63000) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 63002) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 63004) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 63006) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 63009) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 63011) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 63013) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 63017) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 63019) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 63021) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 63025) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 63027) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 63029) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 63032) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 63035) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:63101 - "POST /simulation/start HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63200 - "GET /simulation/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63423 - "POST /simulation/stop HTTP/1.1" 200 OK
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     127.0.0.1:63889 - "GET /simulation/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63889 - "GET /simulation/status HTTP/1.1" 200 OK
+INFO:     ('127.0.0.1', 63893) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 63897) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63899) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63901) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63904) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63906) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 63908) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63912) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63916) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63919) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63921) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63923) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63927) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63929) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63932) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63937) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63939) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 63941) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63943) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63945) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63947) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63949) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63951) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63955) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63960) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63962) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63966) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63968) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63972) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63974) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63976) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63978) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63980) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63982) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63984) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 63995) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 63997) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64001) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64005) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64009) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64013) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:63889 - "OPTIONS /simulation/start HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63889 - "POST /simulation/start HTTP/1.1" 200 OK
+INFO:     ('127.0.0.1', 64024) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64032) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64033) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64034) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64036) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64038) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64039) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64041) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64043) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64046) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64048) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64051) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64053) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64056) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64058) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64060) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64062) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64064) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64067) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64069) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64072) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64074) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64076) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64080) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64082) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64084) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64086) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64087) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64091) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64093) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64095) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64097) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64099) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64101) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64103) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64105) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64108) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64111) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64113) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64115) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64117) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64119) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64121) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64124) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64126) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64128) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64130) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64132) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64135) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64137) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64139) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64141) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64142) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64143) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64145) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64147) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64149) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64151) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64154) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64156) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64158) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64160) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64162) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64164) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64167) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64169) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64170) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64174) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64176) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64177) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64179) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64182) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64183) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64185) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64187) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64190) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64192) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64194) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64196) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64198) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64201) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64203) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64206) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64207) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64209) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64212) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64214) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64216) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64219) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64221) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64222) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64225) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64227) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64229) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64231) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64233) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64235) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64237) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64239) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64241) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64244) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64246) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64248) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64250) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64252) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64254) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64256) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64258) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64262) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64264) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64266) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64269) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64271) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64273) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64276) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64278) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64280) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64283) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64285) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64287) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64289) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64291) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64294) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64296) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64297) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64298) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64301) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64302) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64303) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64305) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64307) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64309) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64311) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64314) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64315) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64316) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64318) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64321) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64323) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64325) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64327) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64330) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64332) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64334) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64337) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64339) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64342) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64344) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64347) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64348) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64352) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64354) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64355) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64357) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64359) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64361) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64363) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64365) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64366) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64367) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64370) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64372) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64374) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64376) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64378) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64381) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64382) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64383) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64386) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64388) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64390) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64392) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64394) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64397) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64399) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64402) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64404) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64406) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64410) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64412) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64413) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64415) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64417) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64419) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64421) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64423) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64426) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64428) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64430) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64432) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64435) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64437) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64439) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64441) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64445) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64447) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64449) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64451) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64453) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64456) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64458) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64460) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64462) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64465) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64469) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64471) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64472) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64473) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64475) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64476) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64478) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64480) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64482) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64485) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64487) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64491) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64493) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64495) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64497) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64499) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64501) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64503) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64505) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64509) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64510) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64512) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64514) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64516) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64518) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64520) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64522) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64524) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64526) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64528) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64531) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64534) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64536) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64540) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64542) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64544) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64548) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64550) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64553) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64555) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64558) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64560) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64622) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+Task exception was never retrieved
+future: <Task finished name='Task-8292' coro=<simulation_loop() done, defined at /Users/ttotenberg/projects/ld-guarded-release-runner/backend/app/simulation.py:164> exception=RuntimeError('Cannot call "send" once a close message has been sent.')>
+Traceback (most recent call last):
+  File "/Users/ttotenberg/projects/ld-guarded-release-runner/venv/lib/python3.12/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 331, in asgi_send
+    await self.send(data)  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ttotenberg/projects/ld-guarded-release-runner/venv/lib/python3.12/site-packages/websockets/legacy/protocol.py", line 632, in send
+    await self.write_frame(True, opcode, data)
+  File "/Users/ttotenberg/projects/ld-guarded-release-runner/venv/lib/python3.12/site-packages/websockets/legacy/protocol.py", line 1191, in write_frame
+    await self.drain()
+  File "/Users/ttotenberg/projects/ld-guarded-release-runner/venv/lib/python3.12/site-packages/websockets/legacy/protocol.py", line 1180, in drain
+    await self.ensure_open()
+  File "/Users/ttotenberg/projects/ld-guarded-release-runner/venv/lib/python3.12/site-packages/websockets/legacy/protocol.py", line 921, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: no close frame received or sent
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/ttotenberg/projects/ld-guarded-release-runner/venv/lib/python3.12/site-packages/starlette/websockets.py", line 85, in send
+    await self._send(message)
+  File "/Users/ttotenberg/projects/ld-guarded-release-runner/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 39, in sender
+    await send(message)
+  File "/Users/ttotenberg/projects/ld-guarded-release-runner/venv/lib/python3.12/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 344, in asgi_send
+    raise ClientDisconnected from exc
+uvicorn.protocols.utils.ClientDisconnected
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/ttotenberg/projects/ld-guarded-release-runner/backend/app/simulation.py", line 124, in send_events
+    await send_log_to_clients(f"Executing {variation_str}")
+  File "/Users/ttotenberg/projects/ld-guarded-release-runner/backend/app/simulation.py", line 24, in send_log_to_clients
+    await asyncio.gather(
+  File "/Users/ttotenberg/projects/ld-guarded-release-runner/venv/lib/python3.12/site-packages/starlette/websockets.py", line 165, in send_text
+    await self.send({"type": "websocket.send", "text": data})
+  File "/Users/ttotenberg/projects/ld-guarded-release-runner/venv/lib/python3.12/site-packages/starlette/websockets.py", line 88, in send
+    raise WebSocketDisconnect(code=1006)
+starlette.websockets.WebSocketDisconnect
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/ttotenberg/projects/ld-guarded-release-runner/backend/app/simulation.py", line 170, in simulation_loop
+    await send_events(100)  # Send batches of 100 for better control
+    ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ttotenberg/projects/ld-guarded-release-runner/backend/app/simulation.py", line 159, in send_events
+    await send_log_to_clients(error_msg)
+  File "/Users/ttotenberg/projects/ld-guarded-release-runner/backend/app/simulation.py", line 24, in send_log_to_clients
+    await asyncio.gather(
+  File "/Users/ttotenberg/projects/ld-guarded-release-runner/venv/lib/python3.12/site-packages/starlette/websockets.py", line 165, in send_text
+    await self.send({"type": "websocket.send", "text": data})
+  File "/Users/ttotenberg/projects/ld-guarded-release-runner/venv/lib/python3.12/site-packages/starlette/websockets.py", line 97, in send
+    raise RuntimeError('Cannot call "send" once a close message has been sent.')
+RuntimeError: Cannot call "send" once a close message has been sent.
+INFO:     ('127.0.0.1', 64625) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 64633) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64635) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 64643) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 64658) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 64669) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 64684) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 64716) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 64750) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 64783) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 64822) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 64861) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 64899) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 64932) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     127.0.0.1:63891 - "GET /simulation/status HTTP/1.1" 200 OK
+INFO:     ('127.0.0.1', 64962) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:63891 - "GET /simulation/status HTTP/1.1" 200 OK
+INFO:     ('127.0.0.1', 64966) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 64970) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 64972) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     connection closed
+INFO:     ('127.0.0.1', 64974) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 64976) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 64980) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 64982) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 64985) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 64987) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 64989) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 64991) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     connection closed
+INFO:     ('127.0.0.1', 64993) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 64995) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 64999) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65005) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65007) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65010) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65012) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65014) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65017) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65021) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65024) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65026) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65028) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65030) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65032) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65034) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65036) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65038) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65041) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65044) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65047) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65049) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65052) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65055) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65057) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65060) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65063) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65065) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65068) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65070) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65072) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65075) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65077) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65080) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65082) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65085) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65087) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65089) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65093) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65096) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65098) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65101) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65103) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65106) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65109) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65111) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65114) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65116) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65118) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65121) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65124) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65127) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65129) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65131) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65134) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65136) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65138) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65140) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65144) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65146) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65149) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65151) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65155) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65162) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65164) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65166) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65170) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65172) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65174) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65176) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65179) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65181) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65183) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65185) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65189) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65191) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65194) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65196) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65199) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65201) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65204) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65206) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65210) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65212) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65214) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65217) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65219) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65221) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65224) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65227) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65229) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65231) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65233) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65235) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65238) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65240) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65242) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65245) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65247) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65250) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65252) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65254) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65259) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65261) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65263) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65266) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65268) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65270) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65272) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65275) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65277) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65280) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65282) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65285) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65287) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65289) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65291) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65294) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65298) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65300) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65302) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65304) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65307) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65310) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65312) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65314) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65316) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65318) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65320) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65326) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65328) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65330) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65332) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65334) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65337) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65339) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65341) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65344) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65346) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65348) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65350) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65352) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65354) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65356) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65358) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65361) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65363) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65365) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65367) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65370) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65374) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65376) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65378) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65380) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65382) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65384) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65386) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65388) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65391) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65393) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65395) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65397) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65399) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65401) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65404) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65406) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65408) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65410) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65412) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65415) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65417) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65419) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65421) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65425) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65427) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65429) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65431) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65433) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65436) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65438) - "WebSocket /ws" [accepted]
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65443) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65445) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65447) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65449) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65452) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65455) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65457) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 65459) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 65462) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 65464) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 65466) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 65468) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 65471) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 65474) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 65475) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 65478) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 65480) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 65482) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 65488) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 65490) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 65492) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 65494) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 65498) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 65501) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 65503) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 65512) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 65520) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 65522) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 65524) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 65527) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 65529) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 65531) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 65534) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49152) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49155) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49157) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49159) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49162) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49164) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49166) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49168) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49170) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49172) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49174) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49176) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49182) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49184) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49186) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49189) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49191) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49193) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49195) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49197) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49199) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49202) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49204) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49207) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49208) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49210) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49212) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49214) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49216) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49218) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49221) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49223) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49225) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49227) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49230) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49232) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49234) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49236) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49239) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49242) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49243) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49245) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49247) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49249) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49251) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49254) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49256) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49258) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49261) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49263) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49265) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49267) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49269) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49271) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49274) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49276) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49278) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49280) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49282) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49284) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49286) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49288) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49290) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49293) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49295) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49297) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49299) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49305) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49307) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49310) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49312) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49314) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49317) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49319) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49321) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49323) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49325) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49327) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49330) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49332) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49334) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49336) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49338) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49340) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49342) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49344) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49346) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49349) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49351) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49353) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49355) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49357) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49359) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49361) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49363) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49365) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49367) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49370) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49372) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49374) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49376) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49379) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49382) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49384) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49386) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49388) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49390) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49392) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49394) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49396) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49398) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49400) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49402) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49404) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49406) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49408) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49410) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49412) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49414) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49416) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49418) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49424) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49426) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49428) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49430) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49432) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49434) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49436) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49438) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49440) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49443) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49445) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49447) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49449) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49451) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49453) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49455) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49458) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49460) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49462) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49465) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49466) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49468) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49470) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49472) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     ('127.0.0.1', 49475) - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     127.0.0.1:49722 - "POST /simulation/start HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49879 - "GET /simulation/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50262 - "GET /simulation/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50302 - "POST /simulation/stop HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [55032]
