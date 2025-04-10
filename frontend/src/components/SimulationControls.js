@@ -7,53 +7,77 @@ import { startSimulation, stopSimulation } from '../api/simulationApi';
 const SimulationControls = ({ running, connected }) => {
   const handleStart = async () => {
     try {
+      // Get current form values directly from the DOM to ensure we have the latest values
+      // even if the user hasn't clicked Save in the ConfigForm
+      const formElements = document.querySelectorAll('input[name], textarea[name]');
+      let currentConfig = {};
+      
+      // First get the saved config as a base
       const savedConfig = localStorage.getItem('ldConfig');
       if (!savedConfig) {
         alert('Please configure settings first');
         return;
       }
       
-      const config = JSON.parse(savedConfig);
+      // Parse saved config
+      currentConfig = JSON.parse(savedConfig);
+      
+      // Update config with latest values from form fields
+      formElements.forEach(element => {
+        if (element.name) {
+          // Handle checkbox/switch inputs
+          if (element.type === 'checkbox') {
+            currentConfig[element.name] = element.checked;
+          } 
+          // Handle regular inputs
+          else {
+            currentConfig[element.name] = element.value;
+          }
+        }
+      });
       
       // Ensure toggle states are properly preserved as booleans
       ['error_metric_enabled', 'latency_metric_enabled', 'business_metric_enabled'].forEach(toggleKey => {
         // Make sure toggle values are strictly boolean (not string "true"/"false")
         // Use strict comparison to check if the value should be false
-        if (config[toggleKey] === false || config[toggleKey] === 'false' || config[toggleKey] === 0) {
-          config[toggleKey] = false;
+        if (currentConfig[toggleKey] === false || currentConfig[toggleKey] === 'false' || currentConfig[toggleKey] === 0) {
+          currentConfig[toggleKey] = false;
         } else {
-          config[toggleKey] = true;
+          currentConfig[toggleKey] = true;
         }
       });
       
       // Ensure ranges are arrays
       ['latency_metric_1_false_range', 'latency_metric_1_true_range'].forEach(rangeKey => {
-        if (typeof config[rangeKey] === 'string') {
+        if (typeof currentConfig[rangeKey] === 'string') {
           try {
-            const values = config[rangeKey].split(',').map(v => parseInt(v.trim(), 10));
+            const values = currentConfig[rangeKey].split(',').map(v => parseInt(v.trim(), 10));
             const validValues = values.filter(v => !isNaN(v));
             if (validValues.length === 2) {
-              config[rangeKey] = validValues;
+              currentConfig[rangeKey] = validValues;
             } else {
-              config[rangeKey] = rangeKey.includes('false') ? [50, 100] : [75, 125];
+              currentConfig[rangeKey] = rangeKey.includes('false') ? [50, 100] : [75, 125];
             }
           } catch (err) {
-            config[rangeKey] = rangeKey.includes('false') ? [50, 100] : [75, 125];
+            currentConfig[rangeKey] = rangeKey.includes('false') ? [50, 100] : [75, 125];
           }
-        } else if (!Array.isArray(config[rangeKey])) {
-          config[rangeKey] = rangeKey.includes('false') ? [50, 100] : [75, 125];
+        } else if (!Array.isArray(currentConfig[rangeKey])) {
+          currentConfig[rangeKey] = rangeKey.includes('false') ? [50, 100] : [75, 125];
         }
       });
       
       // Make sure numeric fields are numbers
       ['error_metric_1_false_converted', 'error_metric_1_true_converted', 
        'business_metric_1_false_converted', 'business_metric_1_true_converted'].forEach(field => {
-        if (typeof config[field] === 'string') {
-          config[field] = parseInt(config[field], 10) || 0;
+        if (typeof currentConfig[field] === 'string') {
+          currentConfig[field] = parseInt(currentConfig[field], 10) || 0;
         }
       });
       
-      await startSimulation(config);
+      // Save the current config to localStorage before starting
+      localStorage.setItem('ldConfig', JSON.stringify(currentConfig));
+      
+      await startSimulation(currentConfig);
     } catch (error) {
       console.error('Error starting simulation:', error);
       alert(`Failed to start simulation: ${error.message}`);
