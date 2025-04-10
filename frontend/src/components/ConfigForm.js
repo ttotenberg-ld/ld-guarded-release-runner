@@ -233,7 +233,7 @@ const ConfigForm = ({ disabled }) => {
   const titleStyle = {
     fontSize: '0.9rem', 
     fontWeight: 'medium',
-    color: 'primary.main',
+    color: 'warning.main',
     flexShrink: 0
   };
 
@@ -335,7 +335,7 @@ const ConfigForm = ({ disabled }) => {
                 name="error_metric_enabled"
                 disabled={disabled}
                 size="small"
-                color="primary"
+                color="warning"
               />
             }
             label=""
@@ -415,7 +415,7 @@ const ConfigForm = ({ disabled }) => {
                 name="latency_metric_enabled"
                 disabled={disabled}
                 size="small"
-                color="primary"
+                color="warning"
               />
             }
             label=""
@@ -487,7 +487,7 @@ const ConfigForm = ({ disabled }) => {
                 name="business_metric_enabled"
                 disabled={disabled}
                 size="small"
-                color="primary"
+                color="warning"
               />
             }
             label=""

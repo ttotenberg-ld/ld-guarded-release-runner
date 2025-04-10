@@ -83,7 +83,7 @@ const SimulationControls = ({ running, connected }) => {
       <Box sx={{ display: 'flex', gap: 2 }}>
         <Button
           variant="contained"
-          color="primary"
+          color="warning"
           startIcon={<PlayArrowIcon />}
           onClick={handleStart}
           disabled={running || !connected}
