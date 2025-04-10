@@ -290,7 +290,7 @@ const ConfigForm = ({ disabled }) => {
               size="small"
               type="password"
               margin="dense"
-              helperText="Your LaunchDarkly API Key with read permissions"
+              helperText="Your LaunchDarkly API Key"
             />
           </Grid>
           
