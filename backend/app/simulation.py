@@ -59,6 +59,11 @@ async def init_ld_client(config: LDConfig) -> bool:
             active_clients["client"].close()
             del active_clients["client"]
             
+        # Log toggle values for debugging
+        await send_log_to_clients(f"DEBUG - Latency toggle: {config.latency_metric_enabled} (type: {type(config.latency_metric_enabled).__name__})")
+        await send_log_to_clients(f"DEBUG - Error toggle: {config.error_metric_enabled} (type: {type(config.error_metric_enabled).__name__})")
+        await send_log_to_clients(f"DEBUG - Business toggle: {config.business_metric_enabled} (type: {type(config.business_metric_enabled).__name__})")
+            
         # Initialize new client
         ldclient.set_config(Config(config.sdk_key))
         active_clients["client"] = ldclient.get()
@@ -128,6 +133,16 @@ async def send_events(num_events: int = 1000):
         await send_log_to_clients("LaunchDarkly client not initialized")
         return
     
+    # Correctly convert toggle values to ensure they're strictly boolean
+    # Use "is False" to check actual False value, not just truthy/falsy
+    latency_enabled = config.latency_metric_enabled is not False
+    error_enabled = config.error_metric_enabled is not False
+    business_enabled = config.business_metric_enabled is not False
+    
+    # Additional debugging to show exact values
+    await send_log_to_clients(f"DEBUG - Raw latency toggle value: '{config.latency_metric_enabled}' (type: {type(config.latency_metric_enabled).__name__})")
+    await send_log_to_clients(f"DEBUG - Processed latency toggle: {latency_enabled}")
+    
     events_sent = 0
     
     for i in range(num_events):
@@ -144,36 +159,50 @@ async def send_events(num_events: int = 1000):
             
             if flag_variation:
                 # Treatment (true variation)
-                # Error metric tracking
-                if error_chance(config.error_metric_1_true_converted):
+                # Error metric tracking - only if enabled
+                if error_enabled and error_chance(config.error_metric_1_true_converted):
                     client.track(config.error_metric_1, context)
                     await send_log_to_clients(f"Tracking {config.error_metric_1} for treatment")
+                elif not error_enabled:
+                    await send_log_to_clients(f"Skipping {config.error_metric_1} tracking (disabled)")
                 
-                # Business metric tracking
-                if error_chance(config.business_metric_1_true_converted):
+                # Business metric tracking - only if enabled
+                if business_enabled and error_chance(config.business_metric_1_true_converted):
                     client.track(config.business_metric_1, context)
                     await send_log_to_clients(f"Tracking {config.business_metric_1} for treatment")
+                elif not business_enabled:
+                    await send_log_to_clients(f"Skipping {config.business_metric_1} tracking (disabled)")
                 
-                # Latency metric tracking
-                latency_value = random.randint(config.latency_metric_1_true_range[0], config.latency_metric_1_true_range[1])
-                client.track(config.latency_metric_1, context, metric_value=latency_value)
-                await send_log_to_clients(f"Tracking {config.latency_metric_1} with value {latency_value} for treatment")
+                # Latency metric tracking - only if enabled
+                if latency_enabled:
+                    latency_value = random.randint(config.latency_metric_1_true_range[0], config.latency_metric_1_true_range[1])
+                    client.track(config.latency_metric_1, context, metric_value=latency_value)
+                    await send_log_to_clients(f"Tracking {config.latency_metric_1} with value {latency_value} for treatment")
+                else:
+                    await send_log_to_clients(f"Skipping {config.latency_metric_1} tracking (disabled)")
             else:
                 # Control (false variation)
-                # Error metric tracking
-                if error_chance(config.error_metric_1_false_converted):
+                # Error metric tracking - only if enabled
+                if error_enabled and error_chance(config.error_metric_1_false_converted):
                     client.track(config.error_metric_1, context)
                     await send_log_to_clients(f"Tracking {config.error_metric_1} for control")
+                elif not error_enabled:
+                    await send_log_to_clients(f"Skipping {config.error_metric_1} tracking (disabled)")
                 
-                # Business metric tracking
-                if error_chance(config.business_metric_1_false_converted):
+                # Business metric tracking - only if enabled
+                if business_enabled and error_chance(config.business_metric_1_false_converted):
                     client.track(config.business_metric_1, context)
                     await send_log_to_clients(f"Tracking {config.business_metric_1} for control")
+                elif not business_enabled:
+                    await send_log_to_clients(f"Skipping {config.business_metric_1} tracking (disabled)")
                 
-                # Latency metric tracking
-                latency_value = random.randint(config.latency_metric_1_false_range[0], config.latency_metric_1_false_range[1])
-                client.track(config.latency_metric_1, context, metric_value=latency_value)
-                await send_log_to_clients(f"Tracking {config.latency_metric_1} with value {latency_value} for control")
+                # Latency metric tracking - only if enabled
+                if latency_enabled:
+                    latency_value = random.randint(config.latency_metric_1_false_range[0], config.latency_metric_1_false_range[1])
+                    client.track(config.latency_metric_1, context, metric_value=latency_value)
+                    await send_log_to_clients(f"Tracking {config.latency_metric_1} with value {latency_value} for control")
+                else:
+                    await send_log_to_clients(f"Skipping {config.latency_metric_1} tracking (disabled)")
             
             client.flush()
             events_sent += 1

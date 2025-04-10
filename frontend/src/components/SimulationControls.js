@@ -14,6 +14,45 @@ const SimulationControls = ({ running, connected }) => {
       }
       
       const config = JSON.parse(savedConfig);
+      
+      // Ensure toggle states are properly preserved as booleans
+      ['error_metric_enabled', 'latency_metric_enabled', 'business_metric_enabled'].forEach(toggleKey => {
+        // Make sure toggle values are strictly boolean (not string "true"/"false")
+        // Use strict comparison to check if the value should be false
+        if (config[toggleKey] === false || config[toggleKey] === 'false' || config[toggleKey] === 0) {
+          config[toggleKey] = false;
+        } else {
+          config[toggleKey] = true;
+        }
+      });
+      
+      // Ensure ranges are arrays
+      ['latency_metric_1_false_range', 'latency_metric_1_true_range'].forEach(rangeKey => {
+        if (typeof config[rangeKey] === 'string') {
+          try {
+            const values = config[rangeKey].split(',').map(v => parseInt(v.trim(), 10));
+            const validValues = values.filter(v => !isNaN(v));
+            if (validValues.length === 2) {
+              config[rangeKey] = validValues;
+            } else {
+              config[rangeKey] = rangeKey.includes('false') ? [50, 100] : [75, 125];
+            }
+          } catch (err) {
+            config[rangeKey] = rangeKey.includes('false') ? [50, 100] : [75, 125];
+          }
+        } else if (!Array.isArray(config[rangeKey])) {
+          config[rangeKey] = rangeKey.includes('false') ? [50, 100] : [75, 125];
+        }
+      });
+      
+      // Make sure numeric fields are numbers
+      ['error_metric_1_false_converted', 'error_metric_1_true_converted', 
+       'business_metric_1_false_converted', 'business_metric_1_true_converted'].forEach(field => {
+        if (typeof config[field] === 'string') {
+          config[field] = parseInt(config[field], 10) || 0;
+        }
+      });
+      
       await startSimulation(config);
     } catch (error) {
       console.error('Error starting simulation:', error);

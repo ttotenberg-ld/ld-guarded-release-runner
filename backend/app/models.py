@@ -16,6 +16,9 @@ class LDConfig(BaseModel):
     error_metric_1_true_converted: int
     business_metric_1_false_converted: int
     business_metric_1_true_converted: int
+    error_metric_enabled: bool = True
+    latency_metric_enabled: bool = True
+    business_metric_enabled: bool = True
     
     @field_validator('latency_metric_1_false_range', 'latency_metric_1_true_range')
     def validate_range(cls, v):
@@ -28,6 +31,13 @@ class LDConfig(BaseModel):
         if v < 0 or v > 100:
             raise ValueError('Conversion rate must be between 0 and 100')
         return v
+        
+    @field_validator('error_metric_enabled', 'latency_metric_enabled', 'business_metric_enabled')
+    def validate_toggle(cls, v):
+        # Ensure toggle values are strictly boolean
+        if v is True or v == 'true' or v == 1:
+            return True
+        return False
 
 class SimulationStatus(BaseModel):
     running: bool

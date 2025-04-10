@@ -34,7 +34,7 @@ It sends metric events to a LaunchDarkly flag to be measured in Release Guardian
    cd backend
    ```
 
-2. Install dependencies:
+2. Install the backend dependencies (from the backend directory):
    ```
    pip install -r requirements.txt
    ```
@@ -53,7 +53,7 @@ It sends metric events to a LaunchDarkly flag to be measured in Release Guardian
    cd frontend
    ```
 
-2. Install dependencies:
+2. Install the frontend dependencies:
    ```
    npm install
    ```
