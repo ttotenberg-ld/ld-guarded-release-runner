@@ -274,16 +274,17 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
 
   return (
     <>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleClickOpen}
-        disabled={disabled}
-        fullWidth
-        sx={{ mt: 2 }}
-      >
-        ✨ Auto-Create LaunchDarkly Resources ✨
-      </Button>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleClickOpen}
+          disabled={disabled}
+          sx={{ px: 4 }}
+        >
+          ✨ Auto-Create LaunchDarkly Resources ✨
+        </Button>
+      </Box>
       
       <Dialog open={open} onClose={handleClose} maxWidth="md">
         <DialogTitle>Create LaunchDarkly Resources</DialogTitle>
