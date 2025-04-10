@@ -60,3 +60,5 @@ class SimulationStatus(BaseModel):
     last_error: Optional[str] = None
     stats: SimulationStats = SimulationStats()
     guarded_rollout_active: bool = False
+    first_event_time: Optional[float] = None  # Timestamp when first event was sent
+    end_time: Optional[float] = None  # Timestamp when simulation stopped

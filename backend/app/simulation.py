@@ -222,6 +222,11 @@ async def send_events(num_events: int = 1000):
     # Log again for debugging
     await send_log_to_clients(f"DEBUG - At send_events: Latency toggle: {latency_enabled} (type: {type(latency_enabled).__name__})")
     
+    # Record first event time if not set yet
+    if simulation_status.first_event_time is None:
+        simulation_status.first_event_time = time.time()
+        await send_log_to_clients(f"First event sent at: {time.strftime('%H:%M:%S', time.localtime(simulation_status.first_event_time))}")
+    
     events_sent = 0
     
     for i in range(num_events):
@@ -366,6 +371,8 @@ async def start_simulation(config: LDConfig):
     simulation_status.events_sent = 0
     simulation_status.last_error = None
     simulation_status.guarded_rollout_active = False
+    simulation_status.first_event_time = None
+    simulation_status.end_time = None
     
     # Reset stats properly by importing and using SimulationStats instead of SimulationStatus
     simulation_status.stats = SimulationStats()
@@ -380,6 +387,15 @@ async def stop_simulation():
     if not simulation_status.running:
         await send_log_to_clients("No simulation running")
         return
+    
+    # Set end time
+    simulation_status.end_time = time.time()
+    await send_log_to_clients(f"Simulation ended at: {time.strftime('%H:%M:%S', time.localtime(simulation_status.end_time))}")
+    
+    # Calculate run time if the simulation had events sent
+    if simulation_status.first_event_time:
+        run_time = simulation_status.end_time - simulation_status.first_event_time
+        await send_log_to_clients(f"Simulation ran for {int(run_time)} seconds since first event")
         
     simulation_status.running = False
     await send_status_to_clients()

@@ -1,10 +1,33 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Typography, Grid, Paper, Chip, Divider, Card, CardContent, Stack } from '@mui/material';
 
 // Format number with specified decimal places
 const formatNumber = (num, decimals = 1) => {
   if (num === undefined || num === null) return '0';
   return Number(num).toFixed(decimals);
+};
+
+// Format timestamp to readable time
+const formatTime = (timestamp) => {
+  if (!timestamp) return 'N/A';
+  const date = new Date(timestamp * 1000);
+  return date.toLocaleTimeString();
+};
+
+// Format elapsed time in seconds to readable duration (e.g., 2h 15m 30s)
+const formatDuration = (seconds) => {
+  if (!seconds) return '0s';
+  
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = Math.floor(seconds % 60);
+  
+  let result = '';
+  if (hours > 0) result += `${hours}h `;
+  if (minutes > 0 || hours > 0) result += `${minutes}m `;
+  result += `${remainingSeconds}s`;
+  
+  return result;
 };
 
 // Stat display component for consistent styling
@@ -39,31 +62,57 @@ const StatDisplay = ({ label, value, unit = '', color = 'warning.main', subtitle
 // Format stats for display
 const formatStats = (stats) => {
   if (!stats) return { 
-    errorRate: '0', 
-    avgLatency: '0', 
-    businessRate: '0',
-    errorCount: 0,
-    errorTotal: 0,
-    latencyCount: 0,
-    businessCount: 0,
-    businessTotal: 0
+    errorEvents: 0,
+    latencyEvents: 0,
+    conversionEvents: 0
   };
   
   return {
-    errorRate: formatNumber(stats.error_rate.avg),
-    avgLatency: formatNumber(stats.latency.avg),
-    businessRate: formatNumber(stats.business.avg),
-    errorCount: stats.error_rate.sum,
-    errorTotal: stats.error_rate.count,
-    latencyCount: stats.latency.count,
-    businessCount: stats.business.sum,
-    businessTotal: stats.business.count
+    // For errors, .sum is the actual error count
+    errorEvents: stats.error_rate.sum || 0,
+    // For latency, .count is the number of events
+    latencyEvents: stats.latency.count || 0,
+    // For business/conversions, .sum is the actual conversion count
+    conversionEvents: stats.business.sum || 0
   };
 };
 
 const StatusPanel = ({ status }) => {
   const controlStats = formatStats(status.stats?.control);
   const treatmentStats = formatStats(status.stats?.treatment);
+  
+  // State to keep track of elapsed time
+  const [elapsedTime, setElapsedTime] = useState(0);
+  
+  // Update elapsed time every second if simulation is running
+  useEffect(() => {
+    let interval;
+    
+    if (status.running && status.first_event_time) {
+      // Initial calculation from first event time
+      const initialElapsed = Math.floor(Date.now() / 1000 - status.first_event_time);
+      setElapsedTime(initialElapsed);
+      
+      // Set up interval to update every second
+      interval = setInterval(() => {
+        const elapsed = Math.floor(Date.now() / 1000 - status.first_event_time);
+        setElapsedTime(elapsed);
+      }, 1000);
+    } else if (!status.running && status.first_event_time && status.end_time) {
+      // If not running and we have both first event and end times, calculate final elapsed time
+      const finalElapsed = Math.floor(status.end_time - status.first_event_time);
+      setElapsedTime(finalElapsed);
+    } else if (status.first_event_time) {
+      // If we only have first event time
+      const currentElapsed = Math.floor(Date.now() / 1000 - status.first_event_time);
+      setElapsedTime(currentElapsed);
+    }
+    
+    // Clean up interval
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [status.running, status.first_event_time, status.end_time]);
 
   return (
     <Box>
@@ -140,6 +189,58 @@ const StatusPanel = ({ status }) => {
         />
       </Paper>
       
+      {/* Time Information */}
+      <Paper 
+        variant="outlined" 
+        sx={{ 
+          p: 1.5, 
+          backgroundColor: 'rgba(255, 255, 255, 0.05)',
+          borderColor: 'divider',
+          mb: 2,
+          borderRadius: 1.5
+        }}
+      >
+        <Typography 
+          variant="body1" 
+          sx={{ 
+            fontWeight: 'bold', 
+            mb: 1.5, 
+            fontSize: '1rem'
+          }}
+        >
+          Timing Information
+        </Typography>
+        
+        <Grid container spacing={1.5}>
+          <Grid item xs={12} md={4}>
+            <Box sx={{ textAlign: 'center', p: 0.75, borderRadius: 1, bgcolor: 'rgba(0, 0, 0, 0.05)' }}>
+              <Typography variant="body2" sx={{ fontWeight: 'medium' }}>First Event At</Typography>
+              <Typography variant="body1" color="text.primary" sx={{ fontWeight: 'bold', mt: 0.5 }}>
+                {formatTime(status.first_event_time)}
+              </Typography>
+            </Box>
+          </Grid>
+          
+          <Grid item xs={12} md={4}>
+            <Box sx={{ textAlign: 'center', p: 0.75, borderRadius: 1, bgcolor: 'rgba(0, 0, 0, 0.05)' }}>
+              <Typography variant="body2" sx={{ fontWeight: 'medium' }}>Running For</Typography>
+              <Typography variant="body1" color={status.running ? 'success.main' : 'text.primary'} sx={{ fontWeight: 'bold', mt: 0.5 }}>
+                {formatDuration(elapsedTime)}
+              </Typography>
+            </Box>
+          </Grid>
+          
+          <Grid item xs={12} md={4}>
+            <Box sx={{ textAlign: 'center', p: 0.75, borderRadius: 1, bgcolor: 'rgba(0, 0, 0, 0.05)' }}>
+              <Typography variant="body2" sx={{ fontWeight: 'medium' }}>Ended At</Typography>
+              <Typography variant="body1" color={!status.running && status.end_time ? 'error.main' : 'text.secondary'} sx={{ fontWeight: 'bold', mt: 0.5 }}>
+                {status.running ? 'Running...' : formatTime(status.end_time)}
+              </Typography>
+            </Box>
+          </Grid>
+        </Grid>
+      </Paper>
+      
       {/* Statistics Section */}
       <Paper 
         variant="outlined" 
@@ -180,26 +281,21 @@ const StatusPanel = ({ status }) => {
                 <Divider sx={{ mb: 1.5 }} />
                 
                 <StatDisplay 
-                  label="Error Rate" 
-                  value={controlStats.errorRate} 
-                  unit="%" 
+                  label="Error Events" 
+                  value={controlStats.errorEvents} 
                   color="error.main"
-                  subtitle={`${controlStats.errorCount} errors out of ${controlStats.errorTotal} events`}
                 />
                 
                 <StatDisplay 
-                  label="Latency" 
-                  value={controlStats.avgLatency} 
-                  unit=" ms"
-                  subtitle={`Average across ${controlStats.latencyCount} events`}
+                  label="Latency Events" 
+                  value={controlStats.latencyEvents} 
+                  color="warning.main"
                 />
                 
                 <StatDisplay 
-                  label="Conversion Rate" 
-                  value={controlStats.businessRate} 
-                  unit="%" 
+                  label="Conversion Events" 
+                  value={controlStats.conversionEvents} 
                   color="success.main"
-                  subtitle={`${controlStats.businessCount} conversions out of ${controlStats.businessTotal} events`}
                 />
               </CardContent>
             </Card>
@@ -223,26 +319,21 @@ const StatusPanel = ({ status }) => {
                 <Divider sx={{ mb: 1.5 }} />
                 
                 <StatDisplay 
-                  label="Error Rate" 
-                  value={treatmentStats.errorRate} 
-                  unit="%" 
+                  label="Error Events" 
+                  value={treatmentStats.errorEvents} 
                   color="error.main"
-                  subtitle={`${treatmentStats.errorCount} errors out of ${treatmentStats.errorTotal} events`}
                 />
                 
                 <StatDisplay 
-                  label="Latency" 
-                  value={treatmentStats.avgLatency} 
-                  unit=" ms"
-                  subtitle={`Average across ${treatmentStats.latencyCount} events`}
+                  label="Latency Events" 
+                  value={treatmentStats.latencyEvents}
+                  color="warning.main" 
                 />
                 
                 <StatDisplay 
-                  label="Conversion Rate" 
-                  value={treatmentStats.businessRate} 
-                  unit="%" 
+                  label="Conversion Events" 
+                  value={treatmentStats.conversionEvents} 
                   color="success.main"
-                  subtitle={`${treatmentStats.businessCount} conversions out of ${treatmentStats.businessTotal} events`}
                 />
               </CardContent>
             </Card>
