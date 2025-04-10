@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, TextField, Button, Alert, Grid, InputAdornment, Typography, Divider, Paper, 
          Switch, FormControlLabel } from '@mui/material';
 import { startSimulation } from '../api/simulationApi';
+import LaunchDarklyResourceCreator from './LaunchDarklyResourceCreator';
 
 // Default configuration with placeholder values
 const DEFAULT_CONFIG = {
@@ -566,6 +567,8 @@ const ConfigForm = ({ disabled }) => {
       >
         Save
       </Button>
+      
+      <LaunchDarklyResourceCreator disabled={disabled} />
     </Box>
   );
 };

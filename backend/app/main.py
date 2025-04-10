@@ -10,6 +10,7 @@ from app.simulation import (
     start_simulation, stop_simulation, get_simulation_status,
     connected_websockets, send_status_to_clients, send_log_to_clients
 )
+from app.api import router as ld_api_router
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -26,6 +27,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include the LaunchDarkly API proxy router
+app.include_router(ld_api_router)
 
 @app.get("/", tags=["Health"])
 async def health_check():

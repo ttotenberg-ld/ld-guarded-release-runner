@@ -10,6 +10,7 @@ A web application to simulate and send metric events to LaunchDarkly flags for R
 - Configurable metrics simulation for latency, errors, and business conversions
 - Automatic detection of guarded rollouts
 - Configuration via UI with local storage persistence
+- **One-click LaunchDarkly resource creation** - Easily create flag and metrics in LaunchDarkly
 
 ## What does it do?
 
@@ -22,8 +23,8 @@ It sends metric events to a LaunchDarkly flag to be measured in Release Guardian
 - npm or yarn
 - LaunchDarkly account with:
   - Server-side SDK Key
-  - API Key with read permissions to flags
-  - A project with a flag set up for Release Guardian
+  - API Key with write permissions to flags and metrics
+  - A project where you want to set up guarded releases
 
 ## Getting Started
 
@@ -73,7 +74,7 @@ The following parameters can be configured:
 
 ### LaunchDarkly Connection
 - **SDK Key** - LaunchDarkly server-side SDK Key (secret)
-- **API Key** - LaunchDarkly API Key with read permissions to flags
+- **API Key** - LaunchDarkly API Key with write permissions to flags and metrics
 - **Project Key** - Project where the flag exists
 - **Flag Key** - Flag key to evaluate and send events to
 
@@ -96,10 +97,22 @@ The following parameters can be configured:
 
 1. Enter your LaunchDarkly credentials and configuration in the web UI
 2. Configure your metrics for error rate, latency, and business conversions
-3. Click "Start Simulation" to begin sending events
-4. The event log will show real-time updates of events being sent
-5. View the status panel to monitor the simulation
-6. Click "Stop Simulation" when finished
+3. Click "Create LaunchDarkly Resources" to automatically create the flag and enabled metrics in LaunchDarkly
+4. Click "Start Simulation" to begin sending events
+5. The event log will show real-time updates of events being sent
+6. View the status panel to monitor the simulation
+7. Click "Stop Simulation" when finished
+
+## Resource Creation
+
+The new **Create LaunchDarkly Resources** feature automatically creates the following resources in LaunchDarkly:
+
+1. **Boolean Flag** - Creates a flag with the key you specified, with two variations: true (treatment) and false (control)
+2. **Error Metric** - Creates an occurrence metric where lower is better, using the error metric name you specified (only if enabled)
+3. **Latency Metric** - Creates a numeric average metric where lower is better, using the latency metric name you specified (only if enabled)
+4. **Conversion Metric** - Creates an occurrence metric where higher is better, using the business metric name you specified (only if enabled)
+
+All resources will be created with appropriate configurations for use with LaunchDarkly's Release Guardian feature. The resources will be tagged with "guarded-rollout-runner" for easy identification in the LaunchDarkly dashboard.
 
 ## Deployment
 
