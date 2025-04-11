@@ -1,7 +1,20 @@
 import axios from 'axios';
 
 // API base URL - try runtime env first, then build-time env, then fallback
-const API_URL = window.REACT_APP_API_URL || process.env.REACT_APP_API_URL || 'http://localhost:8000';
+// Make sure to add protocol if not present
+const getApiUrl = () => {
+  let url = window.REACT_APP_API_URL || process.env.REACT_APP_API_URL || 'http://localhost:8000';
+  
+  // Add http:// protocol if not present
+  if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+    url = 'http://' + url;
+  }
+  
+  return url;
+};
+
+const API_URL = getApiUrl();
+console.log('Using API URL:', API_URL);
 
 // Configure axios
 const api = axios.create({

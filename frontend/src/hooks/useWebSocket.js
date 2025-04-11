@@ -1,7 +1,20 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 // WebSocket URL - try runtime env first, then build-time env, then fallback
-const WS_URL = window.REACT_APP_WS_URL || process.env.REACT_APP_WS_URL || 'ws://localhost:8000/ws';
+// Make sure to add protocol if not present
+const getWsUrl = () => {
+  let url = window.REACT_APP_WS_URL || process.env.REACT_APP_WS_URL || 'ws://localhost:8000/ws';
+  
+  // Add ws:// protocol if not present
+  if (url && !url.startsWith('ws://') && !url.startsWith('wss://')) {
+    url = 'ws://' + url;
+  }
+  
+  return url;
+};
+
+const WS_URL = getWsUrl();
+console.log('Using WebSocket URL:', WS_URL);
 
 const useWebSocket = ({ onMessage }) => {
   const [socket, setSocket] = useState(null);

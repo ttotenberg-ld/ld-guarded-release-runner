@@ -5,7 +5,18 @@ nixPkgs = ["nodejs", "npm"]
 cmds = ["npm install"]
 
 [phases.build]
-cmds = ["npm run build"]
+cmds = [
+  "npm run build", 
+  "echo '#!/bin/sh' > start.sh",
+  "echo 'echo \"window.REACT_APP_API_URL = \\\"\"\"$REACT_APP_API_URL\"\"\\\";\";' >> start.sh",
+  "echo 'echo \"window.REACT_APP_WS_URL = \\\"\"\"$REACT_APP_WS_URL\"\"\\\";\";' >> start.sh",
+  "echo 'echo \"\$(cat <<EOT' >> start.sh",
+  "echo 'console.log(\"Runtime env loaded - API:\", window.REACT_APP_API_URL, \"WS:\", window.REACT_APP_WS_URL);' >> start.sh",
+  "echo 'EOT' >> start.sh",
+  "echo ')\" >> ./build/env-config.js' >> start.sh",
+  "echo 'exec npx serve -s build -l $PORT' >> start.sh",
+  "chmod +x start.sh"
+]
 
 [start]
-cmd = "npx serve -s build -l $PORT" 
+cmd = "./start.sh" 
