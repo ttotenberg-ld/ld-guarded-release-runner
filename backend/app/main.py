@@ -1,4 +1,5 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, HTTPException, status, BackgroundTasks, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict, Any, Optional, Set
 import asyncio
 import json
@@ -17,6 +18,33 @@ app = FastAPI(
     description="A web application to simulate and send metric events to LaunchDarkly flags for Release Guardian.",
     version="1.0.0"
 )
+
+# Add CORS middleware with maximum permissiveness
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods
+    allow_headers=["*"],  # Allow all headers
+)
+
+# Add a global OPTIONS route handler that returns a 200 response
+@app.options("/{path:path}")
+async def options_route(path: str):
+    response = Response(status_code=200)
+    # Manually add CORS headers to ensure they're correct
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    return response
+
+# Debug middleware to log requests
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    print(f"DEBUG: Received {request.method} request for {request.url.path} from origin: {request.headers.get('origin', 'unknown')}")
+    response = await call_next(request)
+    print(f"DEBUG: Returning {response.status_code} response with headers: {dict(response.headers)}")
+    return response
 
 # Include the LaunchDarkly API proxy router
 app.include_router(ld_api_router)

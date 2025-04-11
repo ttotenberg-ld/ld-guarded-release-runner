@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response, Request
 from pydantic import BaseModel
 import httpx
 import logging
@@ -13,6 +13,18 @@ class ProxyRequest(BaseModel):
     payload: dict
     api_key: str
     headers: dict = None
+
+# Add specific OPTIONS handler for the proxy endpoint with manual CORS headers
+@router.options("/proxy")
+async def options_proxy(request: Request):
+    logger.info("OPTIONS request received for /ld-api-proxy/proxy")
+    response = Response(status_code=200)
+    # Set CORS headers manually
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    logger.info(f"Returning OPTIONS response with headers: {dict(response.headers)}")
+    return response
 
 @router.post("/proxy")
 async def proxy_launchdarkly_request(request: ProxyRequest):
