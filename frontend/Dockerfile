@@ -2,13 +2,16 @@ FROM node:16-alpine
 
 WORKDIR /app
 
-COPY package.json .
-COPY package-lock.json .
+# Copy all files first
+COPY . .
 
+# Install dependencies
 RUN npm install
 
-COPY . .
+# Build the application
+RUN npm run build
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+# Serve the static files
+CMD ["npx", "serve", "-s", "build", "-l", "3000"]
