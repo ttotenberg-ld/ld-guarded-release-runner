@@ -1,7 +1,52 @@
 import axios from 'axios';
 
-// API base URL
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+// API base URL - dynamic based on environment
+const getApiUrl = () => {
+  // If running on Railway, use the public backend URL
+  if (window.location.hostname.includes('railway.app')) {
+    // Extract the base domain from our URL and replace the subdomain with 'ld-gr-backend'
+    const hostname = window.location.hostname;
+    const baseUrl = hostname.substring(hostname.indexOf('.railway.app'));
+    const backendUrl = `https://ld-gr-backend${baseUrl}`;
+    console.log('LaunchDarklyApi: Using derived backend URL:', backendUrl);
+    return backendUrl;
+  }
+  
+  // Try runtime env first
+  if (window.REACT_APP_API_URL) {
+    console.log('LaunchDarklyApi: Using runtime API URL:', window.REACT_APP_API_URL);
+    
+    // Add https:// protocol if not present
+    if (!window.REACT_APP_API_URL.startsWith('http://') && !window.REACT_APP_API_URL.startsWith('https://')) {
+      // Use HTTPS in production
+      return window.location.protocol === 'https:' 
+        ? 'https://' + window.REACT_APP_API_URL 
+        : 'http://' + window.REACT_APP_API_URL;
+    }
+    return window.REACT_APP_API_URL;
+  }
+  
+  // Try build time env next
+  if (process.env.REACT_APP_API_URL) {
+    console.log('LaunchDarklyApi: Using build-time API URL:', process.env.REACT_APP_API_URL);
+    
+    // Add https:// protocol if not present
+    if (!process.env.REACT_APP_API_URL.startsWith('http://') && !process.env.REACT_APP_API_URL.startsWith('https://')) {
+      // Use HTTPS in production
+      return window.location.protocol === 'https:' 
+        ? 'https://' + process.env.REACT_APP_API_URL 
+        : 'http://' + process.env.REACT_APP_API_URL;
+    }
+    return process.env.REACT_APP_API_URL;
+  }
+  
+  // Fallback to localhost
+  console.log('LaunchDarklyApi: No environment variables found, using localhost fallback');
+  return 'http://localhost:8000';
+};
+
+const API_URL = getApiUrl();
+console.log('LaunchDarklyApi: FINAL API URL:', API_URL);
 
 // Configure axios
 const api = axios.create({
