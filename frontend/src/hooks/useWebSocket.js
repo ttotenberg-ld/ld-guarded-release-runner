@@ -2,19 +2,22 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 
 // WebSocket URL - with enhanced logging to debug Railway deployment issues
 const getWsUrl = () => {
-  // If running on Railway, use the internal service URL
+  // If running on Railway, use the internal service URL with WSS
   if (window.location.hostname.includes('railway.app')) {
-    console.log('Detected Railway deployment, using internal backend WebSocket URL');
-    return 'ws://ld-gr-backend.railway.internal/ws';
+    console.log('Detected Railway deployment, using internal backend WebSocket URL with WSS');
+    return 'wss://ld-gr-backend.railway.internal/ws';
   }
   
   // Try runtime env first
   if (window.REACT_APP_WS_URL) {
     console.log('Using runtime window.REACT_APP_WS_URL:', window.REACT_APP_WS_URL);
     
-    // Add ws:// protocol if not present
+    // Add appropriate protocol if not present
     if (!window.REACT_APP_WS_URL.startsWith('ws://') && !window.REACT_APP_WS_URL.startsWith('wss://')) {
-      return 'ws://' + window.REACT_APP_WS_URL;
+      // Use WSS in production (if loaded over HTTPS)
+      return window.location.protocol === 'https:' 
+        ? 'wss://' + window.REACT_APP_WS_URL 
+        : 'ws://' + window.REACT_APP_WS_URL;
     }
     return window.REACT_APP_WS_URL;
   }
@@ -23,16 +26,22 @@ const getWsUrl = () => {
   if (process.env.REACT_APP_WS_URL) {
     console.log('Using build-time process.env.REACT_APP_WS_URL:', process.env.REACT_APP_WS_URL);
     
-    // Add ws:// protocol if not present
+    // Add appropriate protocol if not present
     if (!process.env.REACT_APP_WS_URL.startsWith('ws://') && !process.env.REACT_APP_WS_URL.startsWith('wss://')) {
-      return 'ws://' + process.env.REACT_APP_WS_URL;
+      // Use WSS in production (if loaded over HTTPS)
+      return window.location.protocol === 'https:' 
+        ? 'wss://' + process.env.REACT_APP_WS_URL 
+        : 'ws://' + process.env.REACT_APP_WS_URL;
     }
     return process.env.REACT_APP_WS_URL;
   }
   
   // Fallback to localhost
   console.log('No WebSocket environment variables found, using localhost fallback');
-  return 'ws://localhost:8000/ws';
+  // Use secure websocket if page is served over HTTPS
+  return window.location.protocol === 'https:' 
+    ? 'wss://localhost:8000/ws' 
+    : 'ws://localhost:8000/ws';
 };
 
 const WS_URL = getWsUrl();

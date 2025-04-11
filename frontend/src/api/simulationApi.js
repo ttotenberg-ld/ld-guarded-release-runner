@@ -2,19 +2,22 @@ import axios from 'axios';
 
 // API base URL - with enhanced logging to debug Railway deployment issues
 const getApiUrl = () => {
-  // If running on Railway, use the internal service URL
+  // If running on Railway, use the internal service URL with HTTPS
   if (window.location.hostname.includes('railway.app')) {
     console.log('Detected Railway deployment, using internal backend URL');
-    return 'http://ld-gr-backend.railway.internal';
+    return 'https://ld-gr-backend.railway.internal';
   }
   
   // Try runtime env first
   if (window.REACT_APP_API_URL) {
     console.log('Using runtime window.REACT_APP_API_URL:', window.REACT_APP_API_URL);
     
-    // Add http:// protocol if not present
+    // Add https:// protocol if not present
     if (!window.REACT_APP_API_URL.startsWith('http://') && !window.REACT_APP_API_URL.startsWith('https://')) {
-      return 'http://' + window.REACT_APP_API_URL;
+      // Use HTTPS in production
+      return window.location.protocol === 'https:' 
+        ? 'https://' + window.REACT_APP_API_URL 
+        : 'http://' + window.REACT_APP_API_URL;
     }
     return window.REACT_APP_API_URL;
   }
@@ -23,9 +26,12 @@ const getApiUrl = () => {
   if (process.env.REACT_APP_API_URL) {
     console.log('Using build-time process.env.REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
     
-    // Add http:// protocol if not present
+    // Add https:// protocol if not present
     if (!process.env.REACT_APP_API_URL.startsWith('http://') && !process.env.REACT_APP_API_URL.startsWith('https://')) {
-      return 'http://' + process.env.REACT_APP_API_URL;
+      // Use HTTPS in production
+      return window.location.protocol === 'https:' 
+        ? 'https://' + process.env.REACT_APP_API_URL 
+        : 'http://' + process.env.REACT_APP_API_URL;
     }
     return process.env.REACT_APP_API_URL;
   }
