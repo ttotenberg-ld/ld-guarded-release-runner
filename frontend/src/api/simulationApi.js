@@ -2,10 +2,14 @@ import axios from 'axios';
 
 // API base URL - with enhanced logging to debug Railway deployment issues
 const getApiUrl = () => {
-  // If running on Railway, use the internal service URL with HTTPS
+  // If running on Railway, use the public backend URL
   if (window.location.hostname.includes('railway.app')) {
-    console.log('Detected Railway deployment, using internal backend URL');
-    return 'https://ld-gr-backend.railway.internal';
+    // Extract the base domain from our URL and replace the subdomain with 'ld-gr-backend'
+    const hostname = window.location.hostname;
+    const baseUrl = hostname.substring(hostname.indexOf('.railway.app'));
+    const backendUrl = `https://ld-gr-backend${baseUrl}`;
+    console.log('Detected Railway deployment, using derived backend URL:', backendUrl);
+    return backendUrl;
   }
   
   // Try runtime env first

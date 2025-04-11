@@ -2,10 +2,14 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 
 // WebSocket URL - with enhanced logging to debug Railway deployment issues
 const getWsUrl = () => {
-  // If running on Railway, use the internal service URL with WSS
+  // If running on Railway, use the public backend URL
   if (window.location.hostname.includes('railway.app')) {
-    console.log('Detected Railway deployment, using internal backend WebSocket URL with WSS');
-    return 'wss://ld-gr-backend.railway.internal/ws';
+    // Extract the base domain from our URL and replace the subdomain with 'ld-gr-backend'
+    const hostname = window.location.hostname;
+    const baseUrl = hostname.substring(hostname.indexOf('.railway.app'));
+    const backendUrl = `wss://ld-gr-backend${baseUrl}/ws`;
+    console.log('Detected Railway deployment, using derived backend WebSocket URL:', backendUrl);
+    return backendUrl;
   }
   
   // Try runtime env first
