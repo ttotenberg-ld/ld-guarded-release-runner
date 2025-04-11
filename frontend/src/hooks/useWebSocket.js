@@ -1,20 +1,42 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-// WebSocket URL - try runtime env first, then build-time env, then fallback
-// Make sure to add protocol if not present
+// WebSocket URL - with enhanced logging to debug Railway deployment issues
 const getWsUrl = () => {
-  let url = window.REACT_APP_WS_URL || process.env.REACT_APP_WS_URL || 'ws://localhost:8000/ws';
-  
-  // Add ws:// protocol if not present
-  if (url && !url.startsWith('ws://') && !url.startsWith('wss://')) {
-    url = 'ws://' + url;
+  // If running on Railway, use the internal service URL
+  if (window.location.hostname.includes('railway.app')) {
+    console.log('Detected Railway deployment, using internal backend WebSocket URL');
+    return 'ws://ld-gr-backend.railway.internal/ws';
   }
   
-  return url;
+  // Try runtime env first
+  if (window.REACT_APP_WS_URL) {
+    console.log('Using runtime window.REACT_APP_WS_URL:', window.REACT_APP_WS_URL);
+    
+    // Add ws:// protocol if not present
+    if (!window.REACT_APP_WS_URL.startsWith('ws://') && !window.REACT_APP_WS_URL.startsWith('wss://')) {
+      return 'ws://' + window.REACT_APP_WS_URL;
+    }
+    return window.REACT_APP_WS_URL;
+  }
+  
+  // Try build time env next
+  if (process.env.REACT_APP_WS_URL) {
+    console.log('Using build-time process.env.REACT_APP_WS_URL:', process.env.REACT_APP_WS_URL);
+    
+    // Add ws:// protocol if not present
+    if (!process.env.REACT_APP_WS_URL.startsWith('ws://') && !process.env.REACT_APP_WS_URL.startsWith('wss://')) {
+      return 'ws://' + process.env.REACT_APP_WS_URL;
+    }
+    return process.env.REACT_APP_WS_URL;
+  }
+  
+  // Fallback to localhost
+  console.log('No WebSocket environment variables found, using localhost fallback');
+  return 'ws://localhost:8000/ws';
 };
 
 const WS_URL = getWsUrl();
-console.log('Using WebSocket URL:', WS_URL);
+console.log('FINAL WebSocket URL:', WS_URL);
 
 const useWebSocket = ({ onMessage }) => {
   const [socket, setSocket] = useState(null);

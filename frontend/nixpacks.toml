@@ -6,15 +6,16 @@ cmds = ["npm install"]
 
 [phases.build]
 cmds = [
-  "npm run build", 
+  "npm run build",
   "echo '#!/bin/sh' > start.sh",
-  "echo 'echo \"window.REACT_APP_API_URL = \\\"\"\"$REACT_APP_API_URL\"\"\\\";\";' >> start.sh",
-  "echo 'echo \"window.REACT_APP_WS_URL = \\\"\"\"$REACT_APP_WS_URL\"\"\\\";\";' >> start.sh",
-  "echo 'echo \"\$(cat <<EOT' >> start.sh",
+  "echo 'cat > ./build/env-config.js << EOL' >> start.sh",
+  "echo 'window.REACT_APP_API_URL = \"http://\${REACT_APP_API_URL}\";' >> start.sh",
+  "echo 'window.REACT_APP_WS_URL = \"ws://\${REACT_APP_WS_URL}\";' >> start.sh",
   "echo 'console.log(\"Runtime env loaded - API:\", window.REACT_APP_API_URL, \"WS:\", window.REACT_APP_WS_URL);' >> start.sh",
-  "echo 'EOT' >> start.sh",
-  "echo ')\" >> ./build/env-config.js' >> start.sh",
-  "echo 'exec npx serve -s build -l $PORT' >> start.sh",
+  "echo 'EOL' >> start.sh",
+  "echo 'echo \"ENV CONFIG GENERATED:\"' >> start.sh",
+  "echo 'cat ./build/env-config.js' >> start.sh",
+  "echo 'exec npx serve -s build -l \${PORT:-3000}' >> start.sh",
   "chmod +x start.sh"
 ]
 
