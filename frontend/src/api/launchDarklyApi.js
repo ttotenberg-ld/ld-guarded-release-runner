@@ -1,4 +1,5 @@
 import axios from 'axios';
+import railwayProxy from './railwayProxy';
 
 // API base URL - dynamic based on environment
 const getApiUrl = () => {
@@ -48,6 +49,10 @@ const getApiUrl = () => {
 const API_URL = getApiUrl();
 console.log('LaunchDarklyApi: FINAL API URL:', API_URL);
 
+// Check if we're on Railway
+const isRailway = window.location.hostname.includes('railway.app');
+console.log('LaunchDarklyApi: Using Railway proxy?', isRailway);
+
 // Configure axios
 const api = axios.create({
   baseURL: API_URL,
@@ -59,34 +64,61 @@ const api = axios.create({
 // Helper function to make API requests via the proxy
 const makeProxyRequest = async (url, method, payload, api_key, headers) => {
   try {
-    const response = await api.post('/ld-api-proxy/proxy', {
-      url,
-      method,
-      payload,
-      api_key,
-      headers
-    });
-    
-    // Check if the status code indicates success (2xx) even if success flag is false
-    if (response.data.status_code >= 200 && response.data.status_code < 300) {
-      // This is a successful response regardless of the success flag
-      return {
-        ...response.data.data,
-        status_code: response.data.status_code,
-        success: true
-      };
-    }
-    
-    if (!response.data.success) {
+    if (isRailway) {
+      // Use custom proxy for Railway
+      const response = await railwayProxy.post('/ld-api-proxy/proxy', {
+        url,
+        method,
+        payload,
+        api_key,
+        headers
+      });
+      
+      // Check if the status code indicates success
+      if (response.data.status_code >= 200 && response.data.status_code < 300) {
+        return {
+          ...response.data.data,
+          status_code: response.data.status_code,
+          success: true
+        };
+      }
+      
       return { 
         error: `API Error: ${response.data.status_code} - ${response.data.data?.message || 'Unknown error'}`,
         status_code: response.data.status_code,
         data: response.data.data,
-        raw_response: response.data
       };
+    } else {
+      // Use axios for normal requests
+      const response = await api.post('/ld-api-proxy/proxy', {
+        url,
+        method,
+        payload,
+        api_key,
+        headers
+      });
+      
+      // Check if the status code indicates success (2xx) even if success flag is false
+      if (response.data.status_code >= 200 && response.data.status_code < 300) {
+        // This is a successful response regardless of the success flag
+        return {
+          ...response.data.data,
+          status_code: response.data.status_code,
+          success: true
+        };
+      }
+      
+      if (!response.data.success) {
+        return { 
+          error: `API Error: ${response.data.status_code} - ${response.data.data?.message || 'Unknown error'}`,
+          status_code: response.data.status_code,
+          data: response.data.data,
+          raw_response: response.data
+        };
+      }
+      
+      return response.data.data;
     }
-    
-    return response.data.data;
   } catch (error) {
     // Extract the most useful error message
     let errorMessage = 'Unknown error occurred';

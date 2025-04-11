@@ -20,45 +20,24 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Custom middleware to set CORS headers
-class CORSMiddlewareCustom(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        response = await call_next(request)
-        
-        # Set CORS headers
-        response.headers["Access-Control-Allow-Origin"] = "*"
-        response.headers["Access-Control-Allow-Credentials"] = "true"
-        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
-        
-        return response
+# Since Railway sets the CORS headers at their proxy level,
+# Let's remove our custom middleware and use their environment
 
-# Add our custom middleware first
-app.add_middleware(CORSMiddlewareCustom)
-
-# Configure FastAPI's CORS middleware
+# Configure FastAPI's CORS middleware - using railway.com as origin since Railway enforces this
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        "https://railway.com",           # Required by Railway
         "https://ld-gr-frontend-production.up.railway.app",  # Specific Railway frontend
-        "https://*.railway.app",                             # Any Railway subdomain
-        "http://localhost:3000",                            # Local development
-        "http://localhost:8000",                            # Local development API
-        "*"                                                 # Fallback for any origin
+        "https://*.railway.app",         # Any Railway subdomain
+        "http://localhost:3000",         # Local development
+        "http://localhost:8000",         # Local development API
+        "*"                              # Fallback for any origin
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Add OPTIONS method handler for CORS preflight requests
-@app.options("/{full_path:path}")
-async def options_handler(request: Request, full_path: str):
-    response = Response()
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
-    return response
 
 # Include the LaunchDarkly API proxy router
 app.include_router(ld_api_router)
