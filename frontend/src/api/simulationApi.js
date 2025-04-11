@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// API base URL
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+// API base URL - try runtime env first, then build-time env, then fallback
+const API_URL = window.REACT_APP_API_URL || process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 // Configure axios
 const api = axios.create({

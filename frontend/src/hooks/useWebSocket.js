@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-const WS_URL = process.env.REACT_APP_WS_URL || 'ws://localhost:8000/ws';
+// WebSocket URL - try runtime env first, then build-time env, then fallback
+const WS_URL = window.REACT_APP_WS_URL || process.env.REACT_APP_WS_URL || 'ws://localhost:8000/ws';
 
 const useWebSocket = ({ onMessage }) => {
   const [socket, setSocket] = useState(null);
