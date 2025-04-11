@@ -1,10 +1,8 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, HTTPException, status, BackgroundTasks, Request, Response
-from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict, Any, Optional, Set
 import asyncio
 import json
 import os
-from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.models import LDConfig, SimulationStatus
 from app.simulation import (
@@ -18,25 +16,6 @@ app = FastAPI(
     title="LaunchDarkly Guarded Release Runner",
     description="A web application to simulate and send metric events to LaunchDarkly flags for Release Guardian.",
     version="1.0.0"
-)
-
-# Since Railway sets the CORS headers at their proxy level,
-# Let's remove our custom middleware and use their environment
-
-# Configure FastAPI's CORS middleware - using railway.com as origin since Railway enforces this
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "https://railway.com",           # Required by Railway
-        "https://ld-gr-frontend-production.up.railway.app",  # Specific Railway frontend
-        "https://*.railway.app",         # Any Railway subdomain
-        "http://localhost:3000",         # Local development
-        "http://localhost:8000",         # Local development API
-        "*"                              # Fallback for any origin
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
 )
 
 # Include the LaunchDarkly API proxy router

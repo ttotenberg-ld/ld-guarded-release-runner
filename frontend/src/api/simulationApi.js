@@ -1,5 +1,4 @@
 import axios from 'axios';
-import railwayProxy from './railwayProxy';
 
 // API base URL - with enhanced logging to debug Railway deployment issues
 const getApiUrl = () => {
@@ -49,10 +48,6 @@ const getApiUrl = () => {
 const API_URL = getApiUrl();
 console.log('FINAL API URL:', API_URL);
 
-// Check if we're on Railway
-const isRailway = window.location.hostname.includes('railway.app');
-console.log('Using Railway proxy?', isRailway);
-
 // Configure axios
 const api = axios.create({
   baseURL: API_URL,
@@ -64,15 +59,9 @@ const api = axios.create({
 // Start simulation with configuration
 export const startSimulation = async (config) => {
   try {
-    if (isRailway) {
-      // Use our Railway proxy when on Railway
-      const response = await railwayProxy.post('/simulation/start', config);
-      return response.data;
-    } else {
-      // Use axios for normal calls
-      const response = await api.post('/simulation/start', config);
-      return response.data;
-    }
+    // Use axios for all calls
+    const response = await api.post('/simulation/start', config);
+    return response.data;
   } catch (error) {
     console.error('Error starting simulation:', error);
     throw error;
@@ -82,15 +71,9 @@ export const startSimulation = async (config) => {
 // Stop simulation
 export const stopSimulation = async () => {
   try {
-    if (isRailway) {
-      // Use our Railway proxy when on Railway
-      const response = await railwayProxy.post('/simulation/stop');
-      return response.data;
-    } else {
-      // Use axios for normal calls
-      const response = await api.post('/simulation/stop');
-      return response.data;
-    }
+    // Use axios for all calls
+    const response = await api.post('/simulation/stop');
+    return response.data;
   } catch (error) {
     console.error('Error stopping simulation:', error);
     throw error;
@@ -100,15 +83,9 @@ export const stopSimulation = async () => {
 // Get simulation status
 export const getStatus = async () => {
   try {
-    if (isRailway) {
-      // Use our Railway proxy when on Railway
-      const response = await railwayProxy.get('/simulation/status');
-      return response.data;
-    } else {
-      // Use axios for normal calls
-      const response = await api.get('/simulation/status');
-      return response.data;
-    }
+    // Use axios for all calls
+    const response = await api.get('/simulation/status');
+    return response.data;
   } catch (error) {
     console.error('Error fetching status:', error);
     throw error;
