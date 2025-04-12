@@ -349,7 +349,7 @@ const ConfigForm = ({ disabled }) => {
               disabled={disabled}
               size="small"
               margin="dense"
-              helperText="Flag key to evaluate and send events to"
+              helperText="Flag key to evaluate and send events to (✨ Auto-creatable ✨)"
             />
           </Grid>
         </Grid>
@@ -389,7 +389,7 @@ const ConfigForm = ({ disabled }) => {
               size="small"
               margin="dense"
               placeholder="error-rate"
-              helperText="e.g., error-rate"
+              helperText="e.g., error-rate (✨ Auto-creatable ✨)"
             />
           </Grid>
           
@@ -469,7 +469,7 @@ const ConfigForm = ({ disabled }) => {
               size="small"
               margin="dense"
               placeholder="latency"
-              helperText="e.g., latency"
+              helperText="e.g., latency (✨ Auto-creatable ✨)"
             />
           </Grid>
           
@@ -540,8 +540,8 @@ const ConfigForm = ({ disabled }) => {
               disabled={disabled || !config.business_metric_enabled}
               size="small"
               margin="dense"
-              placeholder="conversion"
-              helperText="e.g., conversion, purchase-success"
+              placeholder="payment-success"
+              helperText="e.g., payment-success (✨ Auto-creatable ✨)"
             />
           </Grid>
           
@@ -595,7 +595,8 @@ const ConfigForm = ({ disabled }) => {
       >
         Save
       </Button>
-      
+      <br />
+      <br />
       <LaunchDarklyResourceCreator disabled={disabled} />
     </Box>
   );

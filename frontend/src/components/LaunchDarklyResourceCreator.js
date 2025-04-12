@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, Box, Alert, CircularProgress, List, ListItem, ListItemIcon, ListItemText, Divider } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, Box, Alert, CircularProgress, List, ListItem, ListItemIcon, ListItemText, Divider, Link } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import PendingIcon from '@mui/icons-material/Pending';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { createLaunchDarklyResources } from '../api/launchDarklyApi';
 
 // Helper function to save the configuration, similar to handleSubmit in ConfigForm
@@ -69,6 +70,7 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
   const [result, setResult] = useState(null);
   const [configValues, setConfigValues] = useState({
     flag_key: '',
+    project_key: '',
     error_metric_1: '',
     latency_metric_1: '',
     business_metric_1: '',
@@ -83,6 +85,12 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
     businessMetric: { status: 'pending', message: '' },
     metricAttachment: { status: 'pending', message: '' }
   });
+
+  // Helper function to generate the LaunchDarkly flag URL
+  const getFlagUrl = () => {
+    if (!configValues.project_key || !configValues.flag_key) return null;
+    return `https://app.launchdarkly.com/projects/${configValues.project_key}/flags/${configValues.flag_key}/`;
+  };
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -119,6 +127,7 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
       // Update display values with current form values
       setConfigValues({
         flag_key: currentConfig.flag_key || '',
+        project_key: currentConfig.project_key || '',
         error_metric_1: currentConfig.error_metric_1 || '',
         latency_metric_1: currentConfig.latency_metric_1 || '',
         business_metric_1: currentConfig.business_metric_1 || '',
@@ -184,6 +193,7 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
       // Update display values with the latest config
       setConfigValues({
         flag_key: currentConfig.flag_key || '',
+        project_key: currentConfig.project_key || '',
         error_metric_1: currentConfig.error_metric_1 || '',
         latency_metric_1: currentConfig.latency_metric_1 || '',
         business_metric_1: currentConfig.business_metric_1 || '',
@@ -417,6 +427,19 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
                     <Typography color="info.main" fontFamily="monospace">
                       {configValues.flag_key || 'Not set'}
                     </Typography>
+                    {result && resourceStatuses.flag.status === 'success' && getFlagUrl() && (
+                      <Button 
+                        component={Link}
+                        href={getFlagUrl()}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        size="small"
+                        endIcon={<OpenInNewIcon fontSize="small" />}
+                        sx={{ ml: 1 }}
+                      >
+                        View in LaunchDarkly
+                      </Button>
+                    )}
                   </Box>
                 }
                 secondary={resourceStatuses.flag.status !== 'pending' ? resourceStatuses.flag.message : 'Pending creation'} 
@@ -523,6 +546,18 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
           {result && !error && (
             <Alert severity="success" sx={{ mt: 2 }}>
               Resources created successfully!
+              {getFlagUrl() && (
+                <Box mt={1}>
+                  <Link 
+                    href={getFlagUrl()} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    sx={{ display: 'inline-flex', alignItems: 'center' }}
+                  >
+                    View flag in LaunchDarkly <OpenInNewIcon fontSize="small" sx={{ ml: 0.5 }} />
+                  </Link>
+                </Box>
+              )}
             </Alert>
           )}
         </DialogContent>
