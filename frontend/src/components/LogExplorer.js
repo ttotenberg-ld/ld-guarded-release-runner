@@ -162,7 +162,7 @@ const LogExplorer = ({ simulationStatus, onLogsLoading }) => {
             <Chip 
               size="small" 
               color="primary" 
-              label={`${totalCount.toLocaleString()} events`} 
+              label={`${totalCount.toLocaleString()} entries`} 
               sx={{ mr: 1 }} 
             />
           )}
