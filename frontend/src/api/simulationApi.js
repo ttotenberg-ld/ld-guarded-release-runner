@@ -126,3 +126,18 @@ export const getStatus = async () => {
     throw error;
   }
 };
+
+// Get simulation logs with pagination
+export const getLogs = async (limit = 100, skip = 0) => {
+  try {
+    // Get session ID
+    const sessionId = await getSessionId();
+    
+    // Use axios for all calls
+    const response = await api.get(`/simulation/logs?session_id=${sessionId}&limit=${limit}&skip=${skip}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching logs:', error);
+    throw error;
+  }
+};

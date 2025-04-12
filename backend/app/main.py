@@ -6,7 +6,7 @@ import json
 import os
 import uuid
 
-from app.models import LDConfig, SimulationStatus, SessionRequest
+from app.models import LDConfig, SimulationStatus, SessionRequest, LogsResponse
 from app.simulation import (
     start_simulation, stop_simulation, get_simulation_status,
     register_websocket, unregister_websocket, send_status_to_clients, send_log_to_clients
@@ -78,6 +78,45 @@ async def api_stop_simulation(request: SessionRequest):
 async def api_get_status(session_id: str = Query(..., description="Session ID to get status for")):
     """Get the current simulation status"""
     return get_simulation_status(session_id)
+
+@app.get("/simulation/logs", tags=["Simulation"], response_model=LogsResponse)
+async def api_get_logs(
+    session_id: str = Query(..., description="Session ID to get logs for"),
+    limit: int = Query(100, description="Maximum number of logs to return", ge=1, le=1000),
+    skip: int = Query(0, description="Number of logs to skip for pagination", ge=0)
+):
+    """Get stored logs for a specific session with pagination
+    
+    Args:
+        session_id: The session ID to get logs for
+        limit: Maximum number of logs to return (1-1000)
+        skip: Number of logs to skip for pagination
+        
+    Returns:
+        LogsResponse containing the logs, total count, and whether there are more logs
+    """
+    status = get_simulation_status(session_id)
+    
+    # Get total count of logs
+    total_logs = status.total_logs_generated
+    
+    # Get stored logs with pagination
+    stored_logs = status.stored_logs
+    
+    # Apply pagination
+    paginated_logs = stored_logs[skip:skip+limit] if skip < len(stored_logs) else []
+    
+    # Convert logs to dictionaries
+    log_dicts = [log.to_dict() for log in paginated_logs]
+    
+    # Check if there are more logs
+    has_more = (skip + limit) < len(stored_logs)
+    
+    return LogsResponse(
+        logs=log_dicts,
+        total_count=total_logs,
+        has_more=has_more
+    )
 
 @app.websocket("/ws/{session_id}")
 async def websocket_endpoint(websocket: WebSocket, session_id: str):

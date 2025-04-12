@@ -187,7 +187,7 @@ async def init_ld_client(session_id: str, config: LDConfig) -> bool:
         if session_id not in active_clients:
             active_clients[session_id] = {}
             
-        # Log toggle values for debugging
+        # Log toggle values for debugging - no user key for debug logs
         await send_log_to_clients(session_id, f"DEBUG - Latency toggle: {config.latency_metric_enabled} (type: {type(config.latency_metric_enabled).__name__})")
         await send_log_to_clients(session_id, f"DEBUG - Error toggle: {config.error_metric_enabled} (type: {type(config.error_metric_enabled).__name__})")
         await send_log_to_clients(session_id, f"DEBUG - Business toggle: {config.business_metric_enabled} (type: {type(config.business_metric_enabled).__name__})")
@@ -292,7 +292,7 @@ async def send_events(session_id: str, num_events: int = 1000):
     error_enabled = bool(config.error_metric_enabled)
     business_enabled = bool(config.business_metric_enabled)
     
-    # Log again for debugging
+    # Log debug info without user key
     await send_log_to_clients(session_id, f"DEBUG - At send_events: Latency toggle: {latency_enabled} (type: {type(latency_enabled).__name__})")
     
     events_sent = 0
@@ -330,20 +330,19 @@ async def send_events(session_id: str, num_events: int = 1000):
                 if in_experiment:
                     status.stats.control.in_experiment += 1
                     
-            # Use control/treatment terminology in logs
+            # Flag evaluation log - Include user_key
             variation_str = "treatment" if flag_variation else "control"
             experiment_str = "in experiment" if in_experiment else "not in experiment"
             await send_log_to_clients(session_id, f"Executing {variation_str} ({experiment_str})", user_key)
             
-            # Only send events if the user is part of an experiment
+            # Skip further processing if not in experiment (don't log this)
             if not in_experiment:
-                await send_log_to_clients(session_id, "Skipping event tracking - user not in experiment", user_key)
                 continue
             
-            # Record first event time if not set yet and this is our first actual event
+            # System log - No user_key
             if status.first_event_time is None:
                 status.first_event_time = time.time()
-                await send_log_to_clients(session_id, f"First event sent at: {time.strftime('%H:%M:%S', time.localtime(status.first_event_time))}", user_key)
+                await send_log_to_clients(session_id, f"First event sent at: {time.strftime('%H:%M:%S', time.localtime(status.first_event_time))}")
                 first_event_tracked = True
                 
             if flag_variation:
@@ -356,58 +355,70 @@ async def send_events(session_id: str, num_events: int = 1000):
                 print(f"DEBUG: Treatment error check for session {session_id} - roll: {error_roll}, threshold: {config.error_metric_1_true_converted}, will trigger: {should_trigger}")
                 
                 if error_enabled and error_chance(config.error_metric_1_true_converted):
+                    # Event tracking - Include user_key
                     client.track(config.error_metric_1, context)
                     stats["treatment_error_count"] += 1
                     await send_log_to_clients(session_id, f"Tracking {config.error_metric_1} for treatment", user_key)
                     print(f"DEBUG: Tracked treatment error for session {session_id} - total: {stats['treatment_error_total']}, count: {stats['treatment_error_count']}")
                 elif not error_enabled:
-                    await send_log_to_clients(session_id, f"Skipping {config.error_metric_1} tracking (disabled)", user_key)
+                    # Status log - No user_key
+                    await send_log_to_clients(session_id, f"Skipping {config.error_metric_1} tracking (disabled)")
                 
                 # Business metric tracking - only if enabled
                 stats["treatment_business_total"] += 1
                 if business_enabled and error_chance(config.business_metric_1_true_converted):
+                    # Event tracking - Include user_key
                     client.track(config.business_metric_1, context)
                     stats["treatment_business_count"] += 1
                     await send_log_to_clients(session_id, f"Tracking {config.business_metric_1} for treatment", user_key)
                 elif not business_enabled:
-                    await send_log_to_clients(session_id, f"Skipping {config.business_metric_1} tracking (disabled)", user_key)
+                    # Status log - No user_key
+                    await send_log_to_clients(session_id, f"Skipping {config.business_metric_1} tracking (disabled)")
                 
                 # Latency metric tracking - only if enabled
                 if latency_enabled:
+                    # Event tracking - Include user_key
                     latency_value = random.randint(config.latency_metric_1_true_range[0], config.latency_metric_1_true_range[1])
                     client.track(config.latency_metric_1, context, metric_value=latency_value)
                     stats["treatment_latency_values"].append(latency_value)
                     await send_log_to_clients(session_id, f"Tracking {config.latency_metric_1} with value {latency_value} for treatment", user_key)
                 else:
-                    await send_log_to_clients(session_id, f"Skipping {config.latency_metric_1} tracking (disabled)", user_key)
+                    # Status log - No user_key
+                    await send_log_to_clients(session_id, f"Skipping {config.latency_metric_1} tracking (disabled)")
             else:
                 # Control (false variation)
                 # Error metric tracking - only if enabled
                 stats["control_error_total"] += 1
                 if error_enabled and error_chance(config.error_metric_1_false_converted):
+                    # Event tracking - Include user_key
                     client.track(config.error_metric_1, context)
                     stats["control_error_count"] += 1
                     await send_log_to_clients(session_id, f"Tracking {config.error_metric_1} for control", user_key)
                 elif not error_enabled:
-                    await send_log_to_clients(session_id, f"Skipping {config.error_metric_1} tracking (disabled)", user_key)
+                    # Status log - No user_key
+                    await send_log_to_clients(session_id, f"Skipping {config.error_metric_1} tracking (disabled)")
                 
                 # Business metric tracking - only if enabled
                 stats["control_business_total"] += 1
                 if business_enabled and error_chance(config.business_metric_1_false_converted):
+                    # Event tracking - Include user_key
                     client.track(config.business_metric_1, context)
                     stats["control_business_count"] += 1
                     await send_log_to_clients(session_id, f"Tracking {config.business_metric_1} for control", user_key)
                 elif not business_enabled:
-                    await send_log_to_clients(session_id, f"Skipping {config.business_metric_1} tracking (disabled)", user_key)
+                    # Status log - No user_key
+                    await send_log_to_clients(session_id, f"Skipping {config.business_metric_1} tracking (disabled)")
                 
                 # Latency metric tracking - only if enabled
                 if latency_enabled:
+                    # Event tracking - Include user_key
                     latency_value = random.randint(config.latency_metric_1_false_range[0], config.latency_metric_1_false_range[1])
                     client.track(config.latency_metric_1, context, metric_value=latency_value)
                     stats["control_latency_values"].append(latency_value)
                     await send_log_to_clients(session_id, f"Tracking {config.latency_metric_1} with value {latency_value} for control", user_key)
                 else:
-                    await send_log_to_clients(session_id, f"Skipping {config.latency_metric_1} tracking (disabled)", user_key)
+                    # Status log - No user_key
+                    await send_log_to_clients(session_id, f"Skipping {config.latency_metric_1} tracking (disabled)")
             
             client.flush()
             events_sent += 1

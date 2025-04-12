@@ -1,6 +1,26 @@
 from pydantic import BaseModel, validator, field_validator
 from typing import List, Optional, Union, Dict, Any
 import json
+import time
+
+class LogEntry(BaseModel):
+    """A single log entry with timestamp and message"""
+    timestamp: float  # Unix timestamp
+    message: str
+    user_key: Optional[str] = None  # Added field for user key from context
+    
+    def to_dict(self):
+        result = {
+            "timestamp": self.timestamp,
+            "formatted_time": time.strftime('%H:%M:%S', time.localtime(self.timestamp)),
+            "message": self.message,
+        }
+        
+        # Only include user_key if it has a value
+        if self.user_key is not None:
+            result["user_key"] = self.user_key
+            
+        return result
 
 class MetricStats(BaseModel):
     count: int = 0
@@ -68,6 +88,14 @@ class SimulationStatus(BaseModel):
     guarded_rollout_active: bool = False
     first_event_time: Optional[float] = None  # Timestamp when first event was sent
     end_time: Optional[float] = None  # Timestamp when simulation stopped
+    stored_logs: List[LogEntry] = []  # Store logs for post-simulation review
+    max_logs: int = 50000  # Maximum number of logs to store (50,000 by default)
+    total_logs_generated: int = 0  # Count of all logs, even if not all are stored
 
 class SessionRequest(BaseModel):
     session_id: str
+
+class LogsResponse(BaseModel):
+    logs: List[Dict[str, Any]]
+    total_count: int
+    has_more: bool
