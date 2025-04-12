@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, TextField, Button, Alert, Grid, InputAdornment, Typography, Divider, Paper, 
          Switch, FormControlLabel } from '@mui/material';
 import { startSimulation } from '../api/simulationApi';
@@ -25,12 +25,26 @@ const DEFAULT_CONFIG = {
 };
 
 const ConfigForm = ({ disabled }) => {
+  // Track which fields have been saved to localStorage
+  const [savedToStorage, setSavedToStorage] = useState({
+    sdk_key: false,
+    api_key: false
+  });
+
   const [config, setConfig] = useState(() => {
     // Try to load from localStorage
     const savedConfig = localStorage.getItem('ldConfig');
     if (savedConfig) {
       try {
         const parsedConfig = JSON.parse(savedConfig);
+        
+        // Mark keys as saved if they exist in localStorage
+        if (parsedConfig.sdk_key) {
+          setSavedToStorage(prev => ({ ...prev, sdk_key: true }));
+        }
+        if (parsedConfig.api_key) {
+          setSavedToStorage(prev => ({ ...prev, api_key: true }));
+        }
         
         // Ensure ranges are arrays - convert if needed
         ['latency_metric_1_false_range', 'latency_metric_1_true_range'].forEach(rangeKey => {
@@ -90,6 +104,14 @@ const ConfigForm = ({ disabled }) => {
     // Handle percentage inputs
     if (name.includes('converted')) {
       parsedValue = parseInt(value, 10);
+    }
+    
+    // For API key and SDK key, mark as not saved when changed
+    if (name === 'sdk_key' || name === 'api_key') {
+      setSavedToStorage(prev => ({
+        ...prev,
+        [name]: false
+      }));
     }
     
     setConfig(prev => ({
@@ -201,6 +223,12 @@ const ConfigForm = ({ disabled }) => {
       // Save to localStorage
       localStorage.setItem('ldConfig', JSON.stringify(submissionConfig));
       
+      // Mark SDK and API keys as saved
+      setSavedToStorage({
+        sdk_key: true,
+        api_key: true
+      });
+      
       // Submit configuration to start simulation
       await startSimulation(submissionConfig);
       setSuccess('Configuration saved successfully!');
@@ -273,7 +301,7 @@ const ConfigForm = ({ disabled }) => {
               fullWidth
               disabled={disabled}
               size="small"
-              type="password"
+              type={savedToStorage.sdk_key ? "password" : "text"}
               margin="dense"
               helperText="Your LaunchDarkly server-side SDK Key"
             />
@@ -289,7 +317,7 @@ const ConfigForm = ({ disabled }) => {
               fullWidth
               disabled={disabled}
               size="small"
-              type="password"
+              type={savedToStorage.api_key ? "password" : "text"}
               margin="dense"
               helperText="Your LaunchDarkly API Key"
             />
