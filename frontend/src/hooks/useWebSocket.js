@@ -1,52 +1,60 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { getSessionId } from '../api/simulationApi';
 
 // WebSocket URL - with enhanced logging to debug Railway deployment issues
-const getWsUrl = () => {
+const getWsUrl = async () => {
+  // Get the session ID first
+  const sessionId = await getSessionId();
+  
+  let baseUrl;
+  
   // If running on Railway, use the correct public backend URL
   if (window.location.hostname.includes('railway.app')) {
-    const backendWsUrl = 'wss://ld-gr-backend-production.up.railway.app/ws';
-    console.log('Detected Railway deployment, using backend WebSocket URL:', backendWsUrl);
-    return backendWsUrl;
+    baseUrl = 'wss://ld-gr-backend-production.up.railway.app/ws';
+    console.log('Detected Railway deployment, using backend WebSocket URL:', baseUrl);
   }
-  
   // Try runtime env first
-  if (window.REACT_APP_WS_URL) {
+  else if (window.REACT_APP_WS_URL) {
     console.log('Using runtime window.REACT_APP_WS_URL:', window.REACT_APP_WS_URL);
     
     // Add appropriate protocol if not present
     if (!window.REACT_APP_WS_URL.startsWith('ws://') && !window.REACT_APP_WS_URL.startsWith('wss://')) {
       // Use WSS in production (if loaded over HTTPS)
-      return window.location.protocol === 'https:' 
+      baseUrl = window.location.protocol === 'https:' 
         ? 'wss://' + window.REACT_APP_WS_URL 
         : 'ws://' + window.REACT_APP_WS_URL;
+    } else {
+      baseUrl = window.REACT_APP_WS_URL;
     }
-    return window.REACT_APP_WS_URL;
   }
-  
   // Try build time env next
-  if (process.env.REACT_APP_WS_URL) {
+  else if (process.env.REACT_APP_WS_URL) {
     console.log('Using build-time process.env.REACT_APP_WS_URL:', process.env.REACT_APP_WS_URL);
     
     // Add appropriate protocol if not present
     if (!process.env.REACT_APP_WS_URL.startsWith('ws://') && !process.env.REACT_APP_WS_URL.startsWith('wss://')) {
       // Use WSS in production (if loaded over HTTPS)
-      return window.location.protocol === 'https:' 
+      baseUrl = window.location.protocol === 'https:' 
         ? 'wss://' + process.env.REACT_APP_WS_URL 
         : 'ws://' + process.env.REACT_APP_WS_URL;
+    } else {
+      baseUrl = process.env.REACT_APP_WS_URL;
     }
-    return process.env.REACT_APP_WS_URL;
+  }
+  // Fallback to localhost
+  else {
+    console.log('No WebSocket environment variables found, using localhost fallback');
+    // Use secure websocket if page is served over HTTPS
+    baseUrl = window.location.protocol === 'https:' 
+      ? 'wss://localhost:8000/ws' 
+      : 'ws://localhost:8000/ws';
   }
   
-  // Fallback to localhost
-  console.log('No WebSocket environment variables found, using localhost fallback');
-  // Use secure websocket if page is served over HTTPS
-  return window.location.protocol === 'https:' 
-    ? 'wss://localhost:8000/ws' 
-    : 'ws://localhost:8000/ws';
+  // Add session ID to URL
+  const fullUrl = `${baseUrl}/${sessionId}`;
+  console.log('FINAL WebSocket URL with session:', fullUrl);
+  return fullUrl;
 };
-
-const WS_URL = getWsUrl();
-console.log('FINAL WebSocket URL:', WS_URL);
 
 const useWebSocket = ({ onMessage }) => {
   const [socket, setSocket] = useState(null);
@@ -64,7 +72,7 @@ const useWebSocket = ({ onMessage }) => {
     let pingInterval = null;
     let reconnectTimeout = null;
     
-    const connect = () => {
+    const connect = async () => {
       // Clean up any existing connections
       if (ws) {
         ws.close();
@@ -75,57 +83,68 @@ const useWebSocket = ({ onMessage }) => {
         reconnectTimeout = null;
       }
       
-      // Create new WebSocket connection
-      ws = new WebSocket(WS_URL);
-      
-      ws.onopen = () => {
-        console.log('WebSocket connected');
-        setConnected(true);
+      try {
+        // Get the WebSocket URL with session ID
+        const wsUrl = await getWsUrl();
         
-        // Send ping every 30 seconds to keep connection alive
-        pingInterval = setInterval(() => {
-          if (ws && ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({ type: 'ping' }));
+        // Create new WebSocket connection
+        ws = new WebSocket(wsUrl);
+        
+        ws.onopen = () => {
+          console.log('WebSocket connected');
+          setConnected(true);
+          
+          // Send ping every 30 seconds to keep connection alive
+          pingInterval = setInterval(() => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify({ type: 'ping' }));
+            }
+          }, 30000);
+        };
+        
+        ws.onclose = (event) => {
+          console.log(`WebSocket disconnected (code: ${event.code})`);
+          setConnected(false);
+          
+          if (pingInterval) {
+            clearInterval(pingInterval);
+            pingInterval = null;
           }
-        }, 30000);
-      };
-      
-      ws.onclose = (event) => {
-        console.log(`WebSocket disconnected (code: ${event.code})`);
-        setConnected(false);
-        
-        if (pingInterval) {
-          clearInterval(pingInterval);
-          pingInterval = null;
-        }
-        
-        // Only reconnect if this wasn't a normal closure
-        if (event.code !== 1000) {
-          console.log('Scheduling reconnect attempt...');
-          // Try to reconnect after a delay
-          reconnectTimeout = setTimeout(() => {
-            connect();
-          }, 3000);
-        }
-      };
-      
-      ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
-      };
-      
-      ws.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          // Use the ref to always have the latest callback
-          if (onMessageRef.current) {
-            onMessageRef.current(data);
+          
+          // Only reconnect if this wasn't a normal closure
+          if (event.code !== 1000) {
+            console.log('Scheduling reconnect attempt...');
+            // Try to reconnect after a delay
+            reconnectTimeout = setTimeout(() => {
+              connect();
+            }, 3000);
           }
-        } catch (error) {
-          console.error('Error parsing WebSocket message:', error);
-        }
-      };
-      
-      setSocket(ws);
+        };
+        
+        ws.onerror = (error) => {
+          console.error('WebSocket error:', error);
+        };
+        
+        ws.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            // Use the ref to always have the latest callback
+            if (onMessageRef.current) {
+              onMessageRef.current(data);
+            }
+          } catch (error) {
+            console.error('Error parsing WebSocket message:', error);
+          }
+        };
+        
+        setSocket(ws);
+      } catch (error) {
+        console.error('Error connecting to WebSocket:', error);
+        // Try to reconnect after a delay
+        reconnectTimeout = setTimeout(() => {
+          connect();
+        }, 3000);
+      }
     };
     
     // Initial connection

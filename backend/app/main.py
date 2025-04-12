@@ -1,14 +1,15 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, HTTPException, status, BackgroundTasks, Request, Response
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, HTTPException, status, BackgroundTasks, Request, Response, Query
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict, Any, Optional, Set
 import asyncio
 import json
 import os
+import uuid
 
-from app.models import LDConfig, SimulationStatus
+from app.models import LDConfig, SimulationStatus, SessionRequest
 from app.simulation import (
     start_simulation, stop_simulation, get_simulation_status,
-    connected_websockets, send_status_to_clients, send_log_to_clients
+    register_websocket, unregister_websocket, send_status_to_clients, send_log_to_clients
 )
 from app.api import router as ld_api_router
 
@@ -54,34 +55,42 @@ async def health_check():
     """Check if the API is running"""
     return {"status": "healthy", "version": "1.0.0"}
 
+@app.get("/session", tags=["Session"], response_model=Dict[str, str])
+async def create_session():
+    """Create a new session ID for the client"""
+    session_id = str(uuid.uuid4())
+    return {"session_id": session_id}
+
 @app.post("/simulation/start", tags=["Simulation"], response_model=SimulationStatus)
 async def api_start_simulation(config: LDConfig):
     """Start the simulation with the provided configuration"""
-    await start_simulation(config)
-    return get_simulation_status()
+    # The session_id is now passed as part of the config
+    await start_simulation(config.session_id, config)
+    return get_simulation_status(config.session_id)
 
 @app.post("/simulation/stop", tags=["Simulation"], response_model=SimulationStatus)
-async def api_stop_simulation():
+async def api_stop_simulation(request: SessionRequest):
     """Stop the simulation"""
-    await stop_simulation()
-    return get_simulation_status()
+    await stop_simulation(request.session_id)
+    return get_simulation_status(request.session_id)
 
 @app.get("/simulation/status", tags=["Simulation"], response_model=SimulationStatus)
-async def api_get_status():
+async def api_get_status(session_id: str = Query(..., description="Session ID to get status for")):
     """Get the current simulation status"""
-    return get_simulation_status()
+    return get_simulation_status(session_id)
 
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    """WebSocket endpoint for real-time updates"""
+@app.websocket("/ws/{session_id}")
+async def websocket_endpoint(websocket: WebSocket, session_id: str):
+    """WebSocket endpoint for real-time updates for a specific session"""
     await websocket.accept()
-    connected_websockets.add(websocket)
+    register_websocket(session_id, websocket)
     
     try:
         # Send current status when a client connects
+        current_status = get_simulation_status(session_id)
         await websocket.send_text(json.dumps({
             "type": "status", 
-            "data": get_simulation_status().model_dump()
+            "data": current_status.model_dump()
         }))
         
         # Keep connection alive
@@ -92,4 +101,4 @@ async def websocket_endpoint(websocket: WebSocket):
         # Client disconnected
         pass
     finally:
-        connected_websockets.remove(websocket)
+        unregister_websocket(session_id, websocket)

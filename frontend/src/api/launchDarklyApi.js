@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getSessionId } from './simulationApi';
 
 // API base URL - dynamic based on environment
 const getApiUrl = () => {
@@ -56,12 +57,16 @@ const api = axios.create({
 // Helper function to make API requests via the proxy
 const makeProxyRequest = async (url, method, payload, api_key, headers) => {
   try {
+    // Get the session ID
+    const sessionId = await getSessionId();
+    
     // Use axios for all requests
     const response = await api.post('/ld-api-proxy/proxy', {
       url,
       method,
       payload,
       api_key,
+      session_id: sessionId, // Include session ID in the request
       headers
     });
     

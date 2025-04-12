@@ -38,6 +38,7 @@ class LDConfig(BaseModel):
     error_metric_enabled: bool = True
     latency_metric_enabled: bool = True
     business_metric_enabled: bool = True
+    session_id: str  # Add session ID to track simulations per client
     
     @field_validator('latency_metric_1_false_range', 'latency_metric_1_true_range')
     def validate_range(cls, v):
@@ -59,6 +60,7 @@ class LDConfig(BaseModel):
         return False
 
 class SimulationStatus(BaseModel):
+    session_id: str  # Add session ID to identify unique client sessions
     running: bool
     events_sent: int = 0
     last_error: Optional[str] = None
@@ -66,3 +68,6 @@ class SimulationStatus(BaseModel):
     guarded_rollout_active: bool = False
     first_event_time: Optional[float] = None  # Timestamp when first event was sent
     end_time: Optional[float] = None  # Timestamp when simulation stopped
+
+class SessionRequest(BaseModel):
+    session_id: str

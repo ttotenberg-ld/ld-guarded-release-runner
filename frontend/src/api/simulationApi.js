@@ -53,9 +53,41 @@ const api = axios.create({
   }
 });
 
+// Session management
+export const getSessionId = async () => {
+  // Check localStorage first
+  let sessionId = localStorage.getItem('simulation_session_id');
+  
+  // If no session ID exists, create a new one
+  if (!sessionId) {
+    try {
+      const response = await api.get('/session');
+      sessionId = response.data.session_id;
+      localStorage.setItem('simulation_session_id', sessionId);
+      console.log('Created new session ID:', sessionId);
+    } catch (error) {
+      console.error('Error creating session:', error);
+      // Fallback to a client-generated session ID
+      sessionId = 'client-' + Date.now() + '-' + Math.random().toString(36).substring(2, 9);
+      localStorage.setItem('simulation_session_id', sessionId);
+      console.log('Created fallback session ID:', sessionId);
+    }
+  } else {
+    console.log('Using existing session ID:', sessionId);
+  }
+  
+  return sessionId;
+};
+
 // Start simulation with configuration
 export const startSimulation = async (config) => {
   try {
+    // Get session ID
+    const sessionId = await getSessionId();
+    
+    // Add session ID to config
+    config.session_id = sessionId;
+    
     // Use axios for all calls
     const response = await api.post('/simulation/start', config);
     return response.data;
@@ -68,8 +100,11 @@ export const startSimulation = async (config) => {
 // Stop simulation
 export const stopSimulation = async () => {
   try {
+    // Get session ID
+    const sessionId = await getSessionId();
+    
     // Use axios for all calls
-    const response = await api.post('/simulation/stop');
+    const response = await api.post('/simulation/stop', { session_id: sessionId });
     return response.data;
   } catch (error) {
     console.error('Error stopping simulation:', error);
@@ -80,8 +115,11 @@ export const stopSimulation = async () => {
 // Get simulation status
 export const getStatus = async () => {
   try {
+    // Get session ID
+    const sessionId = await getSessionId();
+    
     // Use axios for all calls
-    const response = await api.get('/simulation/status');
+    const response = await api.get(`/simulation/status?session_id=${sessionId}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching status:', error);

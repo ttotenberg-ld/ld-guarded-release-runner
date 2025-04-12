@@ -18,149 +18,195 @@ from app.utils import create_multi_context, error_chance
 STATS_UPDATE_INTERVAL = 5.0  # Update stats every 5 seconds
 
 # Global variables to track simulation state
-simulation_status = SimulationStatus(running=False)
-active_clients: Dict[str, Any] = {}
-connected_websockets: Set = set()
+# Replace single status with dict of session_id -> status
+simulation_statuses: Dict[str, SimulationStatus] = {}
+active_clients: Dict[str, Dict[str, Any]] = {}  # session_id -> client info
+connected_websockets: Dict[str, Set] = {}  # session_id -> set of websockets
 
-# Stats tracking
-control_latency_values = []
-treatment_latency_values = []
-control_error_count = 0
-treatment_error_count = 0
-control_error_total = 0
-treatment_error_total = 0
-control_business_count = 0
-treatment_business_count = 0
-control_business_total = 0
-treatment_business_total = 0
+# Stats tracking - session-specific
+session_stats: Dict[str, Dict[str, Any]] = {}
 
-# Message deduplication
-last_messages: Deque[str] = deque(maxlen=10)
-last_message_time = 0.0
+# Message deduplication - session-specific
+last_messages: Dict[str, Deque[str]] = {}
+last_message_times: Dict[str, float] = {}
 
-async def send_log_to_clients(message: str):
+def get_or_create_status(session_id: str) -> SimulationStatus:
+    """Get or create a simulation status for a given session"""
+    if session_id not in simulation_statuses:
+        simulation_statuses[session_id] = SimulationStatus(
+            session_id=session_id,
+            running=False
+        )
+        # Initialize stats tracking for this session
+        session_stats[session_id] = {
+            "control_latency_values": [],
+            "treatment_latency_values": [],
+            "control_error_count": 0,
+            "treatment_error_count": 0,
+            "control_error_total": 0,
+            "treatment_error_total": 0,
+            "control_business_count": 0,
+            "treatment_business_count": 0,
+            "control_business_total": 0,
+            "treatment_business_total": 0
+        }
+        # Initialize message deduplication for this session
+        last_messages[session_id] = deque(maxlen=10)
+        last_message_times[session_id] = 0.0
+        # Initialize websockets set for this session
+        connected_websockets[session_id] = set()
+    
+    return simulation_statuses[session_id]
+
+async def send_log_to_clients(session_id: str, message: str):
     """Send a log message to all connected WebSocket clients with deduplication"""
-    global last_message_time
+    if session_id not in connected_websockets:
+        return
     
     # Deduplicate messages within a short time window
     current_time = time.time()
     
     # Skip identical messages sent within 1 second
-    if message in last_messages and current_time - last_message_time < 1.0:
+    if (message in last_messages[session_id] and 
+            current_time - last_message_times[session_id] < 1.0):
         return
     
     # Update tracking
-    last_messages.append(message)
-    last_message_time = current_time
+    last_messages[session_id].append(message)
+    last_message_times[session_id] = current_time
     
-    if connected_websockets:
+    if connected_websockets[session_id]:
         await asyncio.gather(
-            *[websocket.send_text(json.dumps({"type": "log", "message": message})) for websocket in connected_websockets]
+            *[websocket.send_text(json.dumps({"type": "log", "message": message})) 
+              for websocket in connected_websockets[session_id]]
         )
 
-async def send_status_to_clients():
+async def send_status_to_clients(session_id: str):
     """Send current simulation status to all connected WebSocket clients"""
-    if connected_websockets:
-        status_data = json.dumps({"type": "status", "data": simulation_status.model_dump()})
-        await asyncio.gather(
-            *[websocket.send_text(status_data) for websocket in connected_websockets]
-        )
+    if session_id not in connected_websockets or not connected_websockets[session_id]:
+        return
+        
+    status = get_or_create_status(session_id)
+    status_data = json.dumps({"type": "status", "data": status.model_dump()})
+    
+    await asyncio.gather(
+        *[websocket.send_text(status_data) for websocket in connected_websockets[session_id]]
+    )
 
-def update_stats():
-    """Update aggregated statistics"""
-    global control_latency_values, treatment_latency_values
-    global control_error_count, treatment_error_count, control_error_total, treatment_error_total
-    global control_business_count, treatment_business_count, control_business_total, treatment_business_total
+def update_stats(session_id: str):
+    """Update aggregated statistics for a specific session"""
+    if session_id not in session_stats:
+        return False
+    
+    status = get_or_create_status(session_id)
+    stats = session_stats[session_id]
     
     current_time = time.time()
     
     # Only update if sufficient time has passed since last update
-    if current_time - simulation_status.stats.last_updated < STATS_UPDATE_INTERVAL:
+    if current_time - status.stats.last_updated < STATS_UPDATE_INTERVAL:
         return False
     
     # Update control statistics
     # Latency
+    control_latency_values = stats["control_latency_values"]
     if control_latency_values:
-        simulation_status.stats.control.latency.count = len(control_latency_values)
-        simulation_status.stats.control.latency.sum = sum(control_latency_values)
-        simulation_status.stats.control.latency.avg = simulation_status.stats.control.latency.sum / len(control_latency_values)
+        status.stats.control.latency.count = len(control_latency_values)
+        status.stats.control.latency.sum = sum(control_latency_values)
+        status.stats.control.latency.avg = status.stats.control.latency.sum / len(control_latency_values)
     
     # Error rate
+    control_error_total = stats["control_error_total"]
+    control_error_count = stats["control_error_count"]
     if control_error_total > 0:
-        simulation_status.stats.control.error_rate.count = control_error_total
-        simulation_status.stats.control.error_rate.sum = control_error_count
-        simulation_status.stats.control.error_rate.avg = (control_error_count / control_error_total) * 100 if control_error_total > 0 else 0
+        status.stats.control.error_rate.count = control_error_total
+        status.stats.control.error_rate.sum = control_error_count
+        status.stats.control.error_rate.avg = (control_error_count / control_error_total) * 100 if control_error_total > 0 else 0
     
     # Business metrics
+    control_business_total = stats["control_business_total"]
+    control_business_count = stats["control_business_count"]
     if control_business_total > 0:
-        simulation_status.stats.control.business.count = control_business_total
-        simulation_status.stats.control.business.sum = control_business_count
-        simulation_status.stats.control.business.avg = (control_business_count / control_business_total) * 100 if control_business_total > 0 else 0
+        status.stats.control.business.count = control_business_total
+        status.stats.control.business.sum = control_business_count
+        status.stats.control.business.avg = (control_business_count / control_business_total) * 100 if control_business_total > 0 else 0
     
     # Update treatment statistics
     # Latency
+    treatment_latency_values = stats["treatment_latency_values"]
     if treatment_latency_values:
-        simulation_status.stats.treatment.latency.count = len(treatment_latency_values)
-        simulation_status.stats.treatment.latency.sum = sum(treatment_latency_values)
-        simulation_status.stats.treatment.latency.avg = simulation_status.stats.treatment.latency.sum / len(treatment_latency_values)
+        status.stats.treatment.latency.count = len(treatment_latency_values)
+        status.stats.treatment.latency.sum = sum(treatment_latency_values)
+        status.stats.treatment.latency.avg = status.stats.treatment.latency.sum / len(treatment_latency_values)
     
     # Error rate
+    treatment_error_total = stats["treatment_error_total"]
+    treatment_error_count = stats["treatment_error_count"]
     if treatment_error_total > 0:
-        simulation_status.stats.treatment.error_rate.count = treatment_error_total
-        simulation_status.stats.treatment.error_rate.sum = treatment_error_count
-        simulation_status.stats.treatment.error_rate.avg = (treatment_error_count / treatment_error_total) * 100 if treatment_error_total > 0 else 0
+        status.stats.treatment.error_rate.count = treatment_error_total
+        status.stats.treatment.error_rate.sum = treatment_error_count
+        status.stats.treatment.error_rate.avg = (treatment_error_count / treatment_error_total) * 100 if treatment_error_total > 0 else 0
         # Add debug message
-        print(f"DEBUG: Updated treatment error stats - total: {treatment_error_total}, count: {treatment_error_count}, avg: {simulation_status.stats.treatment.error_rate.avg}")
+        print(f"DEBUG: Updated treatment error stats for session {session_id} - total: {treatment_error_total}, count: {treatment_error_count}, avg: {status.stats.treatment.error_rate.avg}")
     
     # Business metrics
+    treatment_business_total = stats["treatment_business_total"]
+    treatment_business_count = stats["treatment_business_count"]
     if treatment_business_total > 0:
-        simulation_status.stats.treatment.business.count = treatment_business_total
-        simulation_status.stats.treatment.business.sum = treatment_business_count
-        simulation_status.stats.treatment.business.avg = (treatment_business_count / treatment_business_total) * 100 if treatment_business_total > 0 else 0
+        status.stats.treatment.business.count = treatment_business_total
+        status.stats.treatment.business.sum = treatment_business_count
+        status.stats.treatment.business.avg = (treatment_business_count / treatment_business_total) * 100 if treatment_business_total > 0 else 0
     
     # Update timestamp
-    simulation_status.stats.last_updated = current_time
+    status.stats.last_updated = current_time
     
     return True
 
-async def init_ld_client(config: LDConfig) -> bool:
-    """Initialize the LaunchDarkly client"""
+async def init_ld_client(session_id: str, config: LDConfig) -> bool:
+    """Initialize the LaunchDarkly client for a specific session"""
     try:
-        # Clean up any existing client
-        if "client" in active_clients:
-            active_clients["client"].close()
-            del active_clients["client"]
+        # Clean up any existing client for this session
+        if session_id in active_clients and "client" in active_clients[session_id]:
+            active_clients[session_id]["client"].close()
+        
+        # Initialize client data structure for this session if needed
+        if session_id not in active_clients:
+            active_clients[session_id] = {}
             
         # Log toggle values for debugging
-        await send_log_to_clients(f"DEBUG - Latency toggle: {config.latency_metric_enabled} (type: {type(config.latency_metric_enabled).__name__})")
-        await send_log_to_clients(f"DEBUG - Error toggle: {config.error_metric_enabled} (type: {type(config.error_metric_enabled).__name__})")
-        await send_log_to_clients(f"DEBUG - Business toggle: {config.business_metric_enabled} (type: {type(config.business_metric_enabled).__name__})")
+        await send_log_to_clients(session_id, f"DEBUG - Latency toggle: {config.latency_metric_enabled} (type: {type(config.latency_metric_enabled).__name__})")
+        await send_log_to_clients(session_id, f"DEBUG - Error toggle: {config.error_metric_enabled} (type: {type(config.error_metric_enabled).__name__})")
+        await send_log_to_clients(session_id, f"DEBUG - Business toggle: {config.business_metric_enabled} (type: {type(config.business_metric_enabled).__name__})")
             
         # Initialize new client
         ldclient.set_config(Config(config.sdk_key))
-        active_clients["client"] = ldclient.get()
-        active_clients["config"] = config
-        await send_log_to_clients("LaunchDarkly client initialized")
+        active_clients[session_id]["client"] = ldclient.get()
+        active_clients[session_id]["config"] = config
+        await send_log_to_clients(session_id, "LaunchDarkly client initialized")
         return True
     except Exception as e:
         error_msg = f"Error initializing LaunchDarkly client: {str(e)}"
-        simulation_status.last_error = error_msg
-        await send_log_to_clients(error_msg)
+        status = get_or_create_status(session_id)
+        status.last_error = error_msg
+        await send_log_to_clients(session_id, error_msg)
         return False
 
-async def check_guarded_rollout() -> bool:
-    """Check if the guarded rollout is active"""
-    config = active_clients.get("config")
-    if not config:
-        await send_log_to_clients("No configuration found")
-        simulation_status.guarded_rollout_active = False
+async def check_guarded_rollout(session_id: str) -> bool:
+    """Check if the guarded rollout is active for a specific session"""
+    status = get_or_create_status(session_id)
+    
+    if session_id not in active_clients or "config" not in active_clients[session_id]:
+        await send_log_to_clients(session_id, "No configuration found")
+        status.guarded_rollout_active = False
         return False
+        
+    config = active_clients[session_id]["config"]
         
     try:
         url = f'https://app.launchdarkly.com/api/v2/flags/{config.project_key}/{config.flag_key}'
         headers = {'Authorization': config.api_key, 'Content-Type': 'application/json'}
         
-        await send_log_to_clients(f"Checking if guarded rollout is active for {config.flag_key}")
+        await send_log_to_clients(session_id, f"Checking if guarded rollout is active for {config.flag_key}")
         response = requests.get(url, headers=headers)
         response.raise_for_status()
         response_data = response.json()
@@ -179,48 +225,53 @@ async def check_guarded_rollout() -> bool:
         is_active = rollout_type == 'measuredRollout'
         
         # Check if the rollout status changed from active to inactive
-        if simulation_status.guarded_rollout_active and not is_active and simulation_status.running:
+        if status.guarded_rollout_active and not is_active and status.running:
             # The rollout just became inactive, but the simulation is still running
-            simulation_status.end_time = time.time()
-            await send_log_to_clients("Guarded rollout became inactive - recording end time")
+            status.end_time = time.time()
+            await send_log_to_clients(session_id, "Guarded rollout became inactive - recording end time")
         
         # Update the status
-        simulation_status.guarded_rollout_active = is_active
+        status.guarded_rollout_active = is_active
         status_msg = "Guarded Rollout is active" if is_active else "Guarded Rollout is not active"
-        await send_log_to_clients(status_msg)
+        await send_log_to_clients(session_id, status_msg)
         return is_active
     
     except requests.RequestException as e:
         error_msg = f"API request error: {str(e)}"
-        simulation_status.last_error = error_msg
-        simulation_status.guarded_rollout_active = False
-        await send_log_to_clients(error_msg)
+        status.last_error = error_msg
+        status.guarded_rollout_active = False
+        await send_log_to_clients(session_id, error_msg)
         return False
     except json.JSONDecodeError as e:
         error_msg = f"Error parsing API response: {str(e)}"
-        simulation_status.last_error = error_msg
-        simulation_status.guarded_rollout_active = False
-        await send_log_to_clients(error_msg)
+        status.last_error = error_msg
+        status.guarded_rollout_active = False
+        await send_log_to_clients(session_id, error_msg)
         return False
     except Exception as e:
         error_msg = f"Unexpected error checking rollout: {str(e)}"
-        simulation_status.last_error = error_msg
-        simulation_status.guarded_rollout_active = False
-        await send_log_to_clients(error_msg)
+        status.last_error = error_msg
+        status.guarded_rollout_active = False
+        await send_log_to_clients(session_id, error_msg)
         return False
 
-async def send_events(num_events: int = 1000):
-    """Send events to LaunchDarkly"""
-    global control_latency_values, treatment_latency_values
-    global control_error_count, treatment_error_count, control_error_total, treatment_error_total
-    global control_business_count, treatment_business_count, control_business_total, treatment_business_total
+async def send_events(session_id: str, num_events: int = 1000):
+    """Send events to LaunchDarkly for a specific session"""
+    status = get_or_create_status(session_id)
     
-    client = active_clients.get("client")
-    config = active_clients.get("config")
+    if session_id not in active_clients:
+        await send_log_to_clients(session_id, "LaunchDarkly client not initialized")
+        return
+        
+    client = active_clients[session_id].get("client")
+    config = active_clients[session_id].get("config")
     
     if not client or not config:
-        await send_log_to_clients("LaunchDarkly client not initialized")
+        await send_log_to_clients(session_id, "LaunchDarkly client not initialized")
         return
+    
+    # Get session-specific stats tracking
+    stats = session_stats[session_id]
     
     # Convert toggle values to explicitly ensure they're boolean
     latency_enabled = bool(config.latency_metric_enabled)
@@ -228,13 +279,13 @@ async def send_events(num_events: int = 1000):
     business_enabled = bool(config.business_metric_enabled)
     
     # Log again for debugging
-    await send_log_to_clients(f"DEBUG - At send_events: Latency toggle: {latency_enabled} (type: {type(latency_enabled).__name__})")
+    await send_log_to_clients(session_id, f"DEBUG - At send_events: Latency toggle: {latency_enabled} (type: {type(latency_enabled).__name__})")
     
     events_sent = 0
     first_event_tracked = False
     
     for i in range(num_events):
-        if not simulation_status.running:
+        if not status.running:
             break
             
         try:
@@ -251,213 +302,227 @@ async def send_events(num_events: int = 1000):
             # Update evaluation counters
             if flag_variation:
                 # Treatment group
-                simulation_status.stats.treatment.evaluations += 1
+                status.stats.treatment.evaluations += 1
                 if in_experiment:
-                    simulation_status.stats.treatment.in_experiment += 1
+                    status.stats.treatment.in_experiment += 1
             else:
                 # Control group
-                simulation_status.stats.control.evaluations += 1
+                status.stats.control.evaluations += 1
                 if in_experiment:
-                    simulation_status.stats.control.in_experiment += 1
+                    status.stats.control.in_experiment += 1
                     
             # Use control/treatment terminology in logs
             variation_str = "treatment" if flag_variation else "control"
             experiment_str = "in experiment" if in_experiment else "not in experiment"
-            await send_log_to_clients(f"Executing {variation_str} ({experiment_str})")
+            await send_log_to_clients(session_id, f"Executing {variation_str} ({experiment_str})")
             
             # Only send events if the user is part of an experiment
             if not in_experiment:
-                await send_log_to_clients("Skipping event tracking - user not in experiment")
+                await send_log_to_clients(session_id, "Skipping event tracking - user not in experiment")
                 continue
             
             # Record first event time if not set yet and this is our first actual event
-            if simulation_status.first_event_time is None:
-                simulation_status.first_event_time = time.time()
-                await send_log_to_clients(f"First event sent at: {time.strftime('%H:%M:%S', time.localtime(simulation_status.first_event_time))}")
+            if status.first_event_time is None:
+                status.first_event_time = time.time()
+                await send_log_to_clients(session_id, f"First event sent at: {time.strftime('%H:%M:%S', time.localtime(status.first_event_time))}")
                 first_event_tracked = True
                 
             if flag_variation:
                 # Treatment (true variation)
                 # Error metric tracking - only if enabled
-                treatment_error_total += 1
+                stats["treatment_error_total"] += 1
                 # Add debug
                 error_roll = random.randint(1, 100)
                 should_trigger = error_roll <= config.error_metric_1_true_converted
-                print(f"DEBUG: Treatment error check - roll: {error_roll}, threshold: {config.error_metric_1_true_converted}, will trigger: {should_trigger}")
+                print(f"DEBUG: Treatment error check for session {session_id} - roll: {error_roll}, threshold: {config.error_metric_1_true_converted}, will trigger: {should_trigger}")
                 
                 if error_enabled and error_chance(config.error_metric_1_true_converted):
                     client.track(config.error_metric_1, context)
-                    treatment_error_count += 1
-                    await send_log_to_clients(f"Tracking {config.error_metric_1} for treatment")
-                    print(f"DEBUG: Tracked treatment error - total: {treatment_error_total}, count: {treatment_error_count}")
+                    stats["treatment_error_count"] += 1
+                    await send_log_to_clients(session_id, f"Tracking {config.error_metric_1} for treatment")
+                    print(f"DEBUG: Tracked treatment error for session {session_id} - total: {stats['treatment_error_total']}, count: {stats['treatment_error_count']}")
                 elif not error_enabled:
-                    await send_log_to_clients(f"Skipping {config.error_metric_1} tracking (disabled)")
+                    await send_log_to_clients(session_id, f"Skipping {config.error_metric_1} tracking (disabled)")
                 
                 # Business metric tracking - only if enabled
-                treatment_business_total += 1
+                stats["treatment_business_total"] += 1
                 if business_enabled and error_chance(config.business_metric_1_true_converted):
                     client.track(config.business_metric_1, context)
-                    treatment_business_count += 1
-                    await send_log_to_clients(f"Tracking {config.business_metric_1} for treatment")
+                    stats["treatment_business_count"] += 1
+                    await send_log_to_clients(session_id, f"Tracking {config.business_metric_1} for treatment")
                 elif not business_enabled:
-                    await send_log_to_clients(f"Skipping {config.business_metric_1} tracking (disabled)")
+                    await send_log_to_clients(session_id, f"Skipping {config.business_metric_1} tracking (disabled)")
                 
                 # Latency metric tracking - only if enabled
                 if latency_enabled:
                     latency_value = random.randint(config.latency_metric_1_true_range[0], config.latency_metric_1_true_range[1])
                     client.track(config.latency_metric_1, context, metric_value=latency_value)
-                    treatment_latency_values.append(latency_value)
-                    await send_log_to_clients(f"Tracking {config.latency_metric_1} with value {latency_value} for treatment")
+                    stats["treatment_latency_values"].append(latency_value)
+                    await send_log_to_clients(session_id, f"Tracking {config.latency_metric_1} with value {latency_value} for treatment")
                 else:
-                    await send_log_to_clients(f"Skipping {config.latency_metric_1} tracking (disabled)")
+                    await send_log_to_clients(session_id, f"Skipping {config.latency_metric_1} tracking (disabled)")
             else:
                 # Control (false variation)
                 # Error metric tracking - only if enabled
-                control_error_total += 1
+                stats["control_error_total"] += 1
                 if error_enabled and error_chance(config.error_metric_1_false_converted):
                     client.track(config.error_metric_1, context)
-                    control_error_count += 1
-                    await send_log_to_clients(f"Tracking {config.error_metric_1} for control")
+                    stats["control_error_count"] += 1
+                    await send_log_to_clients(session_id, f"Tracking {config.error_metric_1} for control")
                 elif not error_enabled:
-                    await send_log_to_clients(f"Skipping {config.error_metric_1} tracking (disabled)")
+                    await send_log_to_clients(session_id, f"Skipping {config.error_metric_1} tracking (disabled)")
                 
                 # Business metric tracking - only if enabled
-                control_business_total += 1
+                stats["control_business_total"] += 1
                 if business_enabled and error_chance(config.business_metric_1_false_converted):
                     client.track(config.business_metric_1, context)
-                    control_business_count += 1
-                    await send_log_to_clients(f"Tracking {config.business_metric_1} for control")
+                    stats["control_business_count"] += 1
+                    await send_log_to_clients(session_id, f"Tracking {config.business_metric_1} for control")
                 elif not business_enabled:
-                    await send_log_to_clients(f"Skipping {config.business_metric_1} tracking (disabled)")
+                    await send_log_to_clients(session_id, f"Skipping {config.business_metric_1} tracking (disabled)")
                 
                 # Latency metric tracking - only if enabled
                 if latency_enabled:
                     latency_value = random.randint(config.latency_metric_1_false_range[0], config.latency_metric_1_false_range[1])
                     client.track(config.latency_metric_1, context, metric_value=latency_value)
-                    control_latency_values.append(latency_value)
-                    await send_log_to_clients(f"Tracking {config.latency_metric_1} with value {latency_value} for control")
+                    stats["control_latency_values"].append(latency_value)
+                    await send_log_to_clients(session_id, f"Tracking {config.latency_metric_1} with value {latency_value} for control")
                 else:
-                    await send_log_to_clients(f"Skipping {config.latency_metric_1} tracking (disabled)")
+                    await send_log_to_clients(session_id, f"Skipping {config.latency_metric_1} tracking (disabled)")
             
             client.flush()
             events_sent += 1
-            simulation_status.events_sent += 1
+            status.events_sent += 1
             
             # Update statistics periodically
-            if update_stats():
-                await send_status_to_clients()
+            if update_stats(session_id):
+                await send_status_to_clients(session_id)
             # Update status periodically
             elif events_sent % 10 == 0:
-                await send_status_to_clients()
+                await send_status_to_clients(session_id)
                 
             # Sleep to avoid overwhelming the service
             await asyncio.sleep(0.05)
             
         except Exception as e:
             error_msg = f"Error during event sending: {str(e)}"
-            simulation_status.last_error = error_msg
-            await send_log_to_clients(error_msg)
+            status.last_error = error_msg
+            await send_log_to_clients(session_id, error_msg)
             continue
     
     # Final update before exiting
-    update_stats()
-    await send_status_to_clients()
+    update_stats(session_id)
+    await send_status_to_clients(session_id)
 
-async def simulation_loop():
-    """Main simulation loop"""
+async def simulation_loop(session_id: str):
+    """Main simulation loop for a specific session"""
+    status = get_or_create_status(session_id)
     was_active = False
     
-    while simulation_status.running:
-        is_active = await check_guarded_rollout()
+    while status.running:
+        is_active = await check_guarded_rollout(session_id)
         
         # Check if rollout went from active to inactive
         if was_active and not is_active:
-            await send_log_to_clients("Guarded rollout became inactive - stopping simulation")
-            await stop_simulation()
+            await send_log_to_clients(session_id, "Guarded rollout became inactive - stopping simulation")
+            await stop_simulation(session_id)
             break
             
         # Record current active state for next loop
         was_active = is_active
         
         if is_active:
-            await send_events(100)  # Send batches of 100 for better control
+            await send_events(session_id, 100)  # Send batches of 100 for better control
         else:
-            await send_log_to_clients("Waiting for guarded rollout to become active...")
+            await send_log_to_clients(session_id, "Waiting for guarded rollout to become active...")
             await asyncio.sleep(5)  # Check again in 5 seconds
-            await send_status_to_clients()  # Send updated status with guarded_rollout_active flag
+            await send_status_to_clients(session_id)  # Send updated status with guarded_rollout_active flag
 
-async def start_simulation(config: LDConfig):
-    """Start the simulation"""
-    global control_latency_values, treatment_latency_values
-    global control_error_count, treatment_error_count, control_error_total, treatment_error_total
-    global control_business_count, treatment_business_count, control_business_total, treatment_business_total
+async def start_simulation(session_id: str, config: LDConfig):
+    """Start the simulation for a specific session"""
+    status = get_or_create_status(session_id)
     
-    if simulation_status.running:
-        await send_log_to_clients("Simulation already running")
+    if status.running:
+        await send_log_to_clients(session_id, "Simulation already running")
         return
         
     # Initialize client
-    if not await init_ld_client(config):
+    if not await init_ld_client(session_id, config):
         return
     
     # Reset statistics
-    control_latency_values = []
-    treatment_latency_values = []
-    control_error_count = 0
-    treatment_error_count = 0
-    control_error_total = 0
-    treatment_error_total = 0
-    control_business_count = 0
-    treatment_business_count = 0
-    control_business_total = 0
-    treatment_business_total = 0
+    session_stats[session_id] = {
+        "control_latency_values": [],
+        "treatment_latency_values": [],
+        "control_error_count": 0,
+        "treatment_error_count": 0,
+        "control_error_total": 0,
+        "treatment_error_total": 0,
+        "control_business_count": 0,
+        "treatment_business_count": 0,
+        "control_business_total": 0,
+        "treatment_business_total": 0
+    }
     
     # Reset status
-    simulation_status.running = True
-    simulation_status.events_sent = 0
-    simulation_status.last_error = None
-    simulation_status.guarded_rollout_active = False
-    simulation_status.first_event_time = None
-    simulation_status.end_time = None
+    status.running = True
+    status.events_sent = 0
+    status.last_error = None
+    status.guarded_rollout_active = False
+    status.first_event_time = None
+    status.end_time = None
     
     # Reset stats properly by creating a new SimulationStats instance
-    simulation_status.stats = SimulationStats()
+    status.stats = SimulationStats()
     
     # Start simulation in background
-    asyncio.create_task(simulation_loop())
-    await send_status_to_clients()
-    await send_log_to_clients("Simulation started")
+    asyncio.create_task(simulation_loop(session_id))
+    await send_status_to_clients(session_id)
+    await send_log_to_clients(session_id, "Simulation started")
 
-async def stop_simulation():
-    """Stop the simulation"""
-    if not simulation_status.running:
-        await send_log_to_clients("No simulation running")
+async def stop_simulation(session_id: str):
+    """Stop the simulation for a specific session"""
+    status = get_or_create_status(session_id)
+    
+    if not status.running:
+        await send_log_to_clients(session_id, "No simulation running")
         return
     
     # Set end time only if not already set by the guarded rollout check
-    if not simulation_status.end_time:
-        simulation_status.end_time = time.time()
-        await send_log_to_clients(f"Simulation ended at: {time.strftime('%H:%M:%S', time.localtime(simulation_status.end_time))}")
+    if not status.end_time:
+        status.end_time = time.time()
+        await send_log_to_clients(session_id, f"Simulation ended at: {time.strftime('%H:%M:%S', time.localtime(status.end_time))}")
     else:
-        await send_log_to_clients(f"Simulation already ended at: {time.strftime('%H:%M:%S', time.localtime(simulation_status.end_time))}")
+        await send_log_to_clients(session_id, f"Simulation already ended at: {time.strftime('%H:%M:%S', time.localtime(status.end_time))}")
     
     # Calculate run time if the simulation had events sent
-    if simulation_status.first_event_time:
-        run_time = simulation_status.end_time - simulation_status.first_event_time
-        await send_log_to_clients(f"Simulation ran for {int(run_time)} seconds since first event")
+    if status.first_event_time:
+        run_time = status.end_time - status.first_event_time
+        await send_log_to_clients(session_id, f"Simulation ran for {int(run_time)} seconds since first event")
         
-    simulation_status.running = False
-    await send_status_to_clients()
-    await send_log_to_clients("Simulation stopped")
+    status.running = False
+    await send_status_to_clients(session_id)
+    await send_log_to_clients(session_id, "Simulation stopped")
     
     # Clean up
-    if "client" in active_clients:
+    if session_id in active_clients and "client" in active_clients[session_id]:
         try:
-            active_clients["client"].flush()
-            active_clients["client"].close()
+            active_clients[session_id]["client"].flush()
+            active_clients[session_id]["client"].close()
         except Exception as e:
-            await send_log_to_clients(f"Error during cleanup: {str(e)}")
+            await send_log_to_clients(session_id, f"Error during cleanup: {str(e)}")
 
-def get_simulation_status() -> SimulationStatus:
-    """Get current simulation status"""
-    return simulation_status
+def get_simulation_status(session_id: str) -> SimulationStatus:
+    """Get current simulation status for a specific session"""
+    return get_or_create_status(session_id)
+
+def register_websocket(session_id: str, websocket: Any):
+    """Register a websocket connection for a specific session"""
+    if session_id not in connected_websockets:
+        connected_websockets[session_id] = set()
+    connected_websockets[session_id].add(websocket)
+
+def unregister_websocket(session_id: str, websocket: Any):
+    """Unregister a websocket connection for a specific session"""
+    if session_id in connected_websockets:
+        connected_websockets[session_id].discard(websocket)
