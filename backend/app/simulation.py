@@ -11,7 +11,7 @@ import uuid
 from contextlib import asynccontextmanager
 from collections import deque
 
-from app.models import LDConfig, SimulationStatus, MetricStats, SimulationStats
+from app.models import LDConfig, SimulationStatus, MetricStats, SimulationStats, LogEntry
 from app.utils import create_multi_context, error_chance
 
 # Constants for stats tracking
@@ -58,10 +58,13 @@ def get_or_create_status(session_id: str) -> SimulationStatus:
     
     return simulation_statuses[session_id]
 
-async def send_log_to_clients(session_id: str, message: str):
-    """Send a log message to all connected WebSocket clients with deduplication"""
+async def send_log_to_clients(session_id: str, message: str, user_key: Optional[str] = None):
+    """Send a log message to all connected WebSocket clients with deduplication and store in log history"""
     if session_id not in connected_websockets:
         return
+    
+    # Get the status to store logs
+    status = get_or_create_status(session_id)
     
     # Deduplicate messages within a short time window
     current_time = time.time()
@@ -75,9 +78,20 @@ async def send_log_to_clients(session_id: str, message: str):
     last_messages[session_id].append(message)
     last_message_times[session_id] = current_time
     
+    # Create a log entry
+    log_entry = LogEntry(timestamp=current_time, message=message, user_key=user_key)
+    
+    # Increment total logs counter
+    status.total_logs_generated += 1
+    
+    # Store log if within limits
+    if len(status.stored_logs) < status.max_logs:
+        status.stored_logs.append(log_entry)
+    
+    # Send to WebSocket clients
     if connected_websockets[session_id]:
         await asyncio.gather(
-            *[websocket.send_text(json.dumps({"type": "log", "message": message})) 
+            *[websocket.send_text(json.dumps({"type": "log", "message": message, "user_key": user_key})) 
               for websocket in connected_websockets[session_id]]
         )
 
@@ -290,6 +304,11 @@ async def send_events(session_id: str, num_events: int = 1000):
             
         try:
             context = create_multi_context()
+            
+            # Extract user key from context
+            user_context = context.get_individual_context('user')
+            user_key = user_context.key if user_context else 'unknown'
+            
             flag_variation_detail = client.variation_detail(config.flag_key, context, False)
             flag_variation = flag_variation_detail.value
             
@@ -314,17 +333,17 @@ async def send_events(session_id: str, num_events: int = 1000):
             # Use control/treatment terminology in logs
             variation_str = "treatment" if flag_variation else "control"
             experiment_str = "in experiment" if in_experiment else "not in experiment"
-            await send_log_to_clients(session_id, f"Executing {variation_str} ({experiment_str})")
+            await send_log_to_clients(session_id, f"Executing {variation_str} ({experiment_str})", user_key)
             
             # Only send events if the user is part of an experiment
             if not in_experiment:
-                await send_log_to_clients(session_id, "Skipping event tracking - user not in experiment")
+                await send_log_to_clients(session_id, "Skipping event tracking - user not in experiment", user_key)
                 continue
             
             # Record first event time if not set yet and this is our first actual event
             if status.first_event_time is None:
                 status.first_event_time = time.time()
-                await send_log_to_clients(session_id, f"First event sent at: {time.strftime('%H:%M:%S', time.localtime(status.first_event_time))}")
+                await send_log_to_clients(session_id, f"First event sent at: {time.strftime('%H:%M:%S', time.localtime(status.first_event_time))}", user_key)
                 first_event_tracked = True
                 
             if flag_variation:
@@ -339,28 +358,28 @@ async def send_events(session_id: str, num_events: int = 1000):
                 if error_enabled and error_chance(config.error_metric_1_true_converted):
                     client.track(config.error_metric_1, context)
                     stats["treatment_error_count"] += 1
-                    await send_log_to_clients(session_id, f"Tracking {config.error_metric_1} for treatment")
+                    await send_log_to_clients(session_id, f"Tracking {config.error_metric_1} for treatment", user_key)
                     print(f"DEBUG: Tracked treatment error for session {session_id} - total: {stats['treatment_error_total']}, count: {stats['treatment_error_count']}")
                 elif not error_enabled:
-                    await send_log_to_clients(session_id, f"Skipping {config.error_metric_1} tracking (disabled)")
+                    await send_log_to_clients(session_id, f"Skipping {config.error_metric_1} tracking (disabled)", user_key)
                 
                 # Business metric tracking - only if enabled
                 stats["treatment_business_total"] += 1
                 if business_enabled and error_chance(config.business_metric_1_true_converted):
                     client.track(config.business_metric_1, context)
                     stats["treatment_business_count"] += 1
-                    await send_log_to_clients(session_id, f"Tracking {config.business_metric_1} for treatment")
+                    await send_log_to_clients(session_id, f"Tracking {config.business_metric_1} for treatment", user_key)
                 elif not business_enabled:
-                    await send_log_to_clients(session_id, f"Skipping {config.business_metric_1} tracking (disabled)")
+                    await send_log_to_clients(session_id, f"Skipping {config.business_metric_1} tracking (disabled)", user_key)
                 
                 # Latency metric tracking - only if enabled
                 if latency_enabled:
                     latency_value = random.randint(config.latency_metric_1_true_range[0], config.latency_metric_1_true_range[1])
                     client.track(config.latency_metric_1, context, metric_value=latency_value)
                     stats["treatment_latency_values"].append(latency_value)
-                    await send_log_to_clients(session_id, f"Tracking {config.latency_metric_1} with value {latency_value} for treatment")
+                    await send_log_to_clients(session_id, f"Tracking {config.latency_metric_1} with value {latency_value} for treatment", user_key)
                 else:
-                    await send_log_to_clients(session_id, f"Skipping {config.latency_metric_1} tracking (disabled)")
+                    await send_log_to_clients(session_id, f"Skipping {config.latency_metric_1} tracking (disabled)", user_key)
             else:
                 # Control (false variation)
                 # Error metric tracking - only if enabled
@@ -368,27 +387,27 @@ async def send_events(session_id: str, num_events: int = 1000):
                 if error_enabled and error_chance(config.error_metric_1_false_converted):
                     client.track(config.error_metric_1, context)
                     stats["control_error_count"] += 1
-                    await send_log_to_clients(session_id, f"Tracking {config.error_metric_1} for control")
+                    await send_log_to_clients(session_id, f"Tracking {config.error_metric_1} for control", user_key)
                 elif not error_enabled:
-                    await send_log_to_clients(session_id, f"Skipping {config.error_metric_1} tracking (disabled)")
+                    await send_log_to_clients(session_id, f"Skipping {config.error_metric_1} tracking (disabled)", user_key)
                 
                 # Business metric tracking - only if enabled
                 stats["control_business_total"] += 1
                 if business_enabled and error_chance(config.business_metric_1_false_converted):
                     client.track(config.business_metric_1, context)
                     stats["control_business_count"] += 1
-                    await send_log_to_clients(session_id, f"Tracking {config.business_metric_1} for control")
+                    await send_log_to_clients(session_id, f"Tracking {config.business_metric_1} for control", user_key)
                 elif not business_enabled:
-                    await send_log_to_clients(session_id, f"Skipping {config.business_metric_1} tracking (disabled)")
+                    await send_log_to_clients(session_id, f"Skipping {config.business_metric_1} tracking (disabled)", user_key)
                 
                 # Latency metric tracking - only if enabled
                 if latency_enabled:
                     latency_value = random.randint(config.latency_metric_1_false_range[0], config.latency_metric_1_false_range[1])
                     client.track(config.latency_metric_1, context, metric_value=latency_value)
                     stats["control_latency_values"].append(latency_value)
-                    await send_log_to_clients(session_id, f"Tracking {config.latency_metric_1} with value {latency_value} for control")
+                    await send_log_to_clients(session_id, f"Tracking {config.latency_metric_1} with value {latency_value} for control", user_key)
                 else:
-                    await send_log_to_clients(session_id, f"Skipping {config.latency_metric_1} tracking (disabled)")
+                    await send_log_to_clients(session_id, f"Skipping {config.latency_metric_1} tracking (disabled)", user_key)
             
             client.flush()
             events_sent += 1
@@ -471,6 +490,10 @@ async def start_simulation(session_id: str, config: LDConfig):
     status.guarded_rollout_active = False
     status.first_event_time = None
     status.end_time = None
+    
+    # Reset stored logs
+    status.stored_logs = []
+    status.total_logs_generated = 0
     
     # Reset stats properly by creating a new SimulationStats instance
     status.stats = SimulationStats()
