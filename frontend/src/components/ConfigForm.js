@@ -199,8 +199,12 @@ const ConfigForm = ({ disabled }) => {
     localStorage.setItem('ldConfig', JSON.stringify(submissionConfig));
   };
   
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Add a new function to save configuration without starting simulation
+  const handleSaveOnly = async (e) => {
+    // If this is triggered by an Enter keypress, prevent default form submission
+    if (e && e.key === 'Enter') {
+      e.preventDefault();
+    }
     
     if (!config.sdk_key || !config.api_key || !config.project_key || !config.flag_key) {
       setError('Please fill out all required fields!');
@@ -209,7 +213,7 @@ const ConfigForm = ({ disabled }) => {
     
     try {
       setError(null);
-      setSuccess(null);
+      setSuccess('Saving configuration...');
       
       const submissionConfig = { ...config };
       
@@ -248,12 +252,11 @@ const ConfigForm = ({ disabled }) => {
         } else {
           submissionConfig[toggleKey] = true;
         }
-        console.log(`Saving ${toggleKey}: ${submissionConfig[toggleKey]}`);
       });
       
       // Try to get the environment key if we don't have it - use the centralized update function
       if (submissionConfig.sdk_key && submissionConfig.api_key && submissionConfig.project_key) {
-        console.log('Updating environment key during form submission');
+        console.log('Updating environment key during save');
         await updateEnvironmentKey(submissionConfig);
       }
       
@@ -266,12 +269,38 @@ const ConfigForm = ({ disabled }) => {
         api_key: true
       });
       
-      // Submit configuration to start simulation
-      await startSimulation(submissionConfig);
       setSuccess('Configuration saved successfully!');
     } catch (error) {
       console.error('Error saving configuration:', error);
       setError(error.response?.data?.detail || error.message || 'Failed to save configuration');
+    }
+  };
+
+  // Modify handleSubmit to make it clear it also starts the simulation
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      // First save the configuration
+      await handleSaveOnly();
+      
+      // Then start the simulation with the saved configuration
+      const savedConfig = localStorage.getItem('ldConfig');
+      if (savedConfig) {
+        setSuccess('Starting simulation...');
+        await startSimulation(JSON.parse(savedConfig));
+        setSuccess('Configuration saved and simulation started!');
+      }
+    } catch (error) {
+      console.error('Error in handleSubmit:', error);
+      setError(error.message || 'Failed to start simulation');
+    }
+  };
+
+  // Add a handler for key press on any field
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSaveOnly(e);
     }
   };
   
@@ -309,7 +338,7 @@ const ConfigForm = ({ disabled }) => {
       fontSize: '0.875rem'
     }
   };
-  
+
   return (
     <Box component="form" onSubmit={handleSubmit} noValidate sx={{ 
       '& .MuiTextField-root': { my: 0.5 },
@@ -334,6 +363,7 @@ const ConfigForm = ({ disabled }) => {
               label="SDK Key"
               value={config.sdk_key}
               onChange={handleChange}
+              onKeyDown={handleKeyDown}
               required
               fullWidth
               disabled={disabled}
@@ -380,6 +410,7 @@ const ConfigForm = ({ disabled }) => {
               label="API Key"
               value={config.api_key}
               onChange={handleChange}
+              onKeyDown={handleKeyDown}
               required
               fullWidth
               disabled={disabled}
@@ -400,6 +431,7 @@ const ConfigForm = ({ disabled }) => {
               label="Project Key"
               value={config.project_key}
               onChange={handleChange}
+              onKeyDown={handleKeyDown}
               required
               fullWidth
               disabled={disabled}
@@ -415,6 +447,7 @@ const ConfigForm = ({ disabled }) => {
               label="Flag Key"
               value={config.flag_key}
               onChange={handleChange}
+              onKeyDown={handleKeyDown}
               required
               fullWidth
               disabled={disabled}
@@ -454,6 +487,7 @@ const ConfigForm = ({ disabled }) => {
               label="Error Metric Key"
               value={config.error_metric_1}
               onChange={handleChange}
+              onKeyDown={handleKeyDown}
               required
               fullWidth
               disabled={disabled || !config.error_metric_enabled}
@@ -470,6 +504,7 @@ const ConfigForm = ({ disabled }) => {
               label="Control Rate"
               value={config.error_metric_1_false_converted}
               onChange={handleChange}
+              onKeyDown={handleKeyDown}
               required
               fullWidth
               disabled={disabled || !config.error_metric_enabled}
@@ -490,6 +525,7 @@ const ConfigForm = ({ disabled }) => {
               label="Treatment Rate"
               value={config.error_metric_1_true_converted}
               onChange={handleChange}
+              onKeyDown={handleKeyDown}
               required
               fullWidth
               disabled={disabled || !config.error_metric_enabled}
@@ -534,6 +570,7 @@ const ConfigForm = ({ disabled }) => {
               label="Latency Metric Key"
               value={config.latency_metric_1}
               onChange={handleChange}
+              onKeyDown={handleKeyDown}
               required
               fullWidth
               disabled={disabled || !config.latency_metric_enabled}
@@ -550,6 +587,7 @@ const ConfigForm = ({ disabled }) => {
               label="Control Range"
               value={formatRange(config.latency_metric_1_false_range)}
               onChange={handleChange}
+              onKeyDown={handleKeyDown}
               required
               fullWidth
               disabled={disabled || !config.latency_metric_enabled}
@@ -566,6 +604,7 @@ const ConfigForm = ({ disabled }) => {
               label="Treatment Range"
               value={formatRange(config.latency_metric_1_true_range)}
               onChange={handleChange}
+              onKeyDown={handleKeyDown}
               required
               fullWidth
               disabled={disabled || !config.latency_metric_enabled}
@@ -606,6 +645,7 @@ const ConfigForm = ({ disabled }) => {
               label="Business Metric Key"
               value={config.business_metric_1}
               onChange={handleChange}
+              onKeyDown={handleKeyDown}
               required
               fullWidth
               disabled={disabled || !config.business_metric_enabled}
@@ -622,6 +662,7 @@ const ConfigForm = ({ disabled }) => {
               label="Control Rate"
               value={config.business_metric_1_false_converted}
               onChange={handleChange}
+              onKeyDown={handleKeyDown}
               required
               fullWidth
               disabled={disabled || !config.business_metric_enabled}
@@ -642,6 +683,7 @@ const ConfigForm = ({ disabled }) => {
               label="Treatment Rate"
               value={config.business_metric_1_true_converted}
               onChange={handleChange}
+              onKeyDown={handleKeyDown}
               required
               fullWidth
               disabled={disabled || !config.business_metric_enabled}
@@ -664,8 +706,27 @@ const ConfigForm = ({ disabled }) => {
         sx={{ display: 'none' }}
         disabled={disabled}
       >
-        Save
+        Start
       </Button>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2, mb: 2 }}>
+        <Button
+          variant="contained"
+          color="warning"
+          onClick={handleSaveOnly}
+          disabled={disabled}
+          sx={{ mr: 1 }}
+        >
+          Save Configuration
+        </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleSubmit}
+          disabled={disabled}
+        >
+          Save & Start Simulation
+        </Button>
+      </Box>
       <br />
       <br />
       <LaunchDarklyResourceCreator disabled={disabled} />
