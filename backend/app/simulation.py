@@ -176,6 +176,33 @@ def update_stats(session_id: str):
     
     return True
 
+async def get_environment_key(session_id: str, config: LDConfig) -> str:
+    """Determine the environment key for a given SDK key by making an API call to list environments"""
+    try:
+        url = f'https://app.launchdarkly.com/api/v2/projects/{config.project_key}/environments'
+        headers = {'Authorization': config.api_key, 'Content-Type': 'application/json'}
+        
+        await send_log_to_clients(session_id, f"Getting environments for project {config.project_key}")
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        response_data = response.json()
+        
+        # Look for environment with matching SDK key
+        for env in response_data.get('items', []):
+            if env.get('apiKey') == config.sdk_key:
+                env_key = env.get('key')
+                await send_log_to_clients(session_id, f"Found environment key: {env_key} for SDK key")
+                return env_key
+        
+        # If no match found, fall back to 'production' with a warning
+        await send_log_to_clients(session_id, "Warning: Could not find matching environment for SDK key, falling back to 'production'")
+        return 'production'
+    
+    except Exception as e:
+        error_msg = f"Error getting environment key: {str(e)} - falling back to 'production'"
+        await send_log_to_clients(session_id, error_msg)
+        return 'production'
+
 async def init_ld_client(session_id: str, config: LDConfig) -> bool:
     """Initialize the LaunchDarkly client for a specific session"""
     try:
@@ -187,7 +214,12 @@ async def init_ld_client(session_id: str, config: LDConfig) -> bool:
         if session_id not in active_clients:
             active_clients[session_id] = {}
             
+        # Get environment key for the SDK key if not already set
+        if not config.environment_key:
+            config.environment_key = await get_environment_key(session_id, config)
+            
         # Log toggle values for debugging - no user key for debug logs
+        await send_log_to_clients(session_id, f"DEBUG - Using environment: {config.environment_key}")
         await send_log_to_clients(session_id, f"DEBUG - Latency toggle: {config.latency_metric_enabled} (type: {type(config.latency_metric_enabled).__name__})")
         await send_log_to_clients(session_id, f"DEBUG - Error toggle: {config.error_metric_enabled} (type: {type(config.error_metric_enabled).__name__})")
         await send_log_to_clients(session_id, f"DEBUG - Business toggle: {config.business_metric_enabled} (type: {type(config.business_metric_enabled).__name__})")
@@ -225,9 +257,12 @@ async def check_guarded_rollout(session_id: str) -> bool:
         response.raise_for_status()
         response_data = response.json()
         
-        # Safely access nested keys
-        production_env = response_data.get('environments', {}).get('production', {})
-        fallthrough = production_env.get('fallthrough', {})
+        # Get the environment key to use (determined during init based on SDK key)
+        env_key = config.environment_key or 'production'
+        
+        # Safely access nested keys for the appropriate environment (not just 'production')
+        env_data = response_data.get('environments', {}).get(env_key, {})
+        fallthrough = env_data.get('fallthrough', {})
         rollout_active = fallthrough.get('rollout')
         
         rollout_type = None
@@ -246,7 +281,7 @@ async def check_guarded_rollout(session_id: str) -> bool:
         
         # Update the status
         status.guarded_rollout_active = is_active
-        status_msg = "Guarded Rollout is active" if is_active else "Guarded Rollout is not active"
+        status_msg = f"Guarded Rollout is active in {env_key}" if is_active else f"Guarded Rollout is not active in {env_key}"
         await send_log_to_clients(session_id, status_msg)
         return is_active
     

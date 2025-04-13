@@ -89,7 +89,25 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
   // Helper function to generate the LaunchDarkly flag URL
   const getFlagUrl = () => {
     if (!configValues.project_key || !configValues.flag_key) return null;
-    return `https://app.launchdarkly.com/projects/${configValues.project_key}/flags/${configValues.flag_key}/`;
+    
+    // Get current config to access environment_key
+    let currentConfig = {};
+    try {
+      const savedConfig = localStorage.getItem('ldConfig');
+      if (savedConfig) {
+        currentConfig = JSON.parse(savedConfig);
+      }
+    } catch (error) {
+      console.error('Error loading config:', error);
+    }
+    
+    // Use environment_key if available, otherwise don't include env parameters
+    const envKey = currentConfig.environment_key;
+    if (envKey) {
+      return `https://app.launchdarkly.com/projects/${configValues.project_key}/flags/${configValues.flag_key}/targeting?env=${envKey}&selected-env=${envKey}`;
+    } else {
+      return `https://app.launchdarkly.com/projects/${configValues.project_key}/flags/${configValues.flag_key}/`;
+    }
   };
 
   const handleClickOpen = () => {

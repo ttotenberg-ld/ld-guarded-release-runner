@@ -46,6 +46,7 @@ class LDConfig(BaseModel):
     api_key: str
     project_key: str
     flag_key: str
+    environment_key: Optional[str] = None  # Added field to store env key associated with SDK key
     latency_metric_1: str
     error_metric_1: str
     business_metric_1: str
