@@ -1,123 +1,119 @@
 import React, { useState, useEffect } from 'react';
 import { Box, TextField, Button, Alert, Grid, InputAdornment, Typography, Divider, Paper, 
-         Switch, FormControlLabel } from '@mui/material';
+         Switch, FormControlLabel, Chip } from '@mui/material';
 import { startSimulation } from '../api/simulationApi';
+import { getEnvironmentKey } from '../api/launchDarklyApi';
 import LaunchDarklyResourceCreator from './LaunchDarklyResourceCreator';
 
 // Default configuration with placeholder values
 const DEFAULT_CONFIG = {
   sdk_key: '',
   api_key: '',
-  project_key: '',
-  flag_key: '',
+  project_key: 'default',
+  flag_key: 'test-flag',
+  environment_key: '',
   latency_metric_1: 'latency',
   error_metric_1: 'error-rate',
-  business_metric_1: 'payment-success',
-  latency_metric_1_false_range: [50, 125],
-  latency_metric_1_true_range: [52, 131],
-  error_metric_1_false_converted: 2,
-  error_metric_1_true_converted: 3,
-  business_metric_1_false_converted: 99,
-  business_metric_1_true_converted: 98,
+  business_metric_1: 'purchase-completion',
+  latency_metric_1_false_range: [50, 100],
+  latency_metric_1_true_range: [75, 125],
+  error_metric_1_false_converted: 5,
+  error_metric_1_true_converted: 10,
+  business_metric_1_false_converted: 15,
+  business_metric_1_true_converted: 20,
   error_metric_enabled: true,
   latency_metric_enabled: true,
   business_metric_enabled: true
 };
 
 const ConfigForm = ({ disabled }) => {
-  // Track which fields have been saved to localStorage
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
   const [savedToStorage, setSavedToStorage] = useState({
     sdk_key: false,
     api_key: false
   });
-
+  const [environment, setEnvironment] = useState('');
+  
   const [config, setConfig] = useState(() => {
-    // Try to load from localStorage
     const savedConfig = localStorage.getItem('ldConfig');
+    
+    let initialConfig = {
+      sdk_key: '',
+      api_key: '',
+      project_key: 'default',
+      flag_key: 'test-flag',
+      environment_key: '',
+      latency_metric_1: 'latency',
+      error_metric_1: 'error-rate',
+      business_metric_1: 'purchase-completion',
+      latency_metric_1_false_range: [50, 100],
+      latency_metric_1_true_range: [75, 125],
+      error_metric_1_false_converted: 5,
+      error_metric_1_true_converted: 10,
+      business_metric_1_false_converted: 15,
+      business_metric_1_true_converted: 20,
+      error_metric_enabled: true,
+      latency_metric_enabled: true,
+      business_metric_enabled: true
+    };
+    
     if (savedConfig) {
       try {
         const parsedConfig = JSON.parse(savedConfig);
+        initialConfig = { ...initialConfig, ...parsedConfig };
         
-        // Mark keys as saved if they exist in localStorage
+        // If SDK key exists in saved config, mark it as saved
         if (parsedConfig.sdk_key) {
-          setSavedToStorage(prev => ({ ...prev, sdk_key: true }));
+          setSavedToStorage(prev => ({
+            ...prev,
+            sdk_key: true
+          }));
         }
+        
+        // If API key exists in saved config, mark it as saved
         if (parsedConfig.api_key) {
-          setSavedToStorage(prev => ({ ...prev, api_key: true }));
+          setSavedToStorage(prev => ({
+            ...prev,
+            api_key: true
+          }));
         }
         
-        // Ensure ranges are arrays - convert if needed
-        ['latency_metric_1_false_range', 'latency_metric_1_true_range'].forEach(rangeKey => {
-          if (typeof parsedConfig[rangeKey] === 'string') {
-            try {
-              const values = parsedConfig[rangeKey].split(',').map(v => parseInt(v.trim(), 10));
-              const validValues = values.filter(v => !isNaN(v));
-              if (validValues.length === 2) {
-                parsedConfig[rangeKey] = validValues;
-              } else {
-                parsedConfig[rangeKey] = rangeKey.includes('false') ? [50, 125] : [52, 131];
-              }
-            } catch (err) {
-              parsedConfig[rangeKey] = rangeKey.includes('false') ? [50, 125] : [52, 131];
-            }
-          } else if (!Array.isArray(parsedConfig[rangeKey])) {
-            parsedConfig[rangeKey] = rangeKey.includes('false') ? [50, 125] : [52, 131];
-          }
-        });
-        
-        // Ensure the toggle properties exist, defaulting to true if missing
-        return {
-          ...parsedConfig,
-          error_metric_enabled: parsedConfig.error_metric_enabled !== false, // default to true
-          latency_metric_enabled: parsedConfig.latency_metric_enabled !== false, // default to true
-          business_metric_enabled: parsedConfig.business_metric_enabled !== false // default to true
-        };
+        // If environment_key exists, set it in state
+        if (parsedConfig.environment_key) {
+          setEnvironment(parsedConfig.environment_key);
+        }
       } catch (e) {
         console.error('Error parsing saved config:', e);
       }
     }
-    return DEFAULT_CONFIG;
+    
+    return initialConfig;
   });
-  
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   
   const handleChange = (e) => {
     const { name, value } = e.target;
-    let parsedValue = value;
+    setConfig({
+      ...config,
+      [name]: value
+    });
     
-    // Handle array inputs
-    if (name.includes('range')) {
-      try {
-        // For range fields, keep the string value in the input
-        // but parse it when submitting
-        setConfig(prev => ({
-          ...prev,
-          [name]: value
-        }));
-        return;
-      } catch (error) {
-        console.error('Error handling range:', error);
-      }
-    }
-    
-    // Handle percentage inputs
-    if (name.includes('converted')) {
-      parsedValue = parseInt(value, 10);
-    }
-    
-    // For API key and SDK key, mark as not saved when changed
+    // If SDK key or API key changed, reset the saved status
     if (name === 'sdk_key' || name === 'api_key') {
       setSavedToStorage(prev => ({
         ...prev,
         [name]: false
       }));
+      
+      // If SDK key changed, reset environment
+      if (name === 'sdk_key') {
+        setEnvironment('');
+      }
     }
     
-    setConfig(prev => ({
-      ...prev,
-      [name]: parsedValue
-    }));
+    // Clear error/success when changing values
+    setError(null);
+    setSuccess(null);
   };
 
   // Handle toggle changes
@@ -166,37 +162,33 @@ const ConfigForm = ({ disabled }) => {
   
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    
+    if (!config.sdk_key || !config.api_key || !config.project_key || !config.flag_key) {
+      setError('Please fill out all required fields!');
+      return;
+    }
     
     try {
-      // Validate config
-      if (!config.sdk_key || !config.api_key || !config.project_key || !config.flag_key) {
-        throw new Error('All required fields must be filled');
-      }
+      setError(null);
+      setSuccess(null);
       
-      // Parse range values before submitting
       const submissionConfig = { ...config };
       
-      // Process the ranges
+      // Process range inputs to ensure they are arrays
       ['latency_metric_1_false_range', 'latency_metric_1_true_range'].forEach(rangeKey => {
         if (typeof submissionConfig[rangeKey] === 'string') {
           try {
             const values = submissionConfig[rangeKey].split(',').map(v => parseInt(v.trim(), 10));
-            // Filter out NaN values
             const validValues = values.filter(v => !isNaN(v));
-            
-            // Ensure array has exactly 2 elements
-            if (validValues.length !== 2) {
-              throw new Error(`${rangeKey} must have exactly 2 values`);
+            if (validValues.length === 2) {
+              submissionConfig[rangeKey] = validValues;
+            } else {
+              submissionConfig[rangeKey] = rangeKey.includes('false') ? [50, 125] : [52, 131];
             }
-            
-            submissionConfig[rangeKey] = validValues;
           } catch (err) {
-            throw new Error(`Invalid range format for ${rangeKey}: ${err.message}`);
+            submissionConfig[rangeKey] = rangeKey.includes('false') ? [50, 125] : [52, 131];
           }
         } else if (!Array.isArray(submissionConfig[rangeKey])) {
-          // If it's neither a string nor an array, default to the placeholder values
           submissionConfig[rangeKey] = rangeKey.includes('false') ? [50, 125] : [52, 131];
         }
       });
@@ -219,6 +211,19 @@ const ConfigForm = ({ disabled }) => {
         }
         console.log(`Saving ${toggleKey}: ${submissionConfig[toggleKey]}`);
       });
+      
+      // Try to get the environment key if we don't have it
+      if (!submissionConfig.environment_key && submissionConfig.sdk_key && submissionConfig.api_key && submissionConfig.project_key) {
+        try {
+          const envKey = await getEnvironmentKey(submissionConfig);
+          if (envKey) {
+            submissionConfig.environment_key = envKey;
+            setEnvironment(envKey);
+          }
+        } catch (envError) {
+          console.error('Error fetching environment key:', envError);
+        }
+      }
       
       // Save to localStorage
       localStorage.setItem('ldConfig', JSON.stringify(submissionConfig));
@@ -303,7 +308,24 @@ const ConfigForm = ({ disabled }) => {
               size="small"
               type={savedToStorage.sdk_key ? "password" : "text"}
               margin="dense"
-              helperText="Your LaunchDarkly server-side SDK Key"
+              helperText={
+                environment ? 
+                `Your LaunchDarkly server-side SDK Key (Environment: ${environment})` : 
+                "Your LaunchDarkly server-side SDK Key"
+              }
+              InputProps={{
+                endAdornment: environment && savedToStorage.sdk_key ? (
+                  <InputAdornment position="end">
+                    <Chip 
+                      label={environment} 
+                      size="small" 
+                      color="primary" 
+                      variant="outlined" 
+                      sx={{ height: '20px', fontSize: '0.7rem' }} 
+                    />
+                  </InputAdornment>
+                ) : null
+              }}
             />
           </Grid>
           
@@ -319,7 +341,7 @@ const ConfigForm = ({ disabled }) => {
               size="small"
               type={savedToStorage.api_key ? "password" : "text"}
               margin="dense"
-              helperText="Your LaunchDarkly API Key"
+              helperText="Your LaunchDarkly API Key with read + write permissions"
             />
           </Grid>
           
@@ -540,8 +562,8 @@ const ConfigForm = ({ disabled }) => {
               disabled={disabled || !config.business_metric_enabled}
               size="small"
               margin="dense"
-              placeholder="payment-success"
-              helperText="e.g., payment-success (✨ Auto-creatable ✨)"
+              placeholder="purchase-completion"
+              helperText="e.g., purchase-completion (✨ Auto-creatable ✨)"
             />
           </Grid>
           

@@ -112,17 +112,73 @@ const makeProxyRequest = async (url, method, payload, api_key, headers) => {
 };
 
 /**
- * Creates resources in LaunchDarkly based on the provided configuration
- * @param {Object} config - The configuration from the form
- * @returns {Promise<Object>} - The result of the resource creation
+ * Gets the environment key for a given SDK key
+ * @param {Object} config - The configuration object with api_key, project_key, and sdk_key
+ * @returns {Promise<string>} - The environment key, or null if not found
  */
-export const createLaunchDarklyResources = async (config) => {
+const getEnvironmentKey = async (config) => {
+  const { api_key, project_key, sdk_key } = config;
+  
+  if (!api_key || !project_key || !sdk_key) {
+    console.error('Missing required config values for getEnvironmentKey');
+    return null;
+  }
+  
+  const url = `https://app.launchdarkly.com/api/v2/projects/${project_key}/environments`;
+  
   try {
-    // Create flag first
-    const flagResponse = await createFlag(config);
+    const response = await makeProxyRequest(url, 'get', {}, api_key);
+    
+    // Handle error responses
+    if (response.error) {
+      console.error('Error getting environments:', response.error);
+      return null;
+    }
+    
+    // Look for environment with matching SDK key
+    if (response.items && Array.isArray(response.items)) {
+      for (const env of response.items) {
+        if (env.apiKey === sdk_key) {
+          console.log(`Found environment key: ${env.key} for SDK key`);
+          return env.key;
+        }
+      }
+    }
+    
+    console.warn('Could not find matching environment for SDK key', sdk_key);
+    return null;
+  } catch (error) {
+    console.error('Error in getEnvironmentKey:', error);
+    return null;
+  }
+};
+
+/**
+ * Creates LaunchDarkly resources (flag, metrics, etc.)
+ * @param {Object} config - The configuration object
+ * @returns {Promise<Object>} - The API response with created resources
+ */
+const createLaunchDarklyResources = async (config) => {
+  try {
+    // First, detect the environment key for the SDK key if not already set
+    if (!config.environment_key) {
+      const environmentKey = await getEnvironmentKey(config);
+      if (environmentKey) {
+        config.environment_key = environmentKey;
+        
+        // Update the stored config with the environment key
+        const savedConfig = localStorage.getItem('ldConfig');
+        if (savedConfig) {
+          const updatedConfig = JSON.parse(savedConfig);
+          updatedConfig.environment_key = environmentKey;
+          localStorage.setItem('ldConfig', JSON.stringify(updatedConfig));
+          console.log('Updated stored config with environment key:', environmentKey);
+        }
+      }
+    }
     
     const results = {
-      flag: flagResponse,
+      flag: null,
       metrics: {
         error: null,
         latency: null,
@@ -131,30 +187,32 @@ export const createLaunchDarklyResources = async (config) => {
       metricAttachment: null
     };
     
-    // Create metrics based on toggles
-    if (config.error_metric_enabled) {
-      results.metrics.error = await createErrorMetric(config);
-    }
+    // Create flag
+    console.log('Creating flag with key:', config.flag_key);
+    const flagResponse = await createFlag(config);
+    results.flag = flagResponse;
     
-    if (config.latency_metric_enabled) {
-      results.metrics.latency = await createLatencyMetric(config);
-    }
-    
-    if (config.business_metric_enabled) {
-      results.metrics.business = await createBusinessMetric(config);
-    }
-    
-    // Collect metric keys to attach, even if creation failed with 409 (already exists)
+    // Create metrics based on enabled flags
     const metricKeys = [];
+    
     if (config.error_metric_enabled) {
+      console.log('Creating error metric with key:', config.error_metric_1);
+      results.metrics.error = await createErrorMetric(config);
+      
       // Include error metric key if enabled (regardless of creation result)
       metricKeys.push(config.error_metric_1);
     }
     if (config.latency_metric_enabled) {
+      console.log('Creating latency metric with key:', config.latency_metric_1);
+      results.metrics.latency = await createLatencyMetric(config);
+      
       // Include latency metric key if enabled (regardless of creation result)
       metricKeys.push(config.latency_metric_1);
     }
     if (config.business_metric_enabled) {
+      console.log('Creating business metric with key:', config.business_metric_1);
+      results.metrics.business = await createBusinessMetric(config);
+      
       // Include business metric key if enabled (regardless of creation result)
       metricKeys.push(config.business_metric_1);
     }
@@ -173,6 +231,12 @@ export const createLaunchDarklyResources = async (config) => {
     throw error;
   }
 };
+
+// Export the function so it can be used by other components
+export { createLaunchDarklyResources };
+
+// Export the utility function for other components that might need it
+export { createFlag, createErrorMetric, createLatencyMetric, createBusinessMetric, attachMetricsToFlag, getEnvironmentKey };
 
 /**
  * Creates a boolean flag in LaunchDarkly
