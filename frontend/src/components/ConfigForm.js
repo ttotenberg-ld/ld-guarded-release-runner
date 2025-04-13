@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, TextField, Button, Alert, Grid, InputAdornment, Typography, Divider, Paper, 
          Switch, FormControlLabel, Chip } from '@mui/material';
 import { startSimulation } from '../api/simulationApi';
-import { getEnvironmentKey } from '../api/launchDarklyApi';
+import { getEnvironmentKey, updateEnvironmentKey } from '../api/launchDarklyApi';
 import LaunchDarklyResourceCreator from './LaunchDarklyResourceCreator';
 
 // Default configuration with placeholder values
@@ -34,6 +34,42 @@ const ConfigForm = ({ disabled }) => {
     api_key: false
   });
   const [environment, setEnvironment] = useState('');
+  
+  // Listen for environment key updates
+  useEffect(() => {
+    const handleEnvironmentUpdate = (event) => {
+      console.log('ConfigForm: Environment updated event received:', event.detail);
+      if (event.detail && event.detail.environment_key) {
+        setEnvironment(event.detail.environment_key);
+      }
+    };
+    
+    window.addEventListener('environmentKeyUpdated', handleEnvironmentUpdate);
+    
+    // Try to get the environment key on mount if we have the necessary info
+    const tryInitialEnvironmentFetch = async () => {
+      const savedConfig = localStorage.getItem('ldConfig');
+      if (savedConfig) {
+        try {
+          const parsedConfig = JSON.parse(savedConfig);
+          if (parsedConfig.sdk_key && parsedConfig.api_key && parsedConfig.project_key) {
+            if (!parsedConfig.environment_key) {
+              console.log('ConfigForm: No environment key found in config, fetching...');
+              await updateEnvironmentKey(parsedConfig);
+            }
+          }
+        } catch (err) {
+          console.error('ConfigForm: Error checking for initial environment key:', err);
+        }
+      }
+    };
+    
+    tryInitialEnvironmentFetch();
+    
+    return () => {
+      window.removeEventListener('environmentKeyUpdated', handleEnvironmentUpdate);
+    };
+  }, []);
   
   const [config, setConfig] = useState(() => {
     const savedConfig = localStorage.getItem('ldConfig');
@@ -215,20 +251,10 @@ const ConfigForm = ({ disabled }) => {
         console.log(`Saving ${toggleKey}: ${submissionConfig[toggleKey]}`);
       });
       
-      // Try to get the environment key if we don't have it
-      if (!submissionConfig.environment_key && submissionConfig.sdk_key && submissionConfig.api_key && submissionConfig.project_key) {
-        try {
-          console.log('Fetching environment key...');
-          const envKey = await getEnvironmentKey(submissionConfig);
-          console.log('Fetched environment key:', envKey);
-          if (envKey) {
-            submissionConfig.environment_key = envKey;
-            setEnvironment(envKey);
-            console.log('Environment state set to:', envKey);
-          }
-        } catch (envError) {
-          console.error('Error fetching environment key:', envError);
-        }
+      // Try to get the environment key if we don't have it - use the centralized update function
+      if (submissionConfig.sdk_key && submissionConfig.api_key && submissionConfig.project_key) {
+        console.log('Updating environment key during form submission');
+        await updateEnvironmentKey(submissionConfig);
       }
       
       // Save to localStorage

@@ -3,6 +3,7 @@ import { Box, Button, Typography, Chip } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopIcon from '@mui/icons-material/Stop';
 import { startSimulation, stopSimulation } from '../api/simulationApi';
+import { updateEnvironmentKey } from '../api/launchDarklyApi';
 
 const SimulationControls = ({ running, connected }) => {
   const handleStart = async () => {
@@ -73,6 +74,12 @@ const SimulationControls = ({ running, connected }) => {
           currentConfig[field] = parseInt(currentConfig[field], 10) || 0;
         }
       });
+      
+      // Update environment key if needed
+      if (currentConfig.sdk_key && currentConfig.api_key && currentConfig.project_key) {
+        console.log('SimulationControls: Updating environment key before starting');
+        await updateEnvironmentKey(currentConfig);
+      }
       
       // Save the current config to localStorage before starting
       localStorage.setItem('ldConfig', JSON.stringify(currentConfig));

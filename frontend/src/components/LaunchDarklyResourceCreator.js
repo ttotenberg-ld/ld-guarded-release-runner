@@ -4,7 +4,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import PendingIcon from '@mui/icons-material/Pending';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import { createLaunchDarklyResources } from '../api/launchDarklyApi';
+import { createLaunchDarklyResources, updateEnvironmentKey } from '../api/launchDarklyApi';
 
 // Helper function to save the configuration, similar to handleSubmit in ConfigForm
 const saveConfiguration = (currentConfig) => {
@@ -200,79 +200,55 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
         }
       });
       
-      // Basic validation
+      // Validate required fields
       if (!currentConfig.sdk_key || !currentConfig.api_key || !currentConfig.project_key || !currentConfig.flag_key) {
-        throw new Error('All required fields must be filled');
+        throw new Error('Please fill out all required fields (SDK Key, API Key, Project Key, Flag Key)');
       }
       
-      // Process and save the configuration to ensure we have the latest values
-      currentConfig = saveConfiguration(currentConfig);
+      // Save current config to localStorage before proceeding
+      const processedConfig = saveConfiguration(currentConfig);
       
-      // Update display values with the latest config
-      setConfigValues({
-        flag_key: currentConfig.flag_key || '',
-        project_key: currentConfig.project_key || '',
-        error_metric_1: currentConfig.error_metric_1 || '',
-        latency_metric_1: currentConfig.latency_metric_1 || '',
-        business_metric_1: currentConfig.business_metric_1 || '',
-        error_metric_enabled: currentConfig.error_metric_enabled !== false,
-        latency_metric_enabled: currentConfig.latency_metric_enabled !== false,
-        business_metric_enabled: currentConfig.business_metric_enabled !== false
-      });
-      
-      // Update status for flag creation
-      setResourceStatuses(prev => ({
-        ...prev, 
-        flag: { status: 'loading', message: 'Creating flag...' }
-      }));
-      
-      // Create resources - pass the entire configuration without altering metric keys
-      const results = await createLaunchDarklyResources(currentConfig);
-      
-      // Update metrics attachment status to loading
-      if (results && !results.flag.error && 
-          (currentConfig.error_metric_enabled || 
-           currentConfig.latency_metric_enabled || 
-           currentConfig.business_metric_enabled)) {
-        setResourceStatuses(prev => ({
-          ...prev,
-          metricAttachment: { status: 'loading', message: 'Attaching metrics to flag...' }
-        }));
+      // Update environment key before creating resources
+      if (processedConfig.sdk_key && processedConfig.api_key && processedConfig.project_key) {
+        console.log('ResourceCreator: Updating environment key before creating resources');
+        await updateEnvironmentKey(processedConfig);
       }
       
-      setResult(results);
+      // Create LaunchDarkly resources
+      const result = await createLaunchDarklyResources(processedConfig);
       
       // Update statuses based on results
       const newStatuses = { 
         flag: { 
-          status: results.flag.error ? 'error' : 'success',
-          message: results.flag.error || 'Flag created successfully!'
+          status: result.flag.error ? 'error' : 'success',
+          message: result.flag.error || 'Flag created successfully!'
         },
         errorMetric: { 
-          status: !currentConfig.error_metric_enabled ? 'disabled' : 
-                  results.metrics.error?.error ? 'error' : 'success',
-          message: !currentConfig.error_metric_enabled ? 'Metric disabled' :
-                   results.metrics.error?.error || 'Error metric created successfully!'
+          status: !processedConfig.error_metric_enabled ? 'disabled' : 
+                  result.metrics.error?.error ? 'error' : 'success',
+          message: !processedConfig.error_metric_enabled ? 'Metric disabled' :
+                   result.metrics.error?.error || 'Error metric created successfully!'
         },
         latencyMetric: { 
-          status: !currentConfig.latency_metric_enabled ? 'disabled' : 
-                  results.metrics.latency?.error ? 'error' : 'success',
-          message: !currentConfig.latency_metric_enabled ? 'Metric disabled' :
-                   results.metrics.latency?.error || 'Latency metric created successfully!'
+          status: !processedConfig.latency_metric_enabled ? 'disabled' : 
+                  result.metrics.latency?.error ? 'error' : 'success',
+          message: !processedConfig.latency_metric_enabled ? 'Metric disabled' :
+                   result.metrics.latency?.error || 'Latency metric created successfully!'
         },
         businessMetric: { 
-          status: !currentConfig.business_metric_enabled ? 'disabled' : 
-                  results.metrics.business?.error ? 'error' : 'success',
-          message: !currentConfig.business_metric_enabled ? 'Metric disabled' :
-                   results.metrics.business?.error || 'Business metric created successfully!'
+          status: !processedConfig.business_metric_enabled ? 'disabled' : 
+                  result.metrics.business?.error ? 'error' : 'success',
+          message: !processedConfig.business_metric_enabled ? 'Metric disabled' :
+                   result.metrics.business?.error || 'Business metric created successfully!'
         },
         metricAttachment: {
-          status: getMetricAttachmentStatus(currentConfig, results.metricAttachment),
-          message: getMetricAttachmentMessage(currentConfig, results.metricAttachment)
+          status: getMetricAttachmentStatus(processedConfig, result.metricAttachment),
+          message: getMetricAttachmentMessage(processedConfig, result.metricAttachment)
         }
       };
       
       setResourceStatuses(newStatuses);
+      setResult(result);
     } catch (error) {
       console.error('Error creating LaunchDarkly resources:', error);
       setError(error.message || 'An error occurred while creating resources');

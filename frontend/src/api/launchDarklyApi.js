@@ -154,6 +154,73 @@ const getEnvironmentKey = async (config) => {
 };
 
 /**
+ * Updates the environment key in localStorage for a given config
+ * @param {Object} config - The configuration object with api_key, project_key, and sdk_key
+ * @returns {Promise<string|null>} - The environment key that was stored, or null if not found
+ */
+const updateEnvironmentKey = async (config) => {
+  // Skip if any required fields are missing
+  if (!config.sdk_key || !config.api_key || !config.project_key) {
+    console.log('Skipping environment key update - missing required fields');
+    return null;
+  }
+  
+  try {
+    // First try to get the environment key
+    const envKey = await getEnvironmentKey(config);
+    console.log('updateEnvironmentKey: Retrieved key:', envKey);
+    
+    if (envKey) {
+      // Update the config with the environment key
+      const savedConfig = localStorage.getItem('ldConfig');
+      if (savedConfig) {
+        try {
+          const updatedConfig = JSON.parse(savedConfig);
+          
+          // Only update if SDK key matches (to avoid overwriting wrong config)
+          if (updatedConfig.sdk_key === config.sdk_key) {
+            updatedConfig.environment_key = envKey;
+            localStorage.setItem('ldConfig', JSON.stringify(updatedConfig));
+            console.log('updateEnvironmentKey: Updated localStorage with environment key:', envKey);
+            
+            // Dispatch an event so other components can react
+            const event = new CustomEvent('environmentKeyUpdated', { 
+              detail: { environment_key: envKey } 
+            });
+            window.dispatchEvent(event);
+          } else {
+            console.log('updateEnvironmentKey: SDK key mismatch, not updating localStorage');
+          }
+        } catch (err) {
+          console.error('updateEnvironmentKey: Error parsing saved config:', err);
+        }
+      } else {
+        // If no saved config exists, create one with just the environment key
+        const newConfig = {
+          sdk_key: config.sdk_key,
+          environment_key: envKey
+        };
+        localStorage.setItem('ldConfig', JSON.stringify(newConfig));
+        console.log('updateEnvironmentKey: Created new config in localStorage with environment key:', envKey);
+        
+        // Dispatch an event so other components can react
+        const event = new CustomEvent('environmentKeyUpdated', { 
+          detail: { environment_key: envKey } 
+        });
+        window.dispatchEvent(event);
+      }
+      
+      return envKey;
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Error in updateEnvironmentKey:', error);
+    return null;
+  }
+};
+
+/**
  * Creates LaunchDarkly resources (flag, metrics, etc.)
  * @param {Object} config - The configuration object
  * @returns {Promise<Object>} - The API response with created resources
@@ -236,7 +303,7 @@ const createLaunchDarklyResources = async (config) => {
 export { createLaunchDarklyResources };
 
 // Export the utility function for other components that might need it
-export { createFlag, createErrorMetric, createLatencyMetric, createBusinessMetric, attachMetricsToFlag, getEnvironmentKey };
+export { createFlag, createErrorMetric, createLatencyMetric, createBusinessMetric, attachMetricsToFlag, getEnvironmentKey, updateEnvironmentKey };
 
 /**
  * Creates a boolean flag in LaunchDarkly
