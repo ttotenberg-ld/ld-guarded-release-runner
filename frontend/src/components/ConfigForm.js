@@ -143,11 +143,9 @@ const ConfigForm = ({ disabled }) => {
         [name]: false
       }));
       
-      // If SDK key changed, reset environment
-      if (name === 'sdk_key') {
-        console.log('SDK key changed, resetting environment');
-        setEnvironment('');
-      }
+      // We no longer immediately reset the environment when SDK key changes
+      // This prevents the chip from disappearing before save
+      // It will be updated correctly on save instead
     }
     
     // Clear error/success when changing values
@@ -257,7 +255,13 @@ const ConfigForm = ({ disabled }) => {
       // Try to get the environment key if we don't have it - use the centralized update function
       if (submissionConfig.sdk_key && submissionConfig.api_key && submissionConfig.project_key) {
         console.log('Updating environment key during save');
-        await updateEnvironmentKey(submissionConfig);
+        const environmentKey = await updateEnvironmentKey(submissionConfig);
+        
+        // Directly update the environment state if we got a key back
+        if (environmentKey) {
+          console.log('Setting environment directly after save:', environmentKey);
+          setEnvironment(environmentKey);
+        }
       }
       
       // Save to localStorage
