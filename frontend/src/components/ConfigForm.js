@@ -81,6 +81,7 @@ const ConfigForm = ({ disabled }) => {
         
         // If environment_key exists, set it in state
         if (parsedConfig.environment_key) {
+          console.log('Loading environment key from storage:', parsedConfig.environment_key);
           setEnvironment(parsedConfig.environment_key);
         }
       } catch (e) {
@@ -100,6 +101,7 @@ const ConfigForm = ({ disabled }) => {
     
     // If SDK key or API key changed, reset the saved status
     if (name === 'sdk_key' || name === 'api_key') {
+      console.log(`${name} changed, resetting saved status`);
       setSavedToStorage(prev => ({
         ...prev,
         [name]: false
@@ -107,6 +109,7 @@ const ConfigForm = ({ disabled }) => {
       
       // If SDK key changed, reset environment
       if (name === 'sdk_key') {
+        console.log('SDK key changed, resetting environment');
         setEnvironment('');
       }
     }
@@ -215,10 +218,13 @@ const ConfigForm = ({ disabled }) => {
       // Try to get the environment key if we don't have it
       if (!submissionConfig.environment_key && submissionConfig.sdk_key && submissionConfig.api_key && submissionConfig.project_key) {
         try {
+          console.log('Fetching environment key...');
           const envKey = await getEnvironmentKey(submissionConfig);
+          console.log('Fetched environment key:', envKey);
           if (envKey) {
             submissionConfig.environment_key = envKey;
             setEnvironment(envKey);
+            console.log('Environment state set to:', envKey);
           }
         } catch (envError) {
           console.error('Error fetching environment key:', envError);
@@ -310,7 +316,7 @@ const ConfigForm = ({ disabled }) => {
               margin="dense"
               helperText={
                 environment ? 
-                `Your LaunchDarkly server-side SDK Key (Environment: ${environment})` : 
+                `Your LaunchDarkly server-side SDK Key (Env: ${environment.length > 20 ? environment.substring(0, 17) + '...' : environment})` : 
                 "Your LaunchDarkly server-side SDK Key"
               }
               InputProps={{
@@ -326,8 +332,13 @@ const ConfigForm = ({ disabled }) => {
                         fontWeight: 'bold',
                         color: 'white',
                         backgroundColor: '#f59e0b',
+                        maxWidth: '180px',
                         '& .MuiChip-label': { 
-                          padding: '0 8px' 
+                          padding: '0 8px',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          display: 'block'
                         }
                       }} 
                     />
@@ -349,7 +360,11 @@ const ConfigForm = ({ disabled }) => {
               size="small"
               type={savedToStorage.api_key ? "password" : "text"}
               margin="dense"
-              helperText="Your LaunchDarkly API Key with read + write permissions"
+              helperText={
+                environment ? 
+                `Your LaunchDarkly API Key with read + write permissions (Env: ${environment.length > 20 ? environment.substring(0, 17) + '...' : environment})` : 
+                "Your LaunchDarkly API Key with read + write permissions"
+              }
             />
           </Grid>
           
