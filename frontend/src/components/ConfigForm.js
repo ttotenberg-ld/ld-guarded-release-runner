@@ -383,7 +383,7 @@ const ConfigForm = ({ disabled }) => {
                 endAdornment: environment && savedToStorage.sdk_key ? (
                   <InputAdornment position="end">
                     <Chip 
-                      label={`Environment: ${environment}`} 
+                      label={`Env: ${environment}`} 
                       size="small" 
                       color="warning" 
                       sx={{ 
