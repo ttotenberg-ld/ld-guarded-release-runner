@@ -520,7 +520,7 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
                 InputProps={{
                   endAdornment: <InputAdornment position="end">%</InputAdornment>,
                 }}
-                helperText="% when flag returns false (control)"
+                helperText="% chance of error for control"
               />
             </Grid>
             
@@ -541,7 +541,7 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
                 InputProps={{
                   endAdornment: <InputAdornment position="end">%</InputAdornment>,
                 }}
-                helperText="% when flag returns true (treatment)"
+                helperText="% chance of error for treatment"
               />
             </Grid>
           </Grid>
@@ -678,7 +678,7 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
                 InputProps={{
                   endAdornment: <InputAdornment position="end">%</InputAdornment>,
                 }}
-                helperText="% when flag returns false (control)"
+                helperText="% chance of conversion for control"
               />
             </Grid>
             
@@ -699,7 +699,7 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
                 InputProps={{
                   endAdornment: <InputAdornment position="end">%</InputAdornment>,
                 }}
-                helperText="% when flag returns true (treatment)"
+                helperText="% chance of conversion for treatment"
               />
             </Grid>
           </Grid>
