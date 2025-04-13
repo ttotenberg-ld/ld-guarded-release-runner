@@ -26,7 +26,7 @@ const DEFAULT_CONFIG = {
   business_metric_enabled: true
 };
 
-const ConfigForm = ({ disabled }) => {
+const ConfigForm = ({ disabled, onStatusChange }) => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [savedToStorage, setSavedToStorage] = useState({
@@ -34,6 +34,13 @@ const ConfigForm = ({ disabled }) => {
     api_key: false
   });
   const [environment, setEnvironment] = useState('');
+  
+  // Update parent component with current status when it changes
+  useEffect(() => {
+    if (onStatusChange) {
+      onStatusChange(error, success);
+    }
+  }, [error, success, onStatusChange]);
   
   // Listen for environment key updates
   useEffect(() => {
@@ -326,7 +333,8 @@ const ConfigForm = ({ disabled }) => {
   const headerStyle = { 
     display: 'flex', 
     alignItems: 'center', 
-    mb: 0.3
+    mb: 0.3,
+    minHeight: '28px' // Ensure consistent height even when alerts aren't present
   };
   
   const titleStyle = {
@@ -350,9 +358,6 @@ const ConfigForm = ({ disabled }) => {
       '& .MuiInputLabel-root': { fontSize: '0.875rem' },
       '& .MuiInputBase-input': { fontSize: '0.875rem' }
     }}>
-      {error && <Alert severity="error" sx={{ mb: 1, py: 0.5, fontSize: '0.875rem' }}>{error}</Alert>}
-      {success && <Alert severity="success" sx={{ mb: 1, py: 0.5, fontSize: '0.875rem' }}>{success}</Alert>}
-      
       {/* Section 1: SDK key, API key, Project key, Flag key */}
       <Paper sx={sectionStyle}>
         <Box sx={headerStyle}>
@@ -374,11 +379,7 @@ const ConfigForm = ({ disabled }) => {
               size="small"
               type={savedToStorage.sdk_key ? "password" : "text"}
               margin="dense"
-              helperText={
-                environment ? 
-                `Your LaunchDarkly server-side SDK Key (Env: ${environment.length > 20 ? environment.substring(0, 17) + '...' : environment})` : 
-                "Your LaunchDarkly server-side SDK Key"
-              }
+              helperText="Your LaunchDarkly server-side SDK Key"
               InputProps={{
                 endAdornment: environment && savedToStorage.sdk_key ? (
                   <InputAdornment position="end">
@@ -421,11 +422,7 @@ const ConfigForm = ({ disabled }) => {
               size="small"
               type={savedToStorage.api_key ? "password" : "text"}
               margin="dense"
-              helperText={
-                environment ? 
-                `Your LaunchDarkly API Key with read + write permissions (Env: ${environment.length > 20 ? environment.substring(0, 17) + '...' : environment})` : 
-                "Your LaunchDarkly API Key with read + write permissions"
-              }
+              helperText="Your LaunchDarkly API Key with read + write permissions"
             />
           </Grid>
           

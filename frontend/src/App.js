@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Container, Box, Typography, Paper, Button, CircularProgress } from '@mui/material';
+import { Container, Box, Typography, Paper, Button, CircularProgress, Alert } from '@mui/material';
 import ArticleIcon from '@mui/icons-material/Article';
 import ConfigForm from './components/ConfigForm';
 import SimulationControls from './components/SimulationControls';
@@ -12,6 +12,7 @@ function App() {
   const [status, setStatus] = useState({ running: false, events_sent: 0, last_error: null });
   const [showLogExplorer, setShowLogExplorer] = useState(false);
   const [logsLoading, setLogsLoading] = useState(false);
+  const [configStatus, setConfigStatus] = useState({ error: null, success: null });
   
   // Initialize WebSocket connection for real-time updates
   const { connected } = useWebSocket({
@@ -48,6 +49,11 @@ function App() {
   const handleShowLogs = useCallback(async () => {
     setShowLogExplorer(true);
   }, []);
+
+  // Handle configuration status updates
+  const handleConfigStatusChange = useCallback((error, success) => {
+    setConfigStatus({ error, success });
+  }, []);
   
   return (
     <Container maxWidth="xl" sx={{ py: 2 }}>
@@ -62,8 +68,70 @@ function App() {
         {/* Left column - Configuration */}
         <Box sx={{ flex: '3 1 0', minWidth: 0 }}>
           <Paper sx={{ p: 2, mb: 2 }}>
-            <Typography variant="h6" gutterBottom sx={{ mb: 1 }}>Configuration</Typography>
-            <ConfigForm disabled={status.running} />
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              mb: 1,
+              minHeight: '28px'
+            }}>
+              <Typography variant="h6" sx={{ mb: 0 }}>Configuration</Typography>
+              {configStatus.error && (
+                <Alert 
+                  severity="error" 
+                  icon={false}
+                  sx={{ 
+                    py: 0, 
+                    px: 1, 
+                    ml: 1.5, 
+                    fontSize: '0.75rem', 
+                    height: '24px',
+                    maxWidth: '50%',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    '& .MuiAlert-message': {
+                      p: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }
+                  }}
+                >
+                  {configStatus.error}
+                </Alert>
+              )}
+              {configStatus.success && !configStatus.error && (
+                <Alert 
+                  severity="success" 
+                  icon={false}
+                  sx={{ 
+                    py: 0, 
+                    px: 1, 
+                    ml: 1.5, 
+                    fontSize: '0.75rem', 
+                    height: '24px',
+                    maxWidth: '50%',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    '& .MuiAlert-message': {
+                      p: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }
+                  }}
+                >
+                  {configStatus.success}
+                </Alert>
+              )}
+            </Box>
+            <ConfigForm 
+              disabled={status.running} 
+              onStatusChange={handleConfigStatusChange}
+            />
           </Paper>
           
           {/* Show log explorer only after simulation has completed */}
