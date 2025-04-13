@@ -317,11 +317,19 @@ const ConfigForm = ({ disabled }) => {
                 endAdornment: environment && savedToStorage.sdk_key ? (
                   <InputAdornment position="end">
                     <Chip 
-                      label={environment} 
+                      label={`Environment: ${environment}`} 
                       size="small" 
-                      color="primary" 
-                      variant="outlined" 
-                      sx={{ height: '20px', fontSize: '0.7rem' }} 
+                      color="warning" 
+                      sx={{ 
+                        height: '22px', 
+                        fontSize: '0.75rem',
+                        fontWeight: 'bold',
+                        color: 'white',
+                        backgroundColor: '#f59e0b',
+                        '& .MuiChip-label': { 
+                          padding: '0 8px' 
+                        }
+                      }} 
                     />
                   </InputAdornment>
                 ) : null
