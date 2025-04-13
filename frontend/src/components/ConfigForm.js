@@ -708,25 +708,6 @@ const ConfigForm = ({ disabled }) => {
       >
         Start
       </Button>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2, mb: 2 }}>
-        <Button
-          variant="contained"
-          color="warning"
-          onClick={handleSaveOnly}
-          disabled={disabled}
-          sx={{ mr: 1 }}
-        >
-          Save Configuration
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleSubmit}
-          disabled={disabled}
-        >
-          Save & Start Simulation
-        </Button>
-      </Box>
       <br />
       <br />
       <LaunchDarklyResourceCreator disabled={disabled} />
