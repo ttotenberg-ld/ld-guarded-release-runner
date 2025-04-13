@@ -1,29 +1,44 @@
-import React, { useState, useEffect } from 'react';
-import { Box, TextField, Button, Alert, Grid, InputAdornment, Typography, Divider, Paper, 
-         Switch, FormControlLabel, Chip } from '@mui/material';
-import { startSimulation } from '../api/simulationApi';
-import { getEnvironmentKey, updateEnvironmentKey } from '../api/launchDarklyApi';
-import LaunchDarklyResourceCreator from './LaunchDarklyResourceCreator';
+import React, { useState, useEffect } from "react";
+import {
+  Box,
+  TextField,
+  Button,
+  Alert,
+  Grid,
+  InputAdornment,
+  Typography,
+  Divider,
+  Paper,
+  Switch,
+  FormControlLabel,
+  Chip,
+} from "@mui/material";
+import { startSimulation } from "../api/simulationApi";
+import {
+  getEnvironmentKey,
+  updateEnvironmentKey,
+} from "../api/launchDarklyApi";
+import LaunchDarklyResourceCreator from "./LaunchDarklyResourceCreator";
 
 // Default configuration with placeholder values
 const DEFAULT_CONFIG = {
-  sdk_key: '',
-  api_key: '',
-  project_key: 'default',
-  flag_key: 'test-flag',
-  environment_key: '',
-  latency_metric_1: 'latency',
-  error_metric_1: 'error-rate',
-  business_metric_1: 'purchase-completion',
+  sdk_key: "",
+  api_key: "",
+  project_key: "default",
+  flag_key: "test-flag",
+  environment_key: "",
+  latency_metric_1: "latency",
+  error_metric_1: "error-rate",
+  business_metric_1: "purchase-completion",
   latency_metric_1_false_range: [50, 100],
-  latency_metric_1_true_range: [75, 125],
-  error_metric_1_false_converted: 5,
-  error_metric_1_true_converted: 10,
-  business_metric_1_false_converted: 15,
-  business_metric_1_true_converted: 20,
+  latency_metric_1_true_range: [52, 131],
+  error_metric_1_false_converted: 2,
+  error_metric_1_true_converted: 4,
+  business_metric_1_false_converted: 99,
+  business_metric_1_true_converted: 97,
   error_metric_enabled: true,
   latency_metric_enabled: true,
-  business_metric_enabled: true
+  business_metric_enabled: true,
 };
 
 const ConfigForm = ({ disabled, onStatusChange }) => {
@@ -31,130 +46,148 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
   const [success, setSuccess] = useState(null);
   const [savedToStorage, setSavedToStorage] = useState({
     sdk_key: false,
-    api_key: false
+    api_key: false,
   });
-  const [environment, setEnvironment] = useState('');
-  
+  const [environment, setEnvironment] = useState("");
+
   // Update parent component with current status when it changes
   useEffect(() => {
     if (onStatusChange) {
       onStatusChange(error, success);
     }
   }, [error, success, onStatusChange]);
-  
+
   // Listen for environment key updates
   useEffect(() => {
     const handleEnvironmentUpdate = (event) => {
-      console.log('ConfigForm: Environment updated event received:', event.detail);
+      console.log(
+        "ConfigForm: Environment updated event received:",
+        event.detail
+      );
       if (event.detail && event.detail.environment_key) {
         setEnvironment(event.detail.environment_key);
       }
     };
-    
-    window.addEventListener('environmentKeyUpdated', handleEnvironmentUpdate);
-    
+
+    window.addEventListener("environmentKeyUpdated", handleEnvironmentUpdate);
+
     // Try to get the environment key on mount if we have the necessary info
     const tryInitialEnvironmentFetch = async () => {
-      const savedConfig = localStorage.getItem('ldConfig');
+      const savedConfig = localStorage.getItem("ldConfig");
       if (savedConfig) {
         try {
           const parsedConfig = JSON.parse(savedConfig);
-          if (parsedConfig.sdk_key && parsedConfig.api_key && parsedConfig.project_key) {
+          if (
+            parsedConfig.sdk_key &&
+            parsedConfig.api_key &&
+            parsedConfig.project_key
+          ) {
             if (!parsedConfig.environment_key) {
-              console.log('ConfigForm: No environment key found in config, fetching...');
+              console.log(
+                "ConfigForm: No environment key found in config, fetching..."
+              );
               await updateEnvironmentKey(parsedConfig);
             }
           }
         } catch (err) {
-          console.error('ConfigForm: Error checking for initial environment key:', err);
+          console.error(
+            "ConfigForm: Error checking for initial environment key:",
+            err
+          );
         }
       }
     };
-    
+
     tryInitialEnvironmentFetch();
-    
+
     return () => {
-      window.removeEventListener('environmentKeyUpdated', handleEnvironmentUpdate);
+      window.removeEventListener(
+        "environmentKeyUpdated",
+        handleEnvironmentUpdate
+      );
     };
   }, []);
-  
+
   const [config, setConfig] = useState(() => {
-    const savedConfig = localStorage.getItem('ldConfig');
-    
+    const savedConfig = localStorage.getItem("ldConfig");
+
     let initialConfig = {
-      sdk_key: '',
-      api_key: '',
-      project_key: 'default',
-      flag_key: 'test-flag',
-      environment_key: '',
-      latency_metric_1: 'latency',
-      error_metric_1: 'error-rate',
-      business_metric_1: 'purchase-completion',
+      sdk_key: "",
+      api_key: "",
+      project_key: "default",
+      flag_key: "test-flag",
+      environment_key: "",
+      latency_metric_1: "latency",
+      error_metric_1: "error-rate",
+      business_metric_1: "purchase-completion",
       latency_metric_1_false_range: [50, 100],
-      latency_metric_1_true_range: [75, 125],
-      error_metric_1_false_converted: 5,
-      error_metric_1_true_converted: 10,
-      business_metric_1_false_converted: 15,
-      business_metric_1_true_converted: 20,
+      latency_metric_1_true_range: [52, 131],
+      error_metric_1_false_converted: 2,
+      error_metric_1_true_converted: 4,
+      business_metric_1_false_converted: 99,
+      business_metric_1_true_converted: 97,
       error_metric_enabled: true,
       latency_metric_enabled: true,
-      business_metric_enabled: true
+      business_metric_enabled: true,
     };
-    
+
     if (savedConfig) {
       try {
         const parsedConfig = JSON.parse(savedConfig);
         initialConfig = { ...initialConfig, ...parsedConfig };
-        
+
         // If SDK key exists in saved config, mark it as saved
         if (parsedConfig.sdk_key) {
-          setSavedToStorage(prev => ({
+          setSavedToStorage((prev) => ({
             ...prev,
-            sdk_key: true
+            sdk_key: true,
           }));
         }
-        
+
         // If API key exists in saved config, mark it as saved
         if (parsedConfig.api_key) {
-          setSavedToStorage(prev => ({
+          setSavedToStorage((prev) => ({
             ...prev,
-            api_key: true
+            api_key: true,
           }));
         }
-        
+
         // If environment_key exists, set it in state
         if (parsedConfig.environment_key) {
-          console.log('Loading environment key from storage:', parsedConfig.environment_key);
+          console.log(
+            "Loading environment key from storage:",
+            parsedConfig.environment_key
+          );
           setEnvironment(parsedConfig.environment_key);
         }
       } catch (e) {
-        console.error('Error parsing saved config:', e);
+        console.error("Error parsing saved config:", e);
       }
     }
-    
+
     return initialConfig;
   });
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setConfig({
       ...config,
-      [name]: value
+      [name]: value,
     });
-    
+
     // If SDK key or API key changed, reset the saved status
-    if (name === 'sdk_key' || name === 'api_key') {
+    if (name === "sdk_key" || name === "api_key") {
       console.log(`${name} changed, resetting saved status`);
-      setSavedToStorage(prev => ({
+      setSavedToStorage((prev) => ({
         ...prev,
-        [name]: false
+        [name]: false,
       }));
-      
+
       // We no longer immediately reset the environment when SDK key changes
       // This prevents the chip from disappearing before save
       // It will be updated correctly on save instead
     }
-    
+
     // Clear error/success when changing values
     setError(null);
     setSuccess(null);
@@ -164,211 +197,268 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
   const handleToggleChange = (e) => {
     const { name, checked } = e.target;
     console.log(`Toggle changed: ${name} = ${checked}`);
-    
+
     // Create updated config
     const updatedConfig = {
       ...config,
-      [name]: checked
+      [name]: checked,
     };
-    
+
     // Update state
     setConfig(updatedConfig);
-    
+
     // Save to localStorage immediately to ensure changes persist
     // Create a submission copy to ensure proper formatting
     const submissionConfig = { ...updatedConfig };
-    
+
     // Process ranges for localStorage
-    ['latency_metric_1_false_range', 'latency_metric_1_true_range'].forEach(rangeKey => {
-      if (typeof submissionConfig[rangeKey] === 'string') {
-        try {
-          const values = submissionConfig[rangeKey].split(',').map(v => parseInt(v.trim(), 10));
-          const validValues = values.filter(v => !isNaN(v));
-          if (validValues.length === 2) {
-            submissionConfig[rangeKey] = validValues;
-          } else {
-            submissionConfig[rangeKey] = rangeKey.includes('false') ? [50, 125] : [52, 131];
-          }
-        } catch (err) {
-          submissionConfig[rangeKey] = rangeKey.includes('false') ? [50, 125] : [52, 131];
-        }
-      }
-    });
-    
-    // Ensure toggle states are strictly boolean
-    ['error_metric_enabled', 'latency_metric_enabled', 'business_metric_enabled'].forEach(toggleKey => {
-      submissionConfig[toggleKey] = submissionConfig[toggleKey] === true;
-    });
-    
-    console.log(`Saving toggle state: ${name} = ${submissionConfig[name]}`);
-    localStorage.setItem('ldConfig', JSON.stringify(submissionConfig));
-  };
-  
-  // Add a new function to save configuration without starting simulation
-  const handleSaveOnly = async (e) => {
-    // If this is triggered by an Enter keypress, prevent default form submission
-    if (e && e.key === 'Enter') {
-      e.preventDefault();
-    }
-    
-    if (!config.sdk_key || !config.api_key || !config.project_key || !config.flag_key) {
-      setError('Please fill out all required fields!');
-      return;
-    }
-    
-    try {
-      setError(null);
-      setSuccess('Saving configuration...');
-      
-      const submissionConfig = { ...config };
-      
-      // Process range inputs to ensure they are arrays
-      ['latency_metric_1_false_range', 'latency_metric_1_true_range'].forEach(rangeKey => {
-        if (typeof submissionConfig[rangeKey] === 'string') {
+    ["latency_metric_1_false_range", "latency_metric_1_true_range"].forEach(
+      (rangeKey) => {
+        if (typeof submissionConfig[rangeKey] === "string") {
           try {
-            const values = submissionConfig[rangeKey].split(',').map(v => parseInt(v.trim(), 10));
-            const validValues = values.filter(v => !isNaN(v));
+            const values = submissionConfig[rangeKey]
+              .split(",")
+              .map((v) => parseInt(v.trim(), 10));
+            const validValues = values.filter((v) => !isNaN(v));
             if (validValues.length === 2) {
               submissionConfig[rangeKey] = validValues;
             } else {
-              submissionConfig[rangeKey] = rangeKey.includes('false') ? [50, 125] : [52, 131];
+              submissionConfig[rangeKey] = rangeKey.includes("false")
+                ? [50, 125]
+                : [52, 131];
             }
           } catch (err) {
-            submissionConfig[rangeKey] = rangeKey.includes('false') ? [50, 125] : [52, 131];
+            submissionConfig[rangeKey] = rangeKey.includes("false")
+              ? [50, 125]
+              : [52, 131];
           }
-        } else if (!Array.isArray(submissionConfig[rangeKey])) {
-          submissionConfig[rangeKey] = rangeKey.includes('false') ? [50, 125] : [52, 131];
         }
-      });
-      
+      }
+    );
+
+    // Ensure toggle states are strictly boolean
+    [
+      "error_metric_enabled",
+      "latency_metric_enabled",
+      "business_metric_enabled",
+    ].forEach((toggleKey) => {
+      submissionConfig[toggleKey] = submissionConfig[toggleKey] === true;
+    });
+
+    console.log(`Saving toggle state: ${name} = ${submissionConfig[name]}`);
+    localStorage.setItem("ldConfig", JSON.stringify(submissionConfig));
+  };
+
+  // Add a new function to save configuration without starting simulation
+  const handleSaveOnly = async (e) => {
+    // If this is triggered by an Enter keypress, prevent default form submission
+    if (e && e.key === "Enter") {
+      e.preventDefault();
+    }
+
+    if (
+      !config.sdk_key ||
+      !config.api_key ||
+      !config.project_key ||
+      !config.flag_key
+    ) {
+      setError("Please fill out all required fields!");
+      return;
+    }
+
+    try {
+      setError(null);
+      setSuccess("Saving configuration...");
+
+      const submissionConfig = { ...config };
+
+      // Process range inputs to ensure they are arrays
+      ["latency_metric_1_false_range", "latency_metric_1_true_range"].forEach(
+        (rangeKey) => {
+          if (typeof submissionConfig[rangeKey] === "string") {
+            try {
+              const values = submissionConfig[rangeKey]
+                .split(",")
+                .map((v) => parseInt(v.trim(), 10));
+              const validValues = values.filter((v) => !isNaN(v));
+              if (validValues.length === 2) {
+                submissionConfig[rangeKey] = validValues;
+              } else {
+                submissionConfig[rangeKey] = rangeKey.includes("false")
+                  ? [50, 125]
+                  : [52, 131];
+              }
+            } catch (err) {
+              submissionConfig[rangeKey] = rangeKey.includes("false")
+                ? [50, 125]
+                : [52, 131];
+            }
+          } else if (!Array.isArray(submissionConfig[rangeKey])) {
+            submissionConfig[rangeKey] = rangeKey.includes("false")
+              ? [50, 125]
+              : [52, 131];
+          }
+        }
+      );
+
       // Make sure all number fields are integers
-      ['error_metric_1_false_converted', 'error_metric_1_true_converted', 
-       'business_metric_1_false_converted', 'business_metric_1_true_converted'].forEach(field => {
-        if (typeof submissionConfig[field] === 'string') {
+      [
+        "error_metric_1_false_converted",
+        "error_metric_1_true_converted",
+        "business_metric_1_false_converted",
+        "business_metric_1_true_converted",
+      ].forEach((field) => {
+        if (typeof submissionConfig[field] === "string") {
           submissionConfig[field] = parseInt(submissionConfig[field], 10) || 0;
         }
       });
-      
+
       // Ensure toggle states are properly saved as booleans
-      ['error_metric_enabled', 'latency_metric_enabled', 'business_metric_enabled'].forEach(toggleKey => {
+      [
+        "error_metric_enabled",
+        "latency_metric_enabled",
+        "business_metric_enabled",
+      ].forEach((toggleKey) => {
         // Explicitly convert to boolean
-        if (submissionConfig[toggleKey] === false || submissionConfig[toggleKey] === 'false' || submissionConfig[toggleKey] === 0) {
+        if (
+          submissionConfig[toggleKey] === false ||
+          submissionConfig[toggleKey] === "false" ||
+          submissionConfig[toggleKey] === 0
+        ) {
           submissionConfig[toggleKey] = false;
         } else {
           submissionConfig[toggleKey] = true;
         }
       });
-      
+
       // Try to get the environment key if we don't have it - use the centralized update function
-      if (submissionConfig.sdk_key && submissionConfig.api_key && submissionConfig.project_key) {
-        console.log('Updating environment key during save');
+      if (
+        submissionConfig.sdk_key &&
+        submissionConfig.api_key &&
+        submissionConfig.project_key
+      ) {
+        console.log("Updating environment key during save");
         const environmentKey = await updateEnvironmentKey(submissionConfig);
-        
+
         // Directly update the environment state if we got a key back
         if (environmentKey) {
-          console.log('Setting environment directly after save:', environmentKey);
+          console.log(
+            "Setting environment directly after save:",
+            environmentKey
+          );
           setEnvironment(environmentKey);
         }
       }
-      
+
       // Save to localStorage
-      localStorage.setItem('ldConfig', JSON.stringify(submissionConfig));
-      
+      localStorage.setItem("ldConfig", JSON.stringify(submissionConfig));
+
       // Mark SDK and API keys as saved
       setSavedToStorage({
         sdk_key: true,
-        api_key: true
+        api_key: true,
       });
-      
-      setSuccess('Configuration saved successfully!');
+
+      setSuccess("Configuration saved successfully!");
     } catch (error) {
-      console.error('Error saving configuration:', error);
-      setError(error.response?.data?.detail || error.message || 'Failed to save configuration');
+      console.error("Error saving configuration:", error);
+      setError(
+        error.response?.data?.detail ||
+          error.message ||
+          "Failed to save configuration"
+      );
     }
   };
 
   // Modify handleSubmit to make it clear it also starts the simulation
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       // First save the configuration
       await handleSaveOnly();
-      
+
       // Then start the simulation with the saved configuration
-      const savedConfig = localStorage.getItem('ldConfig');
+      const savedConfig = localStorage.getItem("ldConfig");
       if (savedConfig) {
-        setSuccess('Starting simulation...');
+        setSuccess("Starting simulation...");
         await startSimulation(JSON.parse(savedConfig));
-        setSuccess('Configuration saved and simulation started!');
+        setSuccess("Configuration saved and simulation started!");
       }
     } catch (error) {
-      console.error('Error in handleSubmit:', error);
-      setError(error.message || 'Failed to start simulation');
+      console.error("Error in handleSubmit:", error);
+      setError(error.message || "Failed to start simulation");
     }
   };
 
   // Add a handler for key press on any field
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleSaveOnly(e);
     }
   };
-  
+
   // Helper for range inputs display
   const formatRange = (range) => {
     if (Array.isArray(range)) {
-      return range.join(', ');
-    } else if (typeof range === 'string') {
+      return range.join(", ");
+    } else if (typeof range === "string") {
       return range;
     } else if (range === undefined || range === null) {
-      return '';
+      return "";
     }
     // Convert anything else to string
     return String(range);
   };
-  
+
   // Common styles for all sections
   const sectionStyle = { p: 1.2, mb: 1.2 };
-  const headerStyle = { 
-    display: 'flex', 
-    alignItems: 'center', 
+  const headerStyle = {
+    display: "flex",
+    alignItems: "center",
     mb: 0.3,
-    minHeight: '28px' // Ensure consistent height even when alerts aren't present
+    minHeight: "28px", // Ensure consistent height even when alerts aren't present
   };
-  
+
   const titleStyle = {
-    fontSize: '1rem', 
-    fontWeight: 'bold',
-    color: 'warning.main',
-    flexShrink: 0
+    fontSize: "1rem",
+    fontWeight: "bold",
+    color: "warning.main",
+    flexShrink: 0,
   };
 
   const formLabelStyle = {
-    margin: 0, 
-    '& .MuiFormControlLabel-label': {
-      fontSize: '0.875rem'
-    }
+    margin: 0,
+    "& .MuiFormControlLabel-label": {
+      fontSize: "0.875rem",
+    },
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ 
-      '& .MuiTextField-root': { my: 0.5 },
-      '& .MuiFormHelperText-root': { margin: 0, fontSize: '0.75rem' },
-      '& .MuiInputLabel-root': { fontSize: '0.875rem' },
-      '& .MuiInputBase-input': { fontSize: '0.875rem' },
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100%'
-    }}>
-      <Box sx={{ flex: '1 1 auto', overflow: 'auto' }}>
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      noValidate
+      sx={{
+        "& .MuiTextField-root": { my: 0.5 },
+        "& .MuiFormHelperText-root": { margin: 0, fontSize: "0.75rem" },
+        "& .MuiInputLabel-root": { fontSize: "0.875rem" },
+        "& .MuiInputBase-input": { fontSize: "0.875rem" },
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+      }}
+    >
+      <Box sx={{ flex: "1 1 auto", overflow: "auto" }}>
         {/* Section 1: SDK key, API key, Project key, Flag key */}
         <Paper sx={sectionStyle}>
           <Box sx={headerStyle}>
-            <Typography variant="body1" sx={titleStyle}>LaunchDarkly Connection</Typography>
+            <Typography variant="body1" sx={titleStyle}>
+              LaunchDarkly Connection
+            </Typography>
             <Divider sx={{ flex: 1, ml: 1 }} />
           </Box>
-          
+
           <Grid container spacing={1}>
             <Grid item xs={12} md={6}>
               <TextField
@@ -385,34 +475,35 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
                 margin="dense"
                 helperText="Your LaunchDarkly server-side SDK Key"
                 InputProps={{
-                  endAdornment: environment && savedToStorage.sdk_key ? (
-                    <InputAdornment position="end">
-                      <Chip 
-                        label={`Env: ${environment}`} 
-                        size="small" 
-                        color="warning" 
-                        sx={{ 
-                          height: '22px', 
-                          fontSize: '0.75rem',
-                          fontWeight: 'bold',
-                          color: 'white',
-                          backgroundColor: '#f59e0b',
-                          maxWidth: '180px',
-                          '& .MuiChip-label': { 
-                            padding: '0 8px',
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            display: 'block'
-                          }
-                        }} 
-                      />
-                    </InputAdornment>
-                  ) : null
+                  endAdornment:
+                    environment && savedToStorage.sdk_key ? (
+                      <InputAdornment position="end">
+                        <Chip
+                          label={`Env: ${environment}`}
+                          size="small"
+                          color="warning"
+                          sx={{
+                            height: "22px",
+                            fontSize: "0.75rem",
+                            fontWeight: "bold",
+                            color: "white",
+                            backgroundColor: "#f59e0b",
+                            maxWidth: "180px",
+                            "& .MuiChip-label": {
+                              padding: "0 8px",
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              display: "block",
+                            },
+                          }}
+                        />
+                      </InputAdornment>
+                    ) : null,
                 }}
               />
             </Grid>
-            
+
             <Grid item xs={12} md={6}>
               <TextField
                 name="api_key"
@@ -429,7 +520,7 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
                 helperText="Your LaunchDarkly API Key with read + write permissions"
               />
             </Grid>
-            
+
             <Grid item xs={12} md={6}>
               <TextField
                 name="project_key"
@@ -445,7 +536,7 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
                 helperText="Project where the flag exists"
               />
             </Grid>
-            
+
             <Grid item xs={12} md={6}>
               <TextField
                 name="flag_key"
@@ -463,14 +554,14 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
             </Grid>
           </Grid>
         </Paper>
-        
+
         {/* Section 2: Error metric name, control conversion rate, treatment conversion rate */}
         <Paper sx={sectionStyle}>
           <Box sx={headerStyle}>
-            <FormControlLabel 
+            <FormControlLabel
               control={
-                <Switch 
-                  checked={config.error_metric_enabled} 
+                <Switch
+                  checked={config.error_metric_enabled}
                   onChange={handleToggleChange}
                   name="error_metric_enabled"
                   disabled={disabled}
@@ -481,10 +572,12 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
               label=""
               sx={formLabelStyle}
             />
-            <Typography variant="body1" sx={titleStyle}>Error Metric Configuration</Typography>
+            <Typography variant="body1" sx={titleStyle}>
+              Error Metric Configuration
+            </Typography>
             <Divider sx={{ flex: 1, ml: 1 }} />
           </Box>
-          
+
           <Grid container spacing={1}>
             <Grid item xs={12} md={4}>
               <TextField
@@ -502,7 +595,7 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
                 helperText="e.g., error-rate (✨ Auto-creatable ✨)"
               />
             </Grid>
-            
+
             <Grid item xs={12} md={4}>
               <TextField
                 name="error_metric_1_false_converted"
@@ -516,14 +609,16 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
                 size="small"
                 margin="dense"
                 type="number"
-                placeholder="5"
+                placeholder="2"
                 InputProps={{
-                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                  endAdornment: (
+                    <InputAdornment position="end">%</InputAdornment>
+                  ),
                 }}
                 helperText="% chance of error for control"
               />
             </Grid>
-            
+
             <Grid item xs={12} md={4}>
               <TextField
                 name="error_metric_1_true_converted"
@@ -537,23 +632,25 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
                 size="small"
                 margin="dense"
                 type="number"
-                placeholder="10"
+                placeholder="4"
                 InputProps={{
-                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                  endAdornment: (
+                    <InputAdornment position="end">%</InputAdornment>
+                  ),
                 }}
                 helperText="% chance of error for treatment"
               />
             </Grid>
           </Grid>
         </Paper>
-        
+
         {/* Section 3: Latency metric name, control range, treatment range */}
         <Paper sx={sectionStyle}>
           <Box sx={headerStyle}>
-            <FormControlLabel 
+            <FormControlLabel
               control={
-                <Switch 
-                  checked={config.latency_metric_enabled} 
+                <Switch
+                  checked={config.latency_metric_enabled}
                   onChange={handleToggleChange}
                   name="latency_metric_enabled"
                   disabled={disabled}
@@ -564,10 +661,12 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
               label=""
               sx={formLabelStyle}
             />
-            <Typography variant="body1" sx={titleStyle}>Latency Configuration</Typography>
+            <Typography variant="body1" sx={titleStyle}>
+              Latency Configuration
+            </Typography>
             <Divider sx={{ flex: 1, ml: 1 }} />
           </Box>
-          
+
           <Grid container spacing={1}>
             <Grid item xs={12} md={4}>
               <TextField
@@ -585,7 +684,7 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
                 helperText="e.g., latency (✨ Auto-creatable ✨)"
               />
             </Grid>
-            
+
             <Grid item xs={12} md={4}>
               <TextField
                 name="latency_metric_1_false_range"
@@ -602,7 +701,7 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
                 helperText="Min, Max for control (comma-separated)"
               />
             </Grid>
-            
+
             <Grid item xs={12} md={4}>
               <TextField
                 name="latency_metric_1_true_range"
@@ -621,14 +720,14 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
             </Grid>
           </Grid>
         </Paper>
-        
+
         {/* Section 4: Business metric name, control conversion rate, treatment conversion rate */}
         <Paper sx={sectionStyle}>
           <Box sx={headerStyle}>
-            <FormControlLabel 
+            <FormControlLabel
               control={
-                <Switch 
-                  checked={config.business_metric_enabled} 
+                <Switch
+                  checked={config.business_metric_enabled}
                   onChange={handleToggleChange}
                   name="business_metric_enabled"
                   disabled={disabled}
@@ -639,10 +738,12 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
               label=""
               sx={formLabelStyle}
             />
-            <Typography variant="body1" sx={titleStyle}>Business Conversion Configuration</Typography>
+            <Typography variant="body1" sx={titleStyle}>
+              Business Conversion Configuration
+            </Typography>
             <Divider sx={{ flex: 1, ml: 1 }} />
           </Box>
-          
+
           <Grid container spacing={1}>
             <Grid item xs={12} md={4}>
               <TextField
@@ -660,7 +761,7 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
                 helperText="e.g., purchase-completion (✨ Auto-creatable ✨)"
               />
             </Grid>
-            
+
             <Grid item xs={12} md={4}>
               <TextField
                 name="business_metric_1_false_converted"
@@ -674,14 +775,16 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
                 size="small"
                 margin="dense"
                 type="number"
-                placeholder="15"
+                placeholder="99"
                 InputProps={{
-                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                  endAdornment: (
+                    <InputAdornment position="end">%</InputAdornment>
+                  ),
                 }}
                 helperText="% chance of conversion for control"
               />
             </Grid>
-            
+
             <Grid item xs={12} md={4}>
               <TextField
                 name="business_metric_1_true_converted"
@@ -695,9 +798,11 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
                 size="small"
                 margin="dense"
                 type="number"
-                placeholder="5"
+                placeholder="97"
                 InputProps={{
-                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                  endAdornment: (
+                    <InputAdornment position="end">%</InputAdornment>
+                  ),
                 }}
                 helperText="% chance of conversion for treatment"
               />
@@ -705,18 +810,16 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
           </Grid>
         </Paper>
       </Box>
-      
+
       {/* Hidden submit button to enable form submission on Enter key */}
-      <Button 
-        type="submit" 
-        sx={{ display: 'none' }}
-        disabled={disabled}
-      >
+      <Button type="submit" sx={{ display: "none" }} disabled={disabled}>
         Start
       </Button>
-      
+
       {/* Resource creator positioned at the bottom with fixed spacing */}
-      <Box sx={{ mt: 'auto', py: 2, display: 'flex', justifyContent: 'center' }}>
+      <Box
+        sx={{ mt: "auto", py: 2, display: "flex", justifyContent: "center" }}
+      >
         <LaunchDarklyResourceCreator disabled={disabled} />
       </Box>
     </Box>
