@@ -64,10 +64,24 @@ function App() {
       </Box>
       
       {/* Main content layout */}
-      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 2 }}>
+      <Box sx={{ 
+        display: 'grid', 
+        gridTemplateColumns: { xs: '1fr', md: '3fr 2fr' }, 
+        gap: 2,
+        alignItems: 'stretch'
+      }}>
         {/* Left column - Configuration */}
-        <Box sx={{ flex: '3 1 0', minWidth: 0 }}>
-          <Paper sx={{ p: 2, mb: 2 }}>
+        <Box sx={{ 
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%'
+        }}>
+          <Paper sx={{ 
+            p: 2, 
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
             <Box sx={{ 
               display: 'flex', 
               alignItems: 'center', 
@@ -162,8 +176,17 @@ function App() {
         </Box>
         
         {/* Right column - Controls and Status */}
-        <Box sx={{ flex: '2 1 0', minWidth: 0 }}>
-          <Paper sx={{ p: 2, mb: 2 }}>
+        <Box sx={{ 
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%'
+        }}>
+          <Paper sx={{ 
+            p: 2,
+            mb: 2,
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
             <Typography variant="h6" gutterBottom sx={{ mb: 1 }}>Controls</Typography>
             <SimulationControls 
               running={status.running} 
@@ -171,7 +194,12 @@ function App() {
             />
           </Paper>
           
-          <Paper sx={{ p: 2 }}>
+          <Paper sx={{ 
+            p: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            flex: 1
+          }}>
             <Typography variant="h6" gutterBottom sx={{ mb: 1 }}>Status</Typography>
             <StatusPanel status={status} />
           </Paper>
