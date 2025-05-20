@@ -59,7 +59,7 @@ function App() {
     <Container maxWidth="xl" sx={{ py: 2 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
         <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>
-          LaunchDarkly Guarded Rollout Runner
+          LaunchDarkly Guarded Release Runner
         </Typography>
       </Box>
       
