@@ -808,13 +808,19 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
               />
             </Grid>
           </Grid>
+          {/* Submit button - centered */}
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 2, mb: 2 }}>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              disabled={disabled}
+            >
+              Save Configuration & Start
+            </Button>
+          </Box>
         </Paper>
       </Box>
-
-      {/* Hidden submit button to enable form submission on Enter key */}
-      <Button type="submit" sx={{ display: "none" }} disabled={disabled}>
-        Start
-      </Button>
 
       {/* Resource creator positioned at the bottom with fixed spacing */}
       <Box

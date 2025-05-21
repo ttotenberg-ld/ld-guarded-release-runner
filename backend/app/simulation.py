@@ -466,8 +466,7 @@ async def send_events(session_id: str, num_events: int = 1000):
             elif events_sent % 10 == 0:
                 await send_status_to_clients(session_id)
                 
-            # Sleep to avoid overwhelming the service
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.5)
             
         except Exception as e:
             error_msg = f"Error during event sending: {str(e)}"
