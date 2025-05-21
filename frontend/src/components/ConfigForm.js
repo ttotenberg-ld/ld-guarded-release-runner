@@ -808,17 +808,7 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
               />
             </Grid>
           </Grid>
-          {/* Submit button - centered */}
-          <Box sx={{ display: "flex", justifyContent: "center", mt: 2, mb: 2 }}>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              disabled={disabled}
-            >
-              Save Configuration & Start
-            </Button>
-          </Box>
+          
         </Paper>
       </Box>
 
@@ -828,6 +818,17 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
       >
         <LaunchDarklyResourceCreator disabled={disabled} />
       </Box>
+      {/* Submit button - centered */}
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 2, mb: 2 }}>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              disabled={disabled}
+            >
+              Save Configuration & Start
+            </Button>
+          </Box>
     </Box>
   );
 };
