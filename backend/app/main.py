@@ -15,8 +15,8 @@ from app.api import router as ld_api_router
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="LaunchDarkly Guarded Release Runner",
-    description="A web application to simulate and send metric events to LaunchDarkly flags for Release Guardian.",
+    title="LaunchDarkly Guarded Rollout Runner",
+    description="A web application to simulate and send metric events to LaunchDarkly flags for Guarded Rollouts.",
     version="1.0.0"
 )
 
