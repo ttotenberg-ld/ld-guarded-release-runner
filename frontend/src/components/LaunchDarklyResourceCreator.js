@@ -505,7 +505,7 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
             
             <Divider component="li" />
             
-            <ListItem>
+            {/* <ListItem>
               <ListItemIcon>
                 {getStatusIcon(resourceStatuses.metricAttachment.status)}
               </ListItemIcon>
@@ -528,7 +528,7 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
                       : resourceStatuses.metricAttachment.message
                 } 
               />
-            </ListItem>
+            </ListItem> */}
           </List>
           
           {error && (
