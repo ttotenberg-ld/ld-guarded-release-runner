@@ -573,7 +573,7 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
               sx={formLabelStyle}
             />
             <Typography variant="body1" sx={titleStyle}>
-              Error Metric Configuration
+              Error Event Configuration
             </Typography>
             <Divider sx={{ flex: 1, ml: 1 }} />
           </Box>
