@@ -318,7 +318,7 @@ const createFlag = async (config) => {
   const payload = {
     name: flag_key,
     key: flag_key,
-    description: 'Created by the LaunchDarkly Guarded Rollout Runner',
+    description: 'Created by the LaunchDarkly Guarded Release Runner',
     variations: [
       {
         value: true,
@@ -332,7 +332,7 @@ const createFlag = async (config) => {
       }
     ],
     temporary: false,
-    tags: ['guarded-rollout-runner'],
+    tags: ['guarded-release-runner'],
     defaults: {
       onVariation: 0,
       offVariation: 1

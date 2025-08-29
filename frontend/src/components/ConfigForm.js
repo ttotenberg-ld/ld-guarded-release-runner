@@ -582,7 +582,7 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
             <Grid item xs={12} md={4}>
               <TextField
                 name="error_metric_1"
-                label="Error Metric Key"
+                label="Error Event Key"
                 value={config.error_metric_1}
                 onChange={handleChange}
                 onKeyDown={handleKeyDown}
@@ -671,7 +671,7 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
             <Grid item xs={12} md={4}>
               <TextField
                 name="latency_metric_1"
-                label="Latency Metric Key"
+                label="Latency Event Key"
                 value={config.latency_metric_1}
                 onChange={handleChange}
                 onKeyDown={handleKeyDown}
@@ -748,7 +748,7 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
             <Grid item xs={12} md={4}>
               <TextField
                 name="business_metric_1"
-                label="Business Metric Key"
+                label="Business Event Key"
                 value={config.business_metric_1}
                 onChange={handleChange}
                 onKeyDown={handleKeyDown}
