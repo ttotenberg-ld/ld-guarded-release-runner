@@ -214,9 +214,10 @@ async def init_ld_client(session_id: str, config: LDConfig) -> bool:
         if session_id not in active_clients:
             active_clients[session_id] = {}
             
-        # Get environment key for the SDK key if not already set
-        if not config.environment_key:
-            config.environment_key = await get_environment_key(session_id, config)
+        # ALWAYS fetch the environment key fresh based on the SDK key
+        # This ensures we don't use a stale environment_key from a previous SDK key
+        await send_log_to_clients(session_id, f"Fetching environment key for SDK key...")
+        config.environment_key = await get_environment_key(session_id, config)
             
         # Log toggle values for debugging - no user key for debug logs
         await send_log_to_clients(session_id, f"DEBUG - Using environment: {config.environment_key}")

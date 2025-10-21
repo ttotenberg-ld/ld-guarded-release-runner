@@ -170,22 +170,38 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setConfig({
-      ...config,
-      [name]: value,
-    });
-
-    // If SDK key or API key changed, reset the saved status
-    if (name === "sdk_key" || name === "api_key") {
-      console.log(`${name} changed, resetting saved status`);
+    
+    // If SDK key changed, clear the environment key since it may no longer be valid
+    if (name === "sdk_key") {
+      console.log("SDK key changed, clearing environment key");
+      const updatedConfig = {
+        ...config,
+        [name]: value,
+        environment_key: "", // Clear stale environment key
+      };
+      setConfig(updatedConfig);
+      setEnvironment(""); // Clear the UI display
       setSavedToStorage((prev) => ({
         ...prev,
-        [name]: false,
+        sdk_key: false,
       }));
-
-      // We no longer immediately reset the environment when SDK key changes
-      // This prevents the chip from disappearing before save
-      // It will be updated correctly on save instead
+      
+      // Update localStorage immediately to clear stale environment_key
+      localStorage.setItem("ldConfig", JSON.stringify(updatedConfig));
+    } else {
+      setConfig({
+        ...config,
+        [name]: value,
+      });
+      
+      // If API key changed, reset the saved status
+      if (name === "api_key") {
+        console.log("api_key changed, resetting saved status");
+        setSavedToStorage((prev) => ({
+          ...prev,
+          api_key: false,
+        }));
+      }
     }
 
     // Clear error/success when changing values
