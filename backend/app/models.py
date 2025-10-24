@@ -59,6 +59,7 @@ class LDConfig(BaseModel):
     error_metric_enabled: bool = True
     latency_metric_enabled: bool = True
     business_metric_enabled: bool = True
+    evaluations_per_second: float = 2.0  # Rate of flag evaluations (default: 2/sec)
     session_id: str  # Add session ID to track simulations per client
     
     @field_validator('latency_metric_1_false_range', 'latency_metric_1_true_range')
@@ -79,6 +80,13 @@ class LDConfig(BaseModel):
         if v is True or v == 'true' or v == 1:
             return True
         return False
+    
+    @field_validator('evaluations_per_second')
+    def validate_evaluations_rate(cls, v):
+        # Enforce min/max bounds for evaluation rate
+        if v < 0.1 or v > 100:
+            raise ValueError('Evaluations per second must be between 0.1 and 100')
+        return v
 
 class SimulationStatus(BaseModel):
     session_id: str  # Add session ID to identify unique client sessions

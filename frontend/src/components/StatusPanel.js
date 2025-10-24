@@ -139,35 +139,52 @@ const StatusPanel = ({ status }) => {
         variant="outlined" 
         sx={{ 
           p: 1.25, 
-          textAlign: 'center',
           backgroundColor: status.guarded_rollout_active ? 'rgba(46, 125, 50, 0.1)' : 'rgba(211, 47, 47, 0.1)',
           borderColor: status.guarded_rollout_active ? 'success.main' : 'error.main',
           mb: 1.5,
-          borderRadius: 1.5,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between'
+          borderRadius: 1.5
         }}
       >
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between',
+          mb: 0.75 
+        }}>
+          <Typography 
+            variant="body1" 
+            sx={{ 
+              fontWeight: 'bold', 
+              textTransform: 'uppercase', 
+              letterSpacing: 0.5, 
+              ml: 1,
+              fontSize: '1rem' 
+            }}
+          >
+            Guarded Rollout
+          </Typography>
+          <Chip
+            label={status.guarded_rollout_active ? 'ACTIVE' : 'INACTIVE'}
+            color={status.guarded_rollout_active ? 'success' : 'error'}
+            variant="filled"
+            size="small"
+            sx={{ fontWeight: 'bold', mr: 1 }}
+          />
+        </Box>
         <Typography 
-          variant="body1" 
+          variant="caption" 
+          color="text.secondary"
           sx={{ 
-            fontWeight: 'bold', 
-            textTransform: 'uppercase', 
-            letterSpacing: 0.5, 
-            ml: 1,
-            fontSize: '1rem' 
+            display: 'block',
+            textAlign: 'center',
+            fontSize: '0.75rem',
+            fontStyle: 'italic',
+            opacity: 0.8,
+            px: 1
           }}
         >
-          Guarded Rollout
+          Monitors API every 5 seconds • Auto-starts when release detected • Auto-stops when release ends
         </Typography>
-        <Chip
-          label={status.guarded_rollout_active ? 'ACTIVE' : 'INACTIVE'}
-          color={status.guarded_rollout_active ? 'success' : 'error'}
-          variant="filled"
-          size="small"
-          sx={{ fontWeight: 'bold', mr: 1 }}
-        />
       </Paper>
       
       {/* Time Information */}

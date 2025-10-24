@@ -8,6 +8,7 @@ A web application to simulate and send metric events to LaunchDarkly flags for R
 - FastAPI backend for efficient API processing
 - Real-time event logging with WebSockets
 - Configurable metrics simulation for latency, errors, and business conversions
+- **Configurable flag evaluation rate** - Control the rate of flag evaluations from 0.1 to 100 per second
 - Automatic detection of guarded rollouts
 - Configuration via UI with local storage persistence
 - **One-click LaunchDarkly resource creation** - Easily create flag and metrics in LaunchDarkly
@@ -78,6 +79,9 @@ The following parameters can be configured:
 - **Project Key** - Project where the flag exists
 - **Flag Key** - Flag key to evaluate and send events to
 
+### Traffic Configuration
+- **Evaluations Per Second** - Rate of flag evaluations (min: 0.1, max: 100, default: 2.0)
+
 ### Error Metric Configuration
 - **Error Metric Name** - Default is "error-rate"
 - **Control Conversion Rate** - Percentage of time error metric triggers for control
@@ -97,11 +101,12 @@ The following parameters can be configured:
 
 1. Enter your LaunchDarkly credentials and configuration in the web UI
 2. Configure your metrics for error rate, latency, and business conversions
-3. Click "Create LaunchDarkly Resources" to automatically create the flag and enabled metrics in LaunchDarkly
-4. Click "Start Simulation" to begin sending events
-5. The event log will show real-time updates of events being sent
-6. View the status panel to monitor the simulation
-7. Click "Stop Simulation" when finished
+3. Adjust the evaluation rate to control how frequently flag evaluations occur
+4. (Optional) Click "Create LaunchDarkly Resources" to automatically create the flag and enabled metrics in LaunchDarkly
+5. Click "Save & Start Simulation" in the Controls pane to save your configuration and begin sending events
+6. View the status panel in the center to monitor the simulation and statistics
+7. Watch the real-time event log on the right side of the interface
+8. Click "Stop Simulation" when finished
 
 ## Resource Creation
 

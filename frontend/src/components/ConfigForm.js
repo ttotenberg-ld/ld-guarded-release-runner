@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Box,
   TextField,
-  Button,
-  Alert,
   Grid,
   InputAdornment,
   Typography,
@@ -15,33 +13,11 @@ import {
 } from "@mui/material";
 import { startSimulation } from "../api/simulationApi";
 import {
-  getEnvironmentKey,
   updateEnvironmentKey,
 } from "../api/launchDarklyApi";
 import LaunchDarklyResourceCreator from "./LaunchDarklyResourceCreator";
 
-// Default configuration with placeholder values
-const DEFAULT_CONFIG = {
-  sdk_key: "",
-  api_key: "",
-  project_key: "default",
-  flag_key: "test-flag",
-  environment_key: "",
-  latency_metric_1: "latency",
-  error_metric_1: "error-rate",
-  business_metric_1: "purchase-completion",
-  latency_metric_1_false_range: [50, 100],
-  latency_metric_1_true_range: [52, 131],
-  error_metric_1_false_converted: 2,
-  error_metric_1_true_converted: 4,
-  business_metric_1_false_converted: 99,
-  business_metric_1_true_converted: 97,
-  error_metric_enabled: true,
-  latency_metric_enabled: true,
-  business_metric_enabled: true,
-};
-
-const ConfigForm = ({ disabled, onStatusChange }) => {
+const ConfigForm = ({ disabled, onStatusChange, saveAndStartRef }) => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [savedToStorage, setSavedToStorage] = useState({
@@ -129,6 +105,7 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
       error_metric_enabled: true,
       latency_metric_enabled: true,
       business_metric_enabled: true,
+      evaluations_per_second: 2.0,
     };
 
     if (savedConfig) {
@@ -329,6 +306,17 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
         }
       });
 
+      // Handle evaluations_per_second as a float
+      if (typeof submissionConfig.evaluations_per_second === "string") {
+        submissionConfig.evaluations_per_second = parseFloat(submissionConfig.evaluations_per_second) || 2.0;
+      }
+      // Ensure it's within bounds
+      if (submissionConfig.evaluations_per_second < 0.1) {
+        submissionConfig.evaluations_per_second = 0.1;
+      } else if (submissionConfig.evaluations_per_second > 100) {
+        submissionConfig.evaluations_per_second = 100;
+      }
+
       // Ensure toggle states are properly saved as booleans
       [
         "error_metric_enabled",
@@ -386,9 +374,13 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
     }
   };
 
-  // Modify handleSubmit to make it clear it also starts the simulation
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Function to save configuration and start simulation
+  // This is exposed to parent component via ref so SimulationControls can call it
+  const handleSubmit = useCallback(async (e) => {
+    // Only prevent default if this is called from a form submission event
+    if (e && e.preventDefault) {
+      e.preventDefault();
+    }
 
     try {
       // First save the configuration
@@ -404,8 +396,16 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
     } catch (error) {
       console.error("Error in handleSubmit:", error);
       setError(error.message || "Failed to start simulation");
+      throw error; // Re-throw so SimulationControls can handle it
     }
-  };
+  }, [config]); // eslint-disable-line react-hooks/exhaustive-deps
+  
+  // Expose saveAndStart function to parent via ref
+  useEffect(() => {
+    if (saveAndStartRef) {
+      saveAndStartRef.current = handleSubmit;
+    }
+  }, [saveAndStartRef, handleSubmit]);
 
   // Add a handler for key press on any field
   const handleKeyDown = (e) => {
@@ -453,7 +453,10 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
   return (
     <Box
       component="form"
-      onSubmit={handleSubmit}
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleSaveOnly(e);
+      }}
       noValidate
       sx={{
         "& .MuiTextField-root": { my: 0.5 },
@@ -567,6 +570,56 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
                 margin="dense"
                 helperText="Flag key to evaluate and send events to (✨ Auto-creatable ✨)"
               />
+            </Grid>
+          </Grid>
+        </Paper>
+
+        {/* Section: Traffic Configuration */}
+        <Paper sx={sectionStyle}>
+          <Box sx={headerStyle}>
+            <Typography variant="body1" sx={titleStyle}>
+              Traffic Configuration
+            </Typography>
+            <Divider sx={{ flex: 1, ml: 1 }} />
+          </Box>
+
+          <Grid container spacing={1}>
+            <Grid item xs={12} md={6}>
+              <TextField
+                name="evaluations_per_second"
+                label="Evaluations Per Second"
+                value={config.evaluations_per_second}
+                onChange={handleChange}
+                onKeyDown={handleKeyDown}
+                required
+                fullWidth
+                disabled={disabled}
+                size="small"
+                margin="dense"
+                type="number"
+                inputProps={{
+                  min: 0.1,
+                  max: 100,
+                  step: 0.1,
+                }}
+                helperText="Rate of flag evaluations (min: 0.1, max: 100, default: 2.0)"
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  height: "100%",
+                  pl: 2,
+                }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  {config.evaluations_per_second
+                    ? `≈ ${(config.evaluations_per_second * 60).toFixed(0)} evaluations/minute`
+                    : ""}
+                </Typography>
+              </Box>
             </Grid>
           </Grid>
         </Paper>
@@ -834,17 +887,6 @@ const ConfigForm = ({ disabled, onStatusChange }) => {
       >
         <LaunchDarklyResourceCreator disabled={disabled} />
       </Box>
-      {/* Submit button - centered */}
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 2, mb: 2 }}>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              disabled={disabled}
-            >
-              Save Configuration & Start
-            </Button>
-          </Box>
     </Box>
   );
 };

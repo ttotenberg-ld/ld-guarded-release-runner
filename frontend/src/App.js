@@ -14,6 +14,9 @@ function App() {
   const [logsLoading, setLogsLoading] = useState(false);
   const [configStatus, setConfigStatus] = useState({ error: null, success: null });
   
+  // Ref to store the ConfigForm's saveAndStart function
+  const saveAndStartRef = React.useRef(null);
+  
   // Initialize WebSocket connection for real-time updates
   const { connected } = useWebSocket({
     onMessage: (data) => {
@@ -53,6 +56,15 @@ function App() {
   // Handle configuration status updates
   const handleConfigStatusChange = useCallback((error, success) => {
     setConfigStatus({ error, success });
+  }, []);
+  
+  // Handle save and start from SimulationControls
+  const handleSaveAndStart = useCallback(async () => {
+    if (saveAndStartRef.current) {
+      return await saveAndStartRef.current();
+    } else {
+      throw new Error('Configuration form is not ready');
+    }
   }, []);
   
   return (
@@ -145,12 +157,45 @@ function App() {
             <ConfigForm 
               disabled={status.running} 
               onStatusChange={handleConfigStatusChange}
+              saveAndStartRef={saveAndStartRef}
             />
+          </Paper>
+        </Box>
+        
+        {/* Right column - Controls and Status */}
+        <Box sx={{ 
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%'
+        }}>
+          <Paper sx={{ 
+            p: 2,
+            mb: 2,
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <Typography variant="h6" gutterBottom sx={{ mb: 1 }}>Controls</Typography>
+            <SimulationControls 
+              running={status.running} 
+              connected={connected}
+              onSaveAndStart={handleSaveAndStart}
+            />
+          </Paper>
+          
+          <Paper sx={{ 
+            p: 2,
+            mb: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            flex: 1
+          }}>
+            <Typography variant="h6" gutterBottom sx={{ mb: 1 }}>Status</Typography>
+            <StatusPanel status={status} />
           </Paper>
           
           {/* Show log explorer only after simulation has completed */}
           {!status.running && status.events_sent > 0 && (
-            <Paper sx={{ p: 2, mb: 2 }}>
+            <Paper sx={{ p: 2 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                 <Typography variant="h6" gutterBottom sx={{ mb: 0 }}>Simulation Logs</Typography>
                 <Button
@@ -173,36 +218,6 @@ function App() {
               )}
             </Paper>
           )}
-        </Box>
-        
-        {/* Right column - Controls and Status */}
-        <Box sx={{ 
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100%'
-        }}>
-          <Paper sx={{ 
-            p: 2,
-            mb: 2,
-            display: 'flex',
-            flexDirection: 'column'
-          }}>
-            <Typography variant="h6" gutterBottom sx={{ mb: 1 }}>Controls</Typography>
-            <SimulationControls 
-              running={status.running} 
-              connected={connected}
-            />
-          </Paper>
-          
-          <Paper sx={{ 
-            p: 2,
-            display: 'flex',
-            flexDirection: 'column',
-            flex: 1
-          }}>
-            <Typography variant="h6" gutterBottom sx={{ mb: 1 }}>Status</Typography>
-            <StatusPanel status={status} />
-          </Paper>
         </Box>
       </Box>
     </Container>

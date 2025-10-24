@@ -2,89 +2,14 @@ import React from 'react';
 import { Box, Button, Typography, Chip } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopIcon from '@mui/icons-material/Stop';
-import { startSimulation, stopSimulation } from '../api/simulationApi';
-import { updateEnvironmentKey } from '../api/launchDarklyApi';
+import { stopSimulation } from '../api/simulationApi';
 
-const SimulationControls = ({ running, connected }) => {
+const SimulationControls = ({ running, connected, onSaveAndStart }) => {
   const handleStart = async () => {
     try {
-      // Get current form values directly from the DOM to ensure we have the latest values
-      // even if the user hasn't clicked Save in the ConfigForm
-      const formElements = document.querySelectorAll('input[name], textarea[name]');
-      let currentConfig = {};
-      
-      // First get the saved config as a base
-      const savedConfig = localStorage.getItem('ldConfig');
-      if (!savedConfig) {
-        alert('Please configure settings first');
-        return;
-      }
-      
-      // Parse saved config
-      currentConfig = JSON.parse(savedConfig);
-      
-      // Update config with latest values from form fields
-      formElements.forEach(element => {
-        if (element.name) {
-          // Handle checkbox/switch inputs
-          if (element.type === 'checkbox') {
-            currentConfig[element.name] = element.checked;
-          } 
-          // Handle regular inputs
-          else {
-            currentConfig[element.name] = element.value;
-          }
-        }
-      });
-      
-      // Ensure toggle states are properly preserved as booleans
-      ['error_metric_enabled', 'latency_metric_enabled', 'business_metric_enabled'].forEach(toggleKey => {
-        // Make sure toggle values are strictly boolean (not string "true"/"false")
-        // Use strict comparison to check if the value should be false
-        if (currentConfig[toggleKey] === false || currentConfig[toggleKey] === 'false' || currentConfig[toggleKey] === 0) {
-          currentConfig[toggleKey] = false;
-        } else {
-          currentConfig[toggleKey] = true;
-        }
-      });
-      
-      // Ensure ranges are arrays
-      ['latency_metric_1_false_range', 'latency_metric_1_true_range'].forEach(rangeKey => {
-        if (typeof currentConfig[rangeKey] === 'string') {
-          try {
-            const values = currentConfig[rangeKey].split(',').map(v => parseInt(v.trim(), 10));
-            const validValues = values.filter(v => !isNaN(v));
-            if (validValues.length === 2) {
-              currentConfig[rangeKey] = validValues;
-            } else {
-              currentConfig[rangeKey] = rangeKey.includes('false') ? [50, 125] : [52, 131];
-            }
-          } catch (err) {
-            currentConfig[rangeKey] = rangeKey.includes('false') ? [50, 125] : [52, 131];
-          }
-        } else if (!Array.isArray(currentConfig[rangeKey])) {
-          currentConfig[rangeKey] = rangeKey.includes('false') ? [50, 125] : [52, 131];
-        }
-      });
-      
-      // Make sure numeric fields are numbers
-      ['error_metric_1_false_converted', 'error_metric_1_true_converted', 
-       'business_metric_1_false_converted', 'business_metric_1_true_converted'].forEach(field => {
-        if (typeof currentConfig[field] === 'string') {
-          currentConfig[field] = parseInt(currentConfig[field], 10) || 0;
-        }
-      });
-      
-      // Update environment key if needed
-      if (currentConfig.sdk_key && currentConfig.api_key && currentConfig.project_key) {
-        console.log('SimulationControls: Updating environment key before starting');
-        await updateEnvironmentKey(currentConfig);
-      }
-      
-      // Save the current config to localStorage before starting
-      localStorage.setItem('ldConfig', JSON.stringify(currentConfig));
-      
-      await startSimulation(currentConfig);
+      // Call the saveAndStart function from ConfigForm
+      // This ensures we always use the current React state and proper validation
+      await onSaveAndStart();
     } catch (error) {
       console.error('Error starting simulation:', error);
       alert(`Failed to start simulation: ${error.message}`);
@@ -120,7 +45,7 @@ const SimulationControls = ({ running, connected }) => {
           disabled={running || !connected}
           fullWidth
         >
-          Start Simulation
+          Save & Start Simulation
         </Button>
         
         <Button

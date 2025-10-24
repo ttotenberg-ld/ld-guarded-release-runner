@@ -225,11 +225,17 @@ async def init_ld_client(session_id: str, config: LDConfig) -> bool:
         await send_log_to_clients(session_id, f"DEBUG - Error toggle: {config.error_metric_enabled} (type: {type(config.error_metric_enabled).__name__})")
         await send_log_to_clients(session_id, f"DEBUG - Business toggle: {config.business_metric_enabled} (type: {type(config.business_metric_enabled).__name__})")
             
-        # Initialize new client
-        ldclient.set_config(Config(config.sdk_key))
+        # Initialize new client with optimized event batching
+        # Configure batch flushing to handle high throughput efficiently
+        ld_config = Config(
+            config.sdk_key,
+            events_max_pending=10000,  # Buffer up to 10k events before forcing a flush
+            flush_interval=1.0  # Auto-flush every 1 second
+        )
+        ldclient.set_config(ld_config)
         active_clients[session_id]["client"] = ldclient.get()
         active_clients[session_id]["config"] = config
-        await send_log_to_clients(session_id, "LaunchDarkly client initialized")
+        await send_log_to_clients(session_id, "LaunchDarkly client initialized with batch event flushing (10k events, 1s interval)")
         return True
     except Exception as e:
         error_msg = f"Error initializing LaunchDarkly client: {str(e)}"
@@ -456,7 +462,7 @@ async def send_events(session_id: str, num_events: int = 1000):
                     # Status log - No user_key
                     await send_log_to_clients(session_id, f"Skipping {config.latency_metric_1} tracking (disabled)")
             
-            client.flush()
+            # SDK handles flushing automatically based on events_max_pending and flush_interval
             events_sent += 1
             status.events_sent += 1
             
@@ -467,7 +473,9 @@ async def send_events(session_id: str, num_events: int = 1000):
             elif events_sent % 10 == 0:
                 await send_status_to_clients(session_id)
                 
-            await asyncio.sleep(0.5)
+            # Calculate sleep time based on configured evaluations per second
+            sleep_time = 1.0 / config.evaluations_per_second
+            await asyncio.sleep(sleep_time)
             
         except Exception as e:
             error_msg = f"Error during event sending: {str(e)}"
