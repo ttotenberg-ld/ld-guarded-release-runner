@@ -59,7 +59,7 @@ class LDConfig(BaseModel):
     error_metric_enabled: bool = True
     latency_metric_enabled: bool = True
     business_metric_enabled: bool = True
-    evaluations_per_second: float = 2.0  # Rate of flag evaluations (default: 2/sec)
+    evaluations_per_second: float = 20.0  # Rate of flag evaluations (default: 20/sec)
     session_id: str  # Add session ID to track simulations per client
     
     @field_validator('latency_metric_1_false_range', 'latency_metric_1_true_range')

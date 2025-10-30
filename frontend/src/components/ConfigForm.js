@@ -105,7 +105,7 @@ const ConfigForm = ({ disabled, onStatusChange, saveAndStartRef }) => {
       error_metric_enabled: true,
       latency_metric_enabled: true,
       business_metric_enabled: true,
-      evaluations_per_second: 2.0,
+      evaluations_per_second: 20.0,
     };
 
     if (savedConfig) {
@@ -308,7 +308,7 @@ const ConfigForm = ({ disabled, onStatusChange, saveAndStartRef }) => {
 
       // Handle evaluations_per_second as a float
       if (typeof submissionConfig.evaluations_per_second === "string") {
-        submissionConfig.evaluations_per_second = parseFloat(submissionConfig.evaluations_per_second) || 2.0;
+        submissionConfig.evaluations_per_second = parseFloat(submissionConfig.evaluations_per_second) || 20.0;
       }
       // Ensure it's within bounds
       if (submissionConfig.evaluations_per_second < 0.1) {
@@ -602,7 +602,7 @@ const ConfigForm = ({ disabled, onStatusChange, saveAndStartRef }) => {
                   max: 100,
                   step: 0.1,
                 }}
-                helperText="Rate of flag evaluations (min: 0.1, max: 100, default: 2.0)"
+                helperText="Rate of flag evaluations (min: 0.1, max: 100, default: 20.0)"
               />
             </Grid>
             <Grid item xs={12} md={6}>
