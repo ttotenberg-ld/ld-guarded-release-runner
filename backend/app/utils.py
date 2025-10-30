@@ -81,5 +81,4 @@ def error_chance(chance_number):
         chance_calc = random.randint(1, 100)
     
     result = chance_calc <= chance_number
-    print(f"DEBUG: error_chance check - threshold: {chance_number}, roll: {chance_calc}, result: {result}")
     return result

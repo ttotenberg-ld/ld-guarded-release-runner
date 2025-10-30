@@ -160,8 +160,6 @@ def update_stats(session_id: str):
         status.stats.treatment.error_rate.count = treatment_error_total
         status.stats.treatment.error_rate.sum = treatment_error_count
         status.stats.treatment.error_rate.avg = (treatment_error_count / treatment_error_total) * 100 if treatment_error_total > 0 else 0
-        # Add debug message
-        print(f"DEBUG: Updated treatment error stats for session {session_id} - total: {treatment_error_total}, count: {treatment_error_count}, avg: {status.stats.treatment.error_rate.avg}")
     
     # Business metrics
     treatment_business_total = stats["treatment_business_total"]

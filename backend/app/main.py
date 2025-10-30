@@ -39,14 +39,6 @@ async def options_route(path: str):
     response.headers["Access-Control-Allow-Headers"] = "*"
     return response
 
-# Debug middleware to log requests
-@app.middleware("http")
-async def log_requests(request: Request, call_next):
-    print(f"DEBUG: Received {request.method} request for {request.url.path} from origin: {request.headers.get('origin', 'unknown')}")
-    response = await call_next(request)
-    print(f"DEBUG: Returning {response.status_code} response with headers: {dict(response.headers)}")
-    return response
-
 # Include the LaunchDarkly API proxy router
 app.include_router(ld_api_router)
 
