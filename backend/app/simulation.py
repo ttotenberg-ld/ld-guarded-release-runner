@@ -183,6 +183,7 @@ async def get_environment_key(session_id: str, config: LDConfig) -> str:
         headers = {'Authorization': config.api_key, 'Content-Type': 'application/json'}
         
         await send_log_to_clients(session_id, f"Getting environments for project {config.project_key}")
+        
         response = requests.get(url, headers=headers)
         response.raise_for_status()
         response_data = response.json()
@@ -191,7 +192,7 @@ async def get_environment_key(session_id: str, config: LDConfig) -> str:
         for env in response_data.get('items', []):
             if env.get('apiKey') == config.sdk_key:
                 env_key = env.get('key')
-                await send_log_to_clients(session_id, f"Found environment key: {env_key} for SDK key")
+                await send_log_to_clients(session_id, f"Found environment: {env_key}")
                 return env_key
         
         # If no match found, fall back to 'production' with a warning
@@ -216,14 +217,7 @@ async def init_ld_client(session_id: str, config: LDConfig) -> bool:
             
         # ALWAYS fetch the environment key fresh based on the SDK key
         # This ensures we don't use a stale environment_key from a previous SDK key
-        await send_log_to_clients(session_id, f"Fetching environment key for SDK key...")
         config.environment_key = await get_environment_key(session_id, config)
-            
-        # Log toggle values for debugging - no user key for debug logs
-        await send_log_to_clients(session_id, f"DEBUG - Using environment: {config.environment_key}")
-        await send_log_to_clients(session_id, f"DEBUG - Latency toggle: {config.latency_metric_enabled} (type: {type(config.latency_metric_enabled).__name__})")
-        await send_log_to_clients(session_id, f"DEBUG - Error toggle: {config.error_metric_enabled} (type: {type(config.error_metric_enabled).__name__})")
-        await send_log_to_clients(session_id, f"DEBUG - Business toggle: {config.business_metric_enabled} (type: {type(config.business_metric_enabled).__name__})")
             
         # Initialize new client with optimized event batching
         # Configure batch flushing to handle high throughput efficiently
@@ -235,7 +229,7 @@ async def init_ld_client(session_id: str, config: LDConfig) -> bool:
         ldclient.set_config(ld_config)
         active_clients[session_id]["client"] = ldclient.get()
         active_clients[session_id]["config"] = config
-        await send_log_to_clients(session_id, "LaunchDarkly client initialized with batch event flushing (10k events, 1s interval)")
+        await send_log_to_clients(session_id, "LaunchDarkly client initialized")
         return True
     except Exception as e:
         error_msg = f"Error initializing LaunchDarkly client: {str(e)}"
@@ -259,7 +253,6 @@ async def check_guarded_rollout(session_id: str) -> bool:
         url = f'https://app.launchdarkly.com/api/v2/flags/{config.project_key}/{config.flag_key}'
         headers = {'Authorization': config.api_key, 'Content-Type': 'application/json'}
         
-        await send_log_to_clients(session_id, f"Checking if guarded rollout is active for {config.flag_key}")
         response = requests.get(url, headers=headers)
         response.raise_for_status()
         response_data = response.json()
@@ -267,18 +260,39 @@ async def check_guarded_rollout(session_id: str) -> bool:
         # Get the environment key to use (determined during init based on SDK key)
         env_key = config.environment_key or 'production'
         
-        # Safely access nested keys for the appropriate environment (not just 'production')
+        # Safely access nested keys for the appropriate environment
         env_data = response_data.get('environments', {}).get(env_key, {})
-        fallthrough = env_data.get('fallthrough', {})
-        rollout_active = fallthrough.get('rollout')
         
-        rollout_type = None
-        if rollout_active and isinstance(rollout_active, dict):
-            experiment_allocation = rollout_active.get('experimentAllocation', {})
+        if not env_data:
+            await send_log_to_clients(session_id, f"No data found for environment '{env_key}'")
+            status.guarded_rollout_active = False
+            return False
+        
+        # Function to check if a rollout has a measured/guarded rollout
+        def has_measured_rollout(rollout_obj):
+            """Check if a rollout object has experimentAllocation.type == 'measuredRollout'"""
+            if not rollout_obj or not isinstance(rollout_obj, dict):
+                return False
+            experiment_allocation = rollout_obj.get('experimentAllocation', {})
             if experiment_allocation and isinstance(experiment_allocation, dict):
-                rollout_type = experiment_allocation.get('type')
+                return experiment_allocation.get('type') == 'measuredRollout'
+            return False
         
-        is_active = rollout_type == 'measuredRollout'
+        is_active = False
+        
+        # Check 1: Look for guarded rollout in fallthrough
+        fallthrough = env_data.get('fallthrough', {})
+        fallthrough_rollout = fallthrough.get('rollout')
+        if fallthrough_rollout and has_measured_rollout(fallthrough_rollout):
+            is_active = True
+        
+        # Check 2: Look for guarded rollout in any targeting rules
+        rules = env_data.get('rules', [])
+        for rule in rules:
+            rule_rollout = rule.get('rollout')
+            if rule_rollout and has_measured_rollout(rule_rollout):
+                is_active = True
+                break
         
         # Check if the rollout status changed from active to inactive
         if status.guarded_rollout_active and not is_active and status.running:
@@ -334,9 +348,6 @@ async def send_events(session_id: str, num_events: int = 1000):
     error_enabled = bool(config.error_metric_enabled)
     business_enabled = bool(config.business_metric_enabled)
     
-    # Log debug info without user key
-    await send_log_to_clients(session_id, f"DEBUG - At send_events: Latency toggle: {latency_enabled} (type: {type(latency_enabled).__name__})")
-    
     events_sent = 0
     first_event_tracked = False
     
@@ -391,17 +402,12 @@ async def send_events(session_id: str, num_events: int = 1000):
                 # Treatment (true variation)
                 # Error metric tracking - only if enabled
                 stats["treatment_error_total"] += 1
-                # Add debug
-                error_roll = random.randint(1, 100)
-                should_trigger = error_roll <= config.error_metric_1_true_converted
-                print(f"DEBUG: Treatment error check for session {session_id} - roll: {error_roll}, threshold: {config.error_metric_1_true_converted}, will trigger: {should_trigger}")
                 
                 if error_enabled and error_chance(config.error_metric_1_true_converted):
                     # Event tracking - Include user_key
                     client.track(config.error_metric_1, context)
                     stats["treatment_error_count"] += 1
                     await send_log_to_clients(session_id, f"Tracking {config.error_metric_1} for treatment", user_key)
-                    print(f"DEBUG: Tracked treatment error for session {session_id} - total: {stats['treatment_error_total']}, count: {stats['treatment_error_count']}")
                 elif not error_enabled:
                     # Status log - No user_key
                     await send_log_to_clients(session_id, f"Skipping {config.error_metric_1} tracking (disabled)")
