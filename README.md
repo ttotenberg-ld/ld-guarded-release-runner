@@ -10,12 +10,13 @@ A web application to simulate and send metric events to LaunchDarkly flags for R
 - Configurable metrics simulation for latency, errors, and business conversions
 - **Configurable flag evaluation rate** - Control the rate of flag evaluations from 0.1 to 100 per second
 - Automatic detection of guarded rollouts
+- **Supports all flag types** - Works with boolean flags, multivariate flags, and AI configs - automatically identifies control and treatment variations
 - Configuration via UI with local storage persistence
 - **One-click LaunchDarkly resource creation** - Easily create flag and metrics in LaunchDarkly
 
 ## What does it do?
 
-It sends metric events to a LaunchDarkly flag to be measured in Release Guardian. With the default setup, the flag serving the treatment variation will over time show regressions in `latency` and increases in `error-rate`, along with improvements in `conversion` metrics. Release Guardian will detect these changes and take the action you define during setup.
+It sends metric events to a LaunchDarkly flag (boolean, multivariate, or AI config) to be measured in Release Guardian. The simulator automatically identifies control and treatment variations from your experiment's baseline configuration. With the default setup, the treatment variation will over time show regressions in `latency` and increases in `error-rate`, along with improvements in `purchase-completion` metrics. Release Guardian will detect these changes and take the action you define during setup.
 
 ## Prerequisites
 
@@ -77,10 +78,10 @@ The following parameters can be configured:
 - **SDK Key** - LaunchDarkly server-side SDK Key (secret)
 - **API Key** - LaunchDarkly API Key with write permissions to flags and metrics
 - **Project Key** - Project where the flag exists
-- **Flag Key** - Flag key to evaluate and send events to
+- **Flag Key** - Flag key to evaluate and send events to (supports boolean, multivariate, and AI config flags)
 
 ### Traffic Configuration
-- **Evaluations Per Second** - Rate of flag evaluations (min: 0.1, max: 100, default: 2.0)
+- **Evaluations Per Second** - Rate of flag evaluations (min: 0.1, max: 100, default: 20.0)
 
 ### Error Metric Configuration
 - **Error Metric Name** - Default is "error-rate"
@@ -93,7 +94,7 @@ The following parameters can be configured:
 - **Treatment Range** - Min, Max values for the latency metric for treatment
 
 ### Business Conversion Configuration
-- **Business Metric Name** - Default is "conversion"
+- **Business Metric Name** - Default is "purchase-completion"
 - **Control Conversion Rate** - Percentage of time business metric triggers for control
 - **Treatment Conversion Rate** - Percentage of time business metric triggers for treatment
 
@@ -118,6 +119,8 @@ The new **Create LaunchDarkly Resources** feature automatically creates the foll
 4. **Conversion Metric** - Creates an occurrence metric where higher is better, using the business metric name you specified (only if enabled)
 
 All resources will be created with appropriate configurations for use with LaunchDarkly's Release Guardian feature. The resources will be tagged with "guarded-rollout-runner" for easy identification in the LaunchDarkly dashboard.
+
+**Note:** While the automatic resource creation generates boolean flags, the simulation tool works with any flag type - boolean, multivariate, or AI configs. The simulator automatically detects the baseline (control) variation from your experiment configuration, ensuring accurate tracking regardless of flag type, number of variations, or variation indices used.
 
 ## Deployment
 

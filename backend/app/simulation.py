@@ -266,31 +266,51 @@ async def check_guarded_rollout(session_id: str) -> bool:
             status.guarded_rollout_active = False
             return False
         
-        # Function to check if a rollout has a measured/guarded rollout
-        def has_measured_rollout(rollout_obj):
-            """Check if a rollout object has experimentAllocation.type == 'measuredRollout'"""
+        # Function to check if a rollout has a measured/guarded rollout and extract baseline
+        def get_experiment_info(rollout_obj):
+            """Check for guarded rollout and extract baseline variation"""
             if not rollout_obj or not isinstance(rollout_obj, dict):
-                return False
+                return False, None
             experiment_allocation = rollout_obj.get('experimentAllocation', {})
             if experiment_allocation and isinstance(experiment_allocation, dict):
-                return experiment_allocation.get('type') == 'measuredRollout'
-            return False
+                if experiment_allocation.get('type') == 'measuredRollout':
+                    default_variation = experiment_allocation.get('defaultVariation')
+                    return True, default_variation
+            return False, None
         
         is_active = False
+        baseline_variation = None
         
         # Check 1: Look for guarded rollout in fallthrough
         fallthrough = env_data.get('fallthrough', {})
         fallthrough_rollout = fallthrough.get('rollout')
-        if fallthrough_rollout and has_measured_rollout(fallthrough_rollout):
+        has_experiment, baseline = get_experiment_info(fallthrough_rollout)
+        if has_experiment:
             is_active = True
+            baseline_variation = baseline
         
         # Check 2: Look for guarded rollout in any targeting rules
-        rules = env_data.get('rules', [])
-        for rule in rules:
-            rule_rollout = rule.get('rollout')
-            if rule_rollout and has_measured_rollout(rule_rollout):
-                is_active = True
-                break
+        if not is_active:
+            rules = env_data.get('rules', [])
+            for rule in rules:
+                rule_rollout = rule.get('rollout')
+                has_experiment, baseline = get_experiment_info(rule_rollout)
+                if has_experiment:
+                    is_active = True
+                    baseline_variation = baseline
+                    break
+        
+        # Store the baseline variation for this session
+        if is_active:
+            if baseline_variation is not None:
+                active_clients[session_id]["baseline_variation"] = baseline_variation
+                await send_log_to_clients(session_id, f"Experiment baseline variation index: {baseline_variation}")
+            else:
+                error_msg = "Error: Guarded rollout active but baseline variation not found"
+                status.last_error = error_msg
+                await send_log_to_clients(session_id, error_msg)
+                # Clear any stale baseline
+                active_clients[session_id]["baseline_variation"] = None
         
         # Check if the rollout status changed from active to inactive
         if status.guarded_rollout_active and not is_active and status.running:
@@ -346,6 +366,9 @@ async def send_events(session_id: str, num_events: int = 1000):
     error_enabled = bool(config.error_metric_enabled)
     business_enabled = bool(config.business_metric_enabled)
     
+    # Get the baseline variation index for this session's experiment
+    baseline_variation_index = active_clients[session_id].get("baseline_variation")
+    
     events_sent = 0
     first_event_tracked = False
     
@@ -362,6 +385,7 @@ async def send_events(session_id: str, num_events: int = 1000):
             
             flag_variation_detail = client.variation_detail(config.flag_key, context, False)
             flag_variation = flag_variation_detail.value
+            variation_index = flag_variation_detail.variation_index
             
             # Check if this user is part of an experiment
             in_experiment = False
@@ -369,20 +393,31 @@ async def send_events(session_id: str, num_events: int = 1000):
             if reason and isinstance(reason, dict) and reason.get('inExperiment') is True:
                 in_experiment = True
             
+            # Determine if this is control or treatment based on baseline variation
+            # If baseline is not available, we cannot properly categorize variations
+            if baseline_variation_index is None:
+                # Skip this evaluation - cannot determine control vs treatment without baseline
+                error_msg = "Skipping evaluation: baseline variation not available"
+                await send_log_to_clients(session_id, error_msg, user_key)
+                continue
+            
+            # Control = baseline variation, Treatment = any other variation
+            is_control = (variation_index == baseline_variation_index)
+            
             # Update evaluation counters
-            if flag_variation:
-                # Treatment group
-                status.stats.treatment.evaluations += 1
-                if in_experiment:
-                    status.stats.treatment.in_experiment += 1
-            else:
-                # Control group
+            if is_control:
+                # Control group (baseline)
                 status.stats.control.evaluations += 1
                 if in_experiment:
                     status.stats.control.in_experiment += 1
+            else:
+                # Treatment group (non-baseline)
+                status.stats.treatment.evaluations += 1
+                if in_experiment:
+                    status.stats.treatment.in_experiment += 1
                     
             # Flag evaluation log - Include user_key
-            variation_str = "treatment" if flag_variation else "control"
+            variation_str = "control" if is_control else "treatment"
             experiment_str = "in experiment" if in_experiment else "not in experiment"
             await send_log_to_clients(session_id, f"Executing {variation_str} ({experiment_str})", user_key)
             
@@ -396,8 +431,42 @@ async def send_events(session_id: str, num_events: int = 1000):
                 await send_log_to_clients(session_id, f"First event sent at: {time.strftime('%H:%M:%S', time.localtime(status.first_event_time))}")
                 first_event_tracked = True
                 
-            if flag_variation:
-                # Treatment (true variation)
+            if is_control:
+                # Control (baseline variation)
+                # Error metric tracking - only if enabled
+                stats["control_error_total"] += 1
+                if error_enabled and error_chance(config.error_metric_1_false_converted):
+                    # Event tracking - Include user_key
+                    client.track(config.error_metric_1, context)
+                    stats["control_error_count"] += 1
+                    await send_log_to_clients(session_id, f"Tracking {config.error_metric_1} for control", user_key)
+                elif not error_enabled:
+                    # Status log - No user_key
+                    await send_log_to_clients(session_id, f"Skipping {config.error_metric_1} tracking (disabled)")
+                
+                # Business metric tracking - only if enabled
+                stats["control_business_total"] += 1
+                if business_enabled and error_chance(config.business_metric_1_false_converted):
+                    # Event tracking - Include user_key
+                    client.track(config.business_metric_1, context)
+                    stats["control_business_count"] += 1
+                    await send_log_to_clients(session_id, f"Tracking {config.business_metric_1} for control", user_key)
+                elif not business_enabled:
+                    # Status log - No user_key
+                    await send_log_to_clients(session_id, f"Skipping {config.business_metric_1} tracking (disabled)")
+                
+                # Latency metric tracking - only if enabled
+                if latency_enabled:
+                    # Event tracking - Include user_key
+                    latency_value = random.randint(config.latency_metric_1_false_range[0], config.latency_metric_1_false_range[1])
+                    client.track(config.latency_metric_1, context, metric_value=latency_value)
+                    stats["control_latency_values"].append(latency_value)
+                    await send_log_to_clients(session_id, f"Tracking {config.latency_metric_1} with value {latency_value} for control", user_key)
+                else:
+                    # Status log - No user_key
+                    await send_log_to_clients(session_id, f"Skipping {config.latency_metric_1} tracking (disabled)")
+            else:
+                # Treatment (non-baseline variation)
                 # Error metric tracking - only if enabled
                 stats["treatment_error_total"] += 1
                 
@@ -428,40 +497,6 @@ async def send_events(session_id: str, num_events: int = 1000):
                     client.track(config.latency_metric_1, context, metric_value=latency_value)
                     stats["treatment_latency_values"].append(latency_value)
                     await send_log_to_clients(session_id, f"Tracking {config.latency_metric_1} with value {latency_value} for treatment", user_key)
-                else:
-                    # Status log - No user_key
-                    await send_log_to_clients(session_id, f"Skipping {config.latency_metric_1} tracking (disabled)")
-            else:
-                # Control (false variation)
-                # Error metric tracking - only if enabled
-                stats["control_error_total"] += 1
-                if error_enabled and error_chance(config.error_metric_1_false_converted):
-                    # Event tracking - Include user_key
-                    client.track(config.error_metric_1, context)
-                    stats["control_error_count"] += 1
-                    await send_log_to_clients(session_id, f"Tracking {config.error_metric_1} for control", user_key)
-                elif not error_enabled:
-                    # Status log - No user_key
-                    await send_log_to_clients(session_id, f"Skipping {config.error_metric_1} tracking (disabled)")
-                
-                # Business metric tracking - only if enabled
-                stats["control_business_total"] += 1
-                if business_enabled and error_chance(config.business_metric_1_false_converted):
-                    # Event tracking - Include user_key
-                    client.track(config.business_metric_1, context)
-                    stats["control_business_count"] += 1
-                    await send_log_to_clients(session_id, f"Tracking {config.business_metric_1} for control", user_key)
-                elif not business_enabled:
-                    # Status log - No user_key
-                    await send_log_to_clients(session_id, f"Skipping {config.business_metric_1} tracking (disabled)")
-                
-                # Latency metric tracking - only if enabled
-                if latency_enabled:
-                    # Event tracking - Include user_key
-                    latency_value = random.randint(config.latency_metric_1_false_range[0], config.latency_metric_1_false_range[1])
-                    client.track(config.latency_metric_1, context, metric_value=latency_value)
-                    stats["control_latency_values"].append(latency_value)
-                    await send_log_to_clients(session_id, f"Tracking {config.latency_metric_1} with value {latency_value} for control", user_key)
                 else:
                     # Status log - No user_key
                     await send_log_to_clients(session_id, f"Skipping {config.latency_metric_1} tracking (disabled)")
