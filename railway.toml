@@ -2,7 +2,6 @@
 builder = "nixpacks"
 
 [deploy]
-startCommand = "echo 'Railway deployment configured!'"
 restartPolicyType = "on_failure"
 
 [[services]]
