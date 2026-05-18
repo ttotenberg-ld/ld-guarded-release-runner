@@ -437,8 +437,13 @@ const createBusinessMetric = async (config) => {
 };
 
 /**
- * Creates a guarded-release release policy scoped to flags tagged with RELEASE_POLICY_TAG.
- * The auto-created flag carries that tag, so the policy applies to it automatically.
+ * Creates (or overwrites) a guarded-release release policy scoped to flags tagged
+ * with RELEASE_POLICY_TAG. The auto-created flag carries that tag, so the policy
+ * applies to it automatically.
+ *
+ * Tries POST first; on 409 (policy already exists) falls back to PUT so repeated
+ * runs pick up changes to the enabled metrics.
+ *
  * @param {Object} config - The configuration object
  * @param {Array<string>} metricKeys - The metric keys to put on the guarded-release config
  * @returns {Promise<Object>} - The API response
@@ -446,48 +451,61 @@ const createBusinessMetric = async (config) => {
 const createReleasePolicy = async (config, metricKeys) => {
   const { api_key, project_key } = config;
 
-  const url = `https://app.launchdarkly.com/api/v2/projects/${project_key}/release-policies`;
+  const guardedReleaseConfig = {
+    metricKeys,
+    rolloutContextKindKey: 'user'
+  };
+  const scope = { flagTagKeys: [RELEASE_POLICY_TAG] };
+  const betaHeader = { 'LD-API-Version': 'beta' };
 
-  const payload = {
+  const createUrl = `https://app.launchdarkly.com/api/v2/projects/${project_key}/release-policies`;
+  const createPayload = {
     key: RELEASE_POLICY_KEY,
     name: 'Guarded Release Runner Policy',
     releaseMethod: 'guarded-release',
-    scope: {
-      flagTagKeys: [RELEASE_POLICY_TAG]
-    },
-    guardedReleaseConfig: {
-      metricKeys,
-      rolloutContextKindKey: 'user'
-    }
+    scope,
+    guardedReleaseConfig
   };
 
-  const response = await makeProxyRequest(url, 'post', payload, api_key, {
-    'LD-API-Version': 'beta'
-  });
+  const createResp = await makeProxyRequest(createUrl, 'post', createPayload, api_key, betaHeader);
 
-  // 201 Created
-  if (response && !response.error) {
+  if (createResp && !createResp.error) {
     return {
       success: true,
       message: 'Release policy created successfully!',
       metricKeys,
-      data: response
+      data: createResp
     };
   }
 
-  // 409 Conflict — policy already exists. Treat as success for this educational flow;
-  // customers can edit the policy from the LaunchDarkly console if metrics changed.
-  if (response && (
-    response.status_code === 409 ||
-    (response.error && response.error.includes('409'))
-  )) {
+  const isConflict = createResp && (
+    createResp.status_code === 409 ||
+    (createResp.error && createResp.error.includes('409'))
+  );
+
+  if (!isConflict) {
+    return createResp;
+  }
+
+  // Policy exists — overwrite it via PUT so the enabled-metrics list is current.
+  const updateUrl = `https://app.launchdarkly.com/api/v2/projects/${project_key}/release-policies/${RELEASE_POLICY_KEY}`;
+  const updatePayload = {
+    name: 'Guarded Release Runner Policy',
+    releaseMethod: 'guarded-release',
+    scope,
+    guardedReleaseConfig
+  };
+
+  const updateResp = await makeProxyRequest(updateUrl, 'put', updatePayload, api_key, betaHeader);
+
+  if (updateResp && !updateResp.error) {
     return {
       success: true,
-      message: 'Release policy already exists',
+      message: 'Release policy updated',
       metricKeys,
-      data: response.data
+      data: updateResp
     };
   }
 
-  return response;
+  return updateResp;
 };

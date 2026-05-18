@@ -236,14 +236,15 @@ async def init_ld_client(session_id: str, config: LDConfig) -> bool:
         await send_log_to_clients(session_id, error_msg)
         return False
 
-# Automated-release statuses that mean "the rollout is currently running and should
-# be observed by the simulation". Other statuses (completed, reverted, archived,
-# manually_*, srm_stopped, monitoring_stopped) are terminal.
+# Automated-release statuses that mean "the rollout is currently running and the
+# simulator should keep firing events". monitoring_regressed is intentionally NOT
+# here — once a regression is detected we stop the sim, since further events don't
+# change the outcome. Terminal statuses (completed, reverted, archived, manually_*,
+# srm_stopped, monitoring_stopped) likewise aren't in this set.
 _ACTIVE_AUTOMATED_RELEASE_STATUSES = {
     "not_started",
     "waiting",
     "in_progress",
-    "monitoring_regressed",
 }
 
 
@@ -292,15 +293,34 @@ async def check_guarded_rollout(session_id: str) -> bool:
         releases_data = releases_response.json()
 
         active_release = None
+        regressed_release = None
         for item in releases_data.get('items', []):
             if item.get('kind') != 'guarded':
                 continue
-            if item.get('status') in _ACTIVE_AUTOMATED_RELEASE_STATUSES:
+            status_val = item.get('status')
+            if status_val in _ACTIVE_AUTOMATED_RELEASE_STATUSES:
                 active_release = item
                 break
+            if status_val == 'monitoring_regressed':
+                regressed_release = item
 
         is_active = active_release is not None
         baseline_variation = None
+
+        # Surface the specific reason when a rollout regressed without auto-rollback:
+        # the loop will see the active→inactive transition and stop, but the default
+        # "became inactive" log is misleading in this case.
+        if not is_active and regressed_release is not None and status.guarded_rollout_active:
+            failing = [
+                mc['metricKey']
+                for mc in regressed_release.get('metricConfigurations', [])
+                if mc.get('status') == 'regressed'
+            ]
+            metric_list = ', '.join(failing) if failing else '(unknown metric)'
+            await send_log_to_clients(
+                session_id,
+                f"Regression detected on metric(s): {metric_list} — stopping simulation"
+            )
 
         # 2) If a guarded release is active, resolve its originalVariationId (a UUID)
         #    back to a variation index by reading the flag's variations list, since
