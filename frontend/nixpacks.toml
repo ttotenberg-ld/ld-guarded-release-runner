@@ -15,7 +15,7 @@ cmds = [
   "echo 'EOL' >> start.sh",
   "echo 'echo \"ENV CONFIG GENERATED:\"' >> start.sh",
   "echo 'cat ./build/env-config.js' >> start.sh",
-  "echo 'exec npx serve -s build -l \${PORT:-3000}' >> start.sh",
+  "echo 'exec npm run start:prod' >> start.sh",
   "chmod +x start.sh"
 ]
 
