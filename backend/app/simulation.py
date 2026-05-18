@@ -236,94 +236,107 @@ async def init_ld_client(session_id: str, config: LDConfig) -> bool:
         await send_log_to_clients(session_id, error_msg)
         return False
 
+# Automated-release statuses that mean "the rollout is currently running and should
+# be observed by the simulation". Other statuses (completed, reverted, archived,
+# manually_*, srm_stopped, monitoring_stopped) are terminal.
+_ACTIVE_AUTOMATED_RELEASE_STATUSES = {
+    "not_started",
+    "waiting",
+    "in_progress",
+    "monitoring_regressed",
+}
+
+
+def _variation_id_to_index(flag_data: dict, variation_id: str) -> Optional[int]:
+    """Map a flag variation _id (UUID) to its zero-based index in flag.variations."""
+    if not variation_id:
+        return None
+    for idx, variation in enumerate(flag_data.get("variations", [])):
+        if variation.get("_id") == variation_id:
+            return idx
+    return None
+
+
 async def check_guarded_rollout(session_id: str) -> bool:
-    """Check if the guarded rollout is active for a specific session"""
+    """Check if a guarded automated-release is active for a specific session.
+
+    Uses the new automated-releases endpoint (replaces inspecting the flag's
+    experimentAllocation field, which was the measured-rollout-era representation).
+    """
     status = get_or_create_status(session_id)
-    
+
     if session_id not in active_clients or "config" not in active_clients[session_id]:
         await send_log_to_clients(session_id, "No configuration found")
         status.guarded_rollout_active = False
         return False
-        
+
     config = active_clients[session_id]["config"]
-        
+    env_key = config.environment_key or 'production'
+    headers = {'Authorization': config.api_key, 'Content-Type': 'application/json'}
+
     try:
-        url = f'https://app.launchdarkly.com/api/v2/flags/{config.project_key}/{config.flag_key}'
-        headers = {'Authorization': config.api_key, 'Content-Type': 'application/json'}
-        
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
-        response_data = response.json()
-        
-        # Get the environment key to use (determined during init based on SDK key)
-        env_key = config.environment_key or 'production'
-        
-        # Safely access nested keys for the appropriate environment
-        env_data = response_data.get('environments', {}).get(env_key, {})
-        
-        if not env_data:
-            await send_log_to_clients(session_id, f"No data found for environment '{env_key}'")
-            status.guarded_rollout_active = False
-            return False
-        
-        # Function to check if a rollout has a measured/guarded rollout and extract baseline
-        def get_experiment_info(rollout_obj):
-            """Check for guarded rollout and extract baseline variation"""
-            if not rollout_obj or not isinstance(rollout_obj, dict):
-                return False, None
-            experiment_allocation = rollout_obj.get('experimentAllocation', {})
-            if experiment_allocation and isinstance(experiment_allocation, dict):
-                if experiment_allocation.get('type') == 'measuredRollout':
-                    default_variation = experiment_allocation.get('defaultVariation')
-                    return True, default_variation
-            return False, None
-        
-        is_active = False
+        # 1) List automated releases for the flag, filtered to guarded rollouts in
+        #    this environment. This endpoint lives under /internal/ — per LD, that
+        #    namespace is reachable with a customer API key, it just isn't part
+        #    of the documented public API. The endpoint requires LD-API-Version: beta
+        #    (the spec doesn't list this header, but the server enforces it).
+        releases_url = (
+            f'https://app.launchdarkly.com/internal/projects/{config.project_key}'
+            f'/flags/{config.flag_key}/automated-releases'
+        )
+        releases_params = {'filter': f'environmentKey:{env_key},kind:guarded'}
+        releases_headers = {**headers, 'LD-API-Version': 'beta'}
+
+        releases_response = requests.get(releases_url, headers=releases_headers, params=releases_params)
+        releases_response.raise_for_status()
+        releases_data = releases_response.json()
+
+        active_release = None
+        for item in releases_data.get('items', []):
+            if item.get('kind') != 'guarded':
+                continue
+            if item.get('status') in _ACTIVE_AUTOMATED_RELEASE_STATUSES:
+                active_release = item
+                break
+
+        is_active = active_release is not None
         baseline_variation = None
-        
-        # Check 1: Look for guarded rollout in fallthrough
-        fallthrough = env_data.get('fallthrough', {})
-        fallthrough_rollout = fallthrough.get('rollout')
-        has_experiment, baseline = get_experiment_info(fallthrough_rollout)
-        if has_experiment:
-            is_active = True
-            baseline_variation = baseline
-        
-        # Check 2: Look for guarded rollout in any targeting rules
-        if not is_active:
-            rules = env_data.get('rules', [])
-            for rule in rules:
-                rule_rollout = rule.get('rollout')
-                has_experiment, baseline = get_experiment_info(rule_rollout)
-                if has_experiment:
-                    is_active = True
-                    baseline_variation = baseline
-                    break
-        
-        # Store the baseline variation for this session
+
+        # 2) If a guarded release is active, resolve its originalVariationId (a UUID)
+        #    back to a variation index by reading the flag's variations list, since
+        #    the downstream simulation compares against SDK variation_index integers.
         if is_active:
+            original_variation_id = active_release.get('originalVariationId')
+
+            flag_url = f'https://app.launchdarkly.com/api/v2/flags/{config.project_key}/{config.flag_key}'
+            flag_response = requests.get(flag_url, headers=headers)
+            flag_response.raise_for_status()
+            flag_data = flag_response.json()
+
+            baseline_variation = _variation_id_to_index(flag_data, original_variation_id)
+
             if baseline_variation is not None:
                 active_clients[session_id]["baseline_variation"] = baseline_variation
                 await send_log_to_clients(session_id, f"Experiment baseline variation index: {baseline_variation}")
             else:
-                error_msg = "Error: Guarded rollout active but baseline variation not found"
+                error_msg = (
+                    f"Error: Guarded rollout active but could not map originalVariationId "
+                    f"{original_variation_id!r} to a variation index"
+                )
                 status.last_error = error_msg
                 await send_log_to_clients(session_id, error_msg)
-                # Clear any stale baseline
                 active_clients[session_id]["baseline_variation"] = None
-        
+
         # Check if the rollout status changed from active to inactive
         if status.guarded_rollout_active and not is_active and status.running:
-            # The rollout just became inactive, but the simulation is still running
             status.end_time = time.time()
             await send_log_to_clients(session_id, "Guarded rollout became inactive - recording end time")
-        
-        # Update the status
+
         status.guarded_rollout_active = is_active
         status_msg = f"Guarded Rollout is active in {env_key}" if is_active else f"Guarded Rollout is not active in {env_key}"
         await send_log_to_clients(session_id, status_msg)
         return is_active
-    
+
     except requests.RequestException as e:
         error_msg = f"API request error: {str(e)}"
         status.last_error = error_msg

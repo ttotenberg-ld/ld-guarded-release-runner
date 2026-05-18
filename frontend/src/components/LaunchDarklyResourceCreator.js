@@ -83,7 +83,7 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
     errorMetric: { status: 'pending', message: '' },
     latencyMetric: { status: 'pending', message: '' },
     businessMetric: { status: 'pending', message: '' },
-    metricAttachment: { status: 'pending', message: '' }
+    releasePolicy: { status: 'pending', message: '' }
   });
 
   // Helper function to generate the LaunchDarkly flag URL
@@ -162,7 +162,7 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
       errorMetric: { status: 'pending', message: '' },
       latencyMetric: { status: 'pending', message: '' },
       businessMetric: { status: 'pending', message: '' },
-      metricAttachment: { status: 'pending', message: '' }
+      releasePolicy: { status: 'pending', message: '' }
     });
   };
 
@@ -241,9 +241,9 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
           message: !processedConfig.business_metric_enabled ? 'Metric disabled' :
                    result.metrics.business?.error || 'Business metric created successfully!'
         },
-        metricAttachment: {
-          status: getMetricAttachmentStatus(processedConfig, result.metricAttachment),
-          message: getMetricAttachmentMessage(processedConfig, result.metricAttachment)
+        releasePolicy: {
+          status: getReleasePolicyStatus(processedConfig, result.releasePolicy),
+          message: getReleasePolicyMessage(processedConfig, result.releasePolicy)
         }
       };
       
@@ -284,107 +284,43 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
     }
   };
 
-  // Helper to format the metrics that will be attached
-  const getMetricKeysString = (values) => {
-    const metrics = [];
-    if (values.error_metric_enabled && values.error_metric_1) metrics.push(`"${values.error_metric_1}"`);
-    if (values.latency_metric_enabled && values.latency_metric_1) metrics.push(`"${values.latency_metric_1}"`);
-    if (values.business_metric_enabled && values.business_metric_1) metrics.push(`"${values.business_metric_1}"`);
-    
-    if (metrics.length === 0) return 'No metrics';
-    if (metrics.length === 1) return metrics[0];
-    if (metrics.length === 2) return `${metrics[0]} and ${metrics[1]}`;
-    return `${metrics.slice(0, -1).join(', ')}, and ${metrics[metrics.length - 1]}`;
-  };
-
-  // Add a helper function above handleCreate
-  const getMetricAttachmentMessage = (config, attachResult) => {
-    // No metrics enabled
+  const getReleasePolicyMessage = (config, policyResult) => {
     if (!config.error_metric_enabled && !config.latency_metric_enabled && !config.business_metric_enabled) {
-      return 'No metrics to attach';
+      return 'No metrics enabled — release policy skipped';
     }
-    
-    // No response at all
-    if (!attachResult) {
-      return 'Error: No response from attachment process';
+
+    if (!policyResult) {
+      return 'Error: No response from release policy creation';
     }
-    
-    // Success cases
-    if (attachResult.success) {
-      if (attachResult.message) {
-        return attachResult.message;
-      }
-      if (attachResult.metricKeys && attachResult.metricKeys.length > 0) {
-        return `Attached ${attachResult.metricKeys.length} metrics to flag: ${attachResult.metricKeys.join(', ')}`;
-      }
-      return 'Metrics attached to flag successfully!';
+
+    if (policyResult.success) {
+      return policyResult.message || 'Release policy created successfully!';
     }
-    
-    // Error with success status code (sometimes happens with 200 responses)
-    if (attachResult.error && (
-      attachResult.status_code === 200 || 
-      (attachResult.raw_response && attachResult.raw_response.status_code === 200) ||
-      attachResult.error.includes('200')
-    )) {
-      return 'Metrics successfully attached (or already attached) to flag';
+
+    if (policyResult.error) {
+      return policyResult.error;
     }
-    
-    // Resource already exists error (409)
-    if (attachResult.error && (
-      attachResult.status_code === 409 || 
-      attachResult.error.includes('409') ||
-      attachResult.error.includes('already exists')
-    )) {
-      return 'Metrics are already attached to this flag';
-    }
-    
-    // General error case
-    if (attachResult.error) {
-      return attachResult.error;
-    }
-    
-    // Fallback
-    return 'Processing attachment request...';
+
+    return 'Processing release policy request...';
   };
 
-  // Add the new helper function for determining metric attachment status
-  const getMetricAttachmentStatus = (config, attachResult) => {
-    // No metrics enabled
+  const getReleasePolicyStatus = (config, policyResult) => {
     if (!config.error_metric_enabled && !config.latency_metric_enabled && !config.business_metric_enabled) {
       return 'disabled';
     }
-    
-    // No response at all
-    if (!attachResult) {
+
+    if (!policyResult) {
       return 'pending';
     }
-    
-    // Success is explicitly set
-    if (attachResult.success) {
+
+    if (policyResult.success) {
       return 'success';
     }
-    
-    // Error with success code (200)
-    if (attachResult.raw_response && attachResult.raw_response.status_code === 200) {
-      return 'success';
-    }
-    
-    if (attachResult.status_code === 200) {
-      return 'success';
-    }
-    
-    // Conflict/already exists (409)
-    if (attachResult.status_code === 409 || 
-       (attachResult.error && attachResult.error.includes('409'))) {
-      return 'success';
-    }
-    
-    // Genuine error
-    if (attachResult.error && !attachResult.success) {
+
+    if (policyResult.error) {
       return 'error';
     }
-    
-    // Default fallback
+
     return 'pending';
   };
 
@@ -503,32 +439,6 @@ const LaunchDarklyResourceCreator = ({ disabled }) => {
               />
             </ListItem>
             
-            <Divider component="li" />
-            
-            {/* <ListItem>
-              <ListItemIcon>
-                {getStatusIcon(resourceStatuses.metricAttachment.status)}
-              </ListItemIcon>
-              <ListItemText 
-                primary={
-                  <Box display="flex" alignItems="center">
-                    <Typography fontWeight="bold" mr={1}>Attach Metrics to Flag:</Typography>
-                    <Typography color="info.main" fontFamily="monospace">
-                      {(configValues.error_metric_enabled || configValues.latency_metric_enabled || configValues.business_metric_enabled) 
-                        ? `${getMetricKeysString(configValues)} will be attached for measured rollout`
-                        : 'No metrics to attach'}
-                    </Typography>
-                  </Box>
-                }
-                secondary={
-                  resourceStatuses.metricAttachment.status === 'loading' 
-                    ? 'Attaching metrics to flag...' 
-                    : resourceStatuses.metricAttachment.status === 'pending' 
-                      ? 'Waiting to attach metrics...' 
-                      : resourceStatuses.metricAttachment.message
-                } 
-              />
-            </ListItem> */}
           </List>
           
           {error && (

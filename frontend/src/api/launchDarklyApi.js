@@ -1,6 +1,10 @@
 import axios from 'axios';
 import { getSessionId } from './simulationApi';
 
+// Tag used to link the auto-created flag to the auto-created release policy
+const RELEASE_POLICY_TAG = 'guarded-release-runner';
+const RELEASE_POLICY_KEY = 'guarded-release-runner-policy';
+
 // API base URL - dynamic based on environment
 const getApiUrl = () => {
   // If running on Railway, use the correct public backend URL
@@ -251,7 +255,7 @@ const createLaunchDarklyResources = async (config) => {
         latency: null,
         business: null
       },
-      metricAttachment: null
+      releasePolicy: null
     };
     
     // Create flag
@@ -284,12 +288,14 @@ const createLaunchDarklyResources = async (config) => {
       metricKeys.push(config.business_metric_1);
     }
     
-    // Attach metrics to flag if we have metrics to attach
-    if (metricKeys.length > 0 && (!flagResponse.error || flagResponse.status_code === 409)) {
-      console.log('Attaching metrics to flag with keys:', metricKeys);
-      results.metricAttachment = await attachMetricsToFlag(config, metricKeys);
+    // Create a release policy scoped to flags carrying RELEASE_POLICY_TAG.
+    // The auto-created flag is tagged with RELEASE_POLICY_TAG (see createFlag),
+    // so the policy applies automatically.
+    if (metricKeys.length > 0) {
+      console.log('Creating release policy with metric keys:', metricKeys);
+      results.releasePolicy = await createReleasePolicy(config, metricKeys);
     } else {
-      console.log('Skipping metric attachment: no metrics to attach or flag creation failed');
+      console.log('Skipping release policy creation: no metrics enabled');
     }
     
     return results;
@@ -303,7 +309,7 @@ const createLaunchDarklyResources = async (config) => {
 export { createLaunchDarklyResources };
 
 // Export the utility function for other components that might need it
-export { createFlag, createErrorMetric, createLatencyMetric, createBusinessMetric, attachMetricsToFlag, getEnvironmentKey, updateEnvironmentKey };
+export { createFlag, createErrorMetric, createLatencyMetric, createBusinessMetric, createReleasePolicy, getEnvironmentKey, updateEnvironmentKey };
 
 /**
  * Creates a boolean flag in LaunchDarkly
@@ -332,7 +338,7 @@ const createFlag = async (config) => {
       }
     ],
     temporary: false,
-    tags: ['guarded-release-runner'],
+    tags: [RELEASE_POLICY_TAG],
     defaults: {
       onVariation: 0,
       offVariation: 1
@@ -431,71 +437,57 @@ const createBusinessMetric = async (config) => {
 };
 
 /**
- * Attaches metrics to the flag for measured rollout
+ * Creates a guarded-release release policy scoped to flags tagged with RELEASE_POLICY_TAG.
+ * The auto-created flag carries that tag, so the policy applies to it automatically.
  * @param {Object} config - The configuration object
- * @param {Array<string>} metricKeys - The metric keys to attach
+ * @param {Array<string>} metricKeys - The metric keys to put on the guarded-release config
  * @returns {Promise<Object>} - The API response
  */
-const attachMetricsToFlag = async (config, metricKeys) => {
-  const { api_key, project_key, flag_key } = config;
-  
-  const url = `https://app.launchdarkly.com/api/v2/projects/${project_key}/flags/${flag_key}/measured-rollout-configuration`;
-  
+const createReleasePolicy = async (config, metricKeys) => {
+  const { api_key, project_key } = config;
+
+  const url = `https://app.launchdarkly.com/api/v2/projects/${project_key}/release-policies`;
+
   const payload = {
-    metricKeys: metricKeys
+    key: RELEASE_POLICY_KEY,
+    name: 'Guarded Release Runner Policy',
+    releaseMethod: 'guarded-release',
+    scope: {
+      flagTagKeys: [RELEASE_POLICY_TAG]
+    },
+    guardedReleaseConfig: {
+      metricKeys,
+      rolloutContextKindKey: 'user'
+    }
   };
-  
-  // Use makeProxyRequest with special beta API header
-  const response = await makeProxyRequest(url, 'put', payload, api_key, {
+
+  const response = await makeProxyRequest(url, 'post', payload, api_key, {
     'LD-API-Version': 'beta'
   });
-  
-  // Add explicit check for 200 status code in raw_response
-  if (response && response.raw_response && response.raw_response.status_code === 200) {
+
+  // 201 Created
+  if (response && !response.error) {
     return {
       success: true,
-      message: 'Metrics successfully attached to flag',
+      message: 'Release policy created successfully!',
       metricKeys,
-      data: response.raw_response.data
-    };
-  }
-  
-  // Handle the various responses:
-  
-  // 1. Successful attachment (200 OK)
-  if (response && !response.error) {
-    return { 
-      success: true,
-      message: 'Metrics attached to flag successfully!',
-      metricKeys: metricKeys,
       data: response
     };
   }
-  
-  // 2. Resource already exists cases (409 or 200 in error)
-  if (response && response.status_code === 409) {
-    return {
-      success: true,
-      message: 'Metrics are already attached to this flag',
-      metricKeys: metricKeys,
-      data: response.data
-    };
-  }
-  
-  // 3. We sometimes get 200 returned as an "error" due to how the proxy reports success
-  if (response && response.error && (
-    response.error.includes('200') || 
-    response.status_code === 200 ||
-    (response.raw_response && response.raw_response.status_code === 200)
+
+  // 409 Conflict — policy already exists. Treat as success for this educational flow;
+  // customers can edit the policy from the LaunchDarkly console if metrics changed.
+  if (response && (
+    response.status_code === 409 ||
+    (response.error && response.error.includes('409'))
   )) {
     return {
       success: true,
-      message: 'Metrics successfully attached (or already attached) to flag',
-      metricKeys: metricKeys,
-      data: response.data || response.raw_response?.data
+      message: 'Release policy already exists',
+      metricKeys,
+      data: response.data
     };
   }
-  
-  // 4. Something else went wrong, return the error
+
   return response;
-}; 
+};
